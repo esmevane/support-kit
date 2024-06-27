@@ -47,12 +47,12 @@ fn main() -> Result<()> {
     prost_build.out_dir("protocol/output");
 
     prost_build.type_attribute(
-        "protocol.services.HealthCheck",
+        "protocol.services.HealthRequest",
         "#[derive(serde::Serialize, serde::Deserialize)]",
     );
 
     prost_build.type_attribute(
-        "protocol.services.HealthCheckResponse",
+        "protocol.services.HealthResponse",
         "#[derive(serde::Serialize, serde::Deserialize)]",
     );
 

@@ -2,10 +2,13 @@ syntax = "proto3";
 
 package protocol.services;
 
-message HealthCheckResponse {
+message HealthRequest {}
+
+message HealthResponse {
   string version = 1;
+  string commit = 2;
 }
 
 service WebService {
-  rpc Health() returns (HealthCheckResponse) {}
+  rpc Health(HealthRequest) returns (HealthResponse) {}
 }
