@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package protocol.services;
+import "google/protobuf/empty.proto";
 
-message HealthRequest {}
+package protocol.services;
 
 message HealthResponse {
   string version = 1;
@@ -10,5 +10,5 @@ message HealthResponse {
 }
 
 service WebService {
-  rpc Health(HealthRequest) returns (HealthResponse) {}
+  rpc Health(google.protobuf.Empty) returns (HealthResponse) {}
 }

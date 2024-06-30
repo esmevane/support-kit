@@ -29,10 +29,17 @@ impl prost_build::ServiceGenerator for ServiceTraitGenerator {
         // Generate the service methods.
         for method in service.methods {
             method.comments.append_with_indent(1, buf);
-            buf.push_str(&format!(
-                "    fn {}(_: {}) -> {};\n",
-                method.name, method.input_type, method.output_type
-            ));
+            if &method.input_type == "()" {
+                buf.push_str(&format!(
+                    "    fn {}() -> {};\n",
+                    method.name, method.output_type
+                ));
+            } else {
+                buf.push_str(&format!(
+                    "    fn {}(input: {}) -> {};\n",
+                    method.name, method.input_type, method.output_type
+                ));
+            }
         }
 
         // Close out the trait.
