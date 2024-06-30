@@ -74,7 +74,7 @@ impl WebDashboardAction {
 enum WebDashboardCommand {
     Check,
     // Clean,
-    // Install,
+    Install,
     // Build,
 }
 
@@ -140,8 +140,8 @@ fn check_dashboard() {
     match (pnpm_version, node_version) {
         (Ok(pnpm_version), Ok(node_version)) => {
             tracing::info!(
-                pnpm = format!("pnpm: {pnpm_version}"),
-                node = format!("node: {node_version}"),
+                pnpm = format!("pnpm: {pnpm_version:?}"),
+                node = format!("node: {node_version:?}"),
             );
         }
         (Err(pnpm_version), Ok(node_version)) => {
@@ -166,6 +166,17 @@ fn check_dashboard() {
             );
         }
     }
+}
+
+fn install_dashboard() {
+    cmd!(
+        "pnpm",
+        "install",
+        "--prefix",
+        "../service-kit-core/dashboard"
+    )
+    .run()
+    .expect("Failed to install dashboard dependencies");
 }
 
 fn main() {
