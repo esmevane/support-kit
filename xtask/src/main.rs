@@ -7,16 +7,49 @@ struct Cli {
     command: Command,
 }
 
+impl Cli {
+    fn run(&self) {
+        self.command.run();
+    }
+}
+
 #[derive(Debug, Parser)]
 #[clap(rename_all = "kebab-case")]
 enum Command {
-    WebBuild,
+    Web(WebAction),
 }
 
 impl Command {
     fn run(&self) {
         match self {
-            Command::WebBuild => {
+            Command::Web(web_action) => web_action.run(),
+        }
+    }
+}
+
+#[derive(Debug, Parser)]
+#[clap(rename_all = "kebab-case")]
+struct WebAction {
+    #[clap(subcommand)]
+    command: WebActionCommand,
+}
+
+impl WebAction {
+    fn run(&self) {
+        self.command.run();
+    }
+}
+
+#[derive(Debug, Parser)]
+#[clap(rename_all = "kebab-case")]
+enum WebActionCommand {
+    Build,
+}
+
+impl WebActionCommand {
+    fn run(&self) {
+        match self {
+            Self::Build => {
                 cmd!(
                     "wasm-pack",
                     "build",
@@ -34,5 +67,5 @@ impl Command {
 }
 
 fn main() {
-    Cli::parse().command.run();
+    Cli::parse().run();
 }
