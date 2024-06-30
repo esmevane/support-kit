@@ -83,7 +83,7 @@ impl WebDashboardCommand {
         match self {
             Self::Check => check_dashboard(),
             // Self::Clean => clean_dashboard(),
-            // Self::Install => install_dashboard(),
+            Self::Install => install_dashboard(),
             // Self::Build => build_dashboard(),
         }
     }
@@ -140,8 +140,8 @@ fn check_dashboard() {
     match (pnpm_version, node_version) {
         (Ok(pnpm_version), Ok(node_version)) => {
             tracing::info!(
-                pnpm = ?pnpm_version,
-                node = ?node_version
+                pnpm = format!("pnpm: {pnpm_version}"),
+                node = format!("node: {node_version}"),
             );
         }
         (Err(pnpm_version), Ok(node_version)) => {
