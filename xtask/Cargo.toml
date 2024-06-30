@@ -18,3 +18,4 @@ dist = false
 clap = { workspace = true }
 dirs = { workspace = true }
 duct = { workspace = true }
+tracing = { workspace = true }
