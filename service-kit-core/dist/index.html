@@ -14,10 +14,15 @@ Check out the <code data-astro-cid-j7pv25f6>Health</code> component to see the W
   async function run() {
     await init();
 
+    const url = new URL(window.location.origin);
+
+    url.port = window.location.port;
+    url.pathname = "/api";
+
     result.classList.add("pending");
     result.innerText = "Checking health...";
     try {
-      const response = await health("localhost:8080");
+      const response = await health(url.toString());
       result.innerHTML = `<pre>${JSON.stringify(response, null, 2)}</pre>`;
     } catch (error) {
       result.innerHTML = `<strong>Error:</strong> ${error}`;

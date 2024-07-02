@@ -15,6 +15,13 @@ pub fn clean() {
         .expect("Failed to clean dashboard");
 }
 
+/// Start the dashboard in development mode
+pub fn dev() {
+    duct::cmd!("pnpm", "run", "--recursive", "dev")
+        .run()
+        .expect("Failed to start dashboard in dev mode");
+}
+
 /// Install dashboard & general workspace dependencies
 pub fn install() {
     duct::cmd!("pnpm", "i",)

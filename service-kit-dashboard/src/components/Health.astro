@@ -37,12 +37,18 @@
   async function run() {
     await init();
 
-    result.classList.add("pending");
+    const url = new URL(window.location.origin);
+
+    url.port = window.location.port;
+    url.pathname = "/api";
+
     result.innerText = "Checking health...";
     try {
-      const response = await health("localhost:8080");
+      const response = await health(url.toString());
       result.innerHTML = `<pre>${JSON.stringify(response, null, 2)}</pre>`;
     } catch (error) {
+      debugger;
+      console.error(error);
       result.innerHTML = `<strong>Error:</strong> ${error}`;
     }
   }

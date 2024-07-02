@@ -18,6 +18,8 @@ enum WebDashboardCommand {
     Preflight,
     /// Clears the dashboard dependencies
     Clean,
+    /// Runs the dashboard in development mode
+    Dev,
     /// Installs the dashboard dependencies after checking the preflight
     Install,
     /// Runs an install, builds the web client, builds the dashboard, then
@@ -30,6 +32,12 @@ impl crate::runnable::Runnable for WebDashboardCommand {
         match self {
             Self::Preflight => crate::tasks::web::dashboard::preflight.run(),
             Self::Clean => crate::tasks::web::dashboard::clean.run(),
+            Self::Dev => [
+                crate::tasks::web::dashboard::preflight,
+                crate::tasks::web::dashboard::install,
+                crate::tasks::web::dashboard::dev,
+            ]
+            .run(),
             Self::Install => [
                 crate::tasks::web::dashboard::preflight,
                 crate::tasks::web::dashboard::install,
