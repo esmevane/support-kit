@@ -5,6 +5,14 @@ pub struct WebDashboard {
     command: WebDashboardCommand,
 }
 
+impl WebDashboard {
+    pub fn dev() -> Self {
+        Self {
+            command: WebDashboardCommand::Dev,
+        }
+    }
+}
+
 impl crate::runnable::Runnable for WebDashboard {
     fn run(&self) {
         self.command.run();
