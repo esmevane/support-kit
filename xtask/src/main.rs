@@ -22,7 +22,7 @@ enum Command {
 impl Command {
     fn run(&self) {
         match self {
-            Command::Web(web_action) => web_action.run(),
+            Command::Web(command) => command.run(),
         }
     }
 }
@@ -43,14 +43,14 @@ impl Web {
 #[derive(Debug, Parser)]
 #[clap(rename_all = "kebab-case")]
 enum WebCommand {
-    Crate(WebCrateAction),
-    Dashboard(WebDashboardAction),
+    Client(WebClient),
+    Dashboard(WebDashboard),
 }
 
 impl WebCommand {
     fn run(&self) {
         match self {
-            Self::Crate(action) => action.run(),
+            Self::Client(action) => action.run(),
             Self::Dashboard(action) => action.run(),
         }
     }
@@ -58,12 +58,12 @@ impl WebCommand {
 
 #[derive(Debug, Parser)]
 #[clap(rename_all = "kebab-case")]
-struct WebDashboardAction {
+struct WebDashboard {
     #[clap(subcommand)]
     command: WebDashboardCommand,
 }
 
-impl WebDashboardAction {
+impl WebDashboard {
     fn run(&self) {
         self.command.run();
     }
@@ -72,31 +72,31 @@ impl WebDashboardAction {
 #[derive(Debug, Parser)]
 #[clap(rename_all = "kebab-case")]
 enum WebDashboardCommand {
-    Check,
-    // Clean,
+    Preflight,
+    Clean,
     Install,
-    // Build,
+    Build,
 }
 
 impl WebDashboardCommand {
     fn run(&self) {
         match self {
-            Self::Check => check_dashboard(),
-            // Self::Clean => clean_dashboard(),
+            Self::Preflight => dashboard_preflight_check(),
+            Self::Clean => clean_dashboard(),
             Self::Install => install_dashboard(),
-            // Self::Build => build_dashboard(),
+            Self::Build => build_dashboard(),
         }
     }
 }
 
 #[derive(Debug, Parser)]
 #[clap(rename_all = "kebab-case")]
-struct WebCrateAction {
+struct WebClient {
     #[clap(subcommand)]
     command: WebCrateCommand,
 }
 
-impl WebCrateAction {
+impl WebClient {
     fn run(&self) {
         self.command.run();
     }
@@ -123,7 +123,7 @@ fn build_web_crate() {
         "--target",
         "web",
         "--out-dir",
-        "../service-kit-core/dist/wasm",
+        "../service-kit-dashboard/public/wasm",
         "service-kit-web"
     )
     .run()
@@ -133,7 +133,7 @@ fn build_web_crate() {
 /// Check that the dependencies for the dashboard are ready:
 ///  - pnpm
 ///  - node
-fn check_dashboard() {
+fn dashboard_preflight_check() {
     let pnpm_version = cmd!("pnpm", "--version").run();
     let node_version = cmd!("node", "--version").run();
 
@@ -168,15 +168,33 @@ fn check_dashboard() {
     }
 }
 
+fn clean_dashboard() {
+    cmd!("rm", "-rf", "node_modules")
+        .run()
+        .expect("Failed to clean dashboard");
+}
+
 fn install_dashboard() {
+    dashboard_preflight_check();
+    cmd!("pnpm", "i",)
+        .run()
+        .expect("Failed to install dashboard dependencies");
+}
+
+fn build_dashboard() {
+    install_dashboard();
+    build_web_crate();
+    cmd!("pnpm", "run", "--recursive", "build")
+        .run()
+        .expect("Failed to build dashboard");
     cmd!(
-        "pnpm",
-        "install",
-        "--prefix",
-        "../service-kit-core/dashboard"
+        "cp",
+        "-r",
+        "service-kit-dashboard/dist/",
+        "service-kit-core/dist/"
     )
     .run()
-    .expect("Failed to install dashboard dependencies");
+    .expect("Failed to copy dashboard to core");
 }
 
 fn main() {
