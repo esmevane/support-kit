@@ -34,11 +34,13 @@ impl ServerMode {
     }
 
     pub async fn exec(&self, config: crate::WebContext) -> crate::Result<()> {
-        Ok(match self {
+        match self {
             ServerMode::Full => crate::server::init(config).await?,
             ServerMode::Web => crate::server::web::init(config).await?,
             ServerMode::Api => crate::server::api::init(config).await?,
-        })
+        };
+
+        Ok(())
     }
 
     pub fn select() -> crate::Result<Self> {

@@ -11,8 +11,8 @@ pub enum Environment {
     Production,
 }
 
-impl Into<ValueKind> for Environment {
-    fn into(self) -> ValueKind {
-        self.to_string().into()
+impl From<Environment> for ValueKind {
+    fn from(val: Environment) -> Self {
+        val.to_string().into()
     }
 }

@@ -12,6 +12,12 @@ pub async fn health(config: NetworkSettings) -> crate::Result<HealthResponse> {
 
 pub struct WebClient;
 
+impl Default for WebClient {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl WebClient {
     pub fn new() -> Self {
         Self

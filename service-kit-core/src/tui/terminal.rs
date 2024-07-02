@@ -81,10 +81,9 @@ impl Terminal {
 
                 tokio::select! {
                   maybe_event = crossterm_event => {
-                    maybe_event
-                      .map(|event| event.wrap_err("failed to get terminal event"))
-                      .and_then(TerminalEvent::from_crossterm_event)
-                      .map(|event| tx.send(event).unwrap());
+                    if let Some(event) = maybe_event
+                        .map(|event| event.wrap_err("failed to get terminal event"))
+                        .and_then(TerminalEvent::from_crossterm_event) { tx.send(event).unwrap() }
                   },
                   _ = tick_delay => {
                       tx.send(TerminalEvent::Tick).unwrap();

@@ -9,13 +9,13 @@ impl StoragePath {
         StoragePath::from(path)
     }
 
-    fn into_inner(&self) -> PathBuf {
+    fn get_path_buffer(&self) -> PathBuf {
         self.0.clone()
     }
 
     pub fn expect_absolute(&self) -> crate::Result<()> {
         if !self.0.is_absolute() {
-            return Err(StorageError::BadPath(self.into_inner()))?;
+            return Err(StorageError::BadPath(self.get_path_buffer()))?;
         }
 
         Ok(())

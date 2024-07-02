@@ -26,9 +26,8 @@ impl App {
 
     /// Update a running application
     pub fn update(&mut self, action: Action) -> Option<Action> {
-        match action {
-            Action::Quit => self.quit(),
-            _ => {}
+        if action == Action::Quit {
+            self.quit()
         }
 
         // loop through all components and update them with the action context
@@ -36,7 +35,7 @@ impl App {
             let next_action = component.update(ActionContext {
                 action_tx: self.action_tx.clone(),
                 config: crate::tui::config::Config::default(),
-                action: action.clone(),
+                action,
             });
 
             if let Ok(Some(action)) = next_action {
