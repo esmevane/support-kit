@@ -2,7 +2,7 @@
 pub struct WebContext {
     pub settings: crate::settings::Settings,
     pub network: crate::settings::NetworkSettings,
-    pub storage: crate::storage::StorageCollection,
+    pub storage: service_kit_support::storage::StorageCollection,
 }
 
 impl WebContext {
@@ -12,7 +12,10 @@ impl WebContext {
     ) -> crate::Result<Self> {
         Ok(Self {
             network,
-            storage: crate::storage::StorageCollection::file_index(settings.storage_path()).await?,
+            storage: service_kit_support::storage::StorageCollection::file_index(
+                settings.storage_path(),
+            )
+            .await?,
             settings,
         })
     }

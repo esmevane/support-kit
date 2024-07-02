@@ -2641,6 +2641,7 @@ dependencies = [
  "serde",
  "serde_json",
  "service-kit-proto",
+ "service-kit-support",
  "service-manager",
  "shadow-rs",
  "sqlx",
@@ -2663,6 +2664,21 @@ dependencies = [
  "prost-build",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "service-kit-support"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "chrono",
+ "mime_guess",
+ "rust-embed",
+ "sqlx",
+ "tempfile",
+ "thiserror",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]

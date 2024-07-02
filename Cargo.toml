@@ -4,6 +4,7 @@ members = [
   "service-kit",
   "service-kit-core",
   "service-kit-proto",
+  "service-kit-support",
   "service-kit-web",
   "xtask",
 ]
@@ -15,6 +16,7 @@ service-kit = { version = "0.1.0", path = "./service-kit" }
 service-kit-core = { version = "0.1.0", path = "./service-kit-core" }
 service-kit-proto = { version = "0.1.0", path = "./service-kit-proto" }
 service-kit-web = { version = "0.1.0", path = "./service-kit-web" }
+service-kit-support = { version = "0.1.0", path = "./service-kit-support" }
 axum = { version = "0.7.5", features = ["ws", "tracing", "tokio"] }
 axum-extra = { version = "0.9", features = ["typed-header"] }
 chrono = { version = "0.4.33", features = ["serde"] }

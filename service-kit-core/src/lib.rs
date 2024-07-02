@@ -7,7 +7,6 @@ mod errors;
 mod server;
 mod service;
 mod settings;
-mod storage;
 mod telemetry;
 mod tui;
 

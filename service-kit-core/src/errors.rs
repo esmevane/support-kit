@@ -10,8 +10,6 @@ pub enum Error {
     SqlxError(#[from] sqlx::Error),
     #[error("Serialization error: {0}")]
     SerializationError(#[from] serde_json::Error),
-    #[error("Storage error: {0}")]
-    StorageError(#[from] crate::storage::StorageError),
     #[error("Storage not configured, unable to initialize storage collection")]
     StorageNotConfiguredError,
     #[error("IO error: {0}")]
@@ -28,4 +26,7 @@ pub enum Error {
 
     #[error("Unable to parse selected option: {0}")]
     CliOptionSelectError(#[from] strum::ParseError),
+
+    #[error("Support error: {0}")]
+    SupportError(#[from] service_kit_support::errors::Error),
 }

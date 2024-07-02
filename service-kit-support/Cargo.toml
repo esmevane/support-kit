@@ -1,0 +1,17 @@
+[package]
+name = "service-kit-support"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tracing = { workspace = true }
+axum = { workspace = true }
+mime_guess = { workspace = true }
+rust-embed = { workspace = true }
+sqlx = { workspace = true }
+tokio = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
