@@ -1,5 +1,68 @@
 use clap::Parser;
 use duct::cmd;
+use runnable::Runnable;
+
+mod runnable {
+
+    pub trait Runnable {
+        fn run(&self);
+    }
+
+    impl<T> Runnable for T
+    where
+        T: Fn(),
+    {
+        fn run(&self) {
+            self();
+        }
+    }
+
+    impl<T> Runnable for Option<T>
+    where
+        T: Runnable,
+    {
+        fn run(&self) {
+            if let Some(runnable) = self {
+                runnable.run();
+            }
+        }
+    }
+
+    impl<T, E> Runnable for Result<T, E>
+    where
+        T: Runnable,
+        E: std::error::Error,
+    {
+        fn run(&self) {
+            match self {
+                Ok(runnable) => runnable.run(),
+                Err(error) => panic!("{}", error),
+            }
+        }
+    }
+
+    impl<T> Runnable for [T]
+    where
+        T: Runnable,
+    {
+        fn run(&self) {
+            for runnable in self {
+                runnable.run();
+            }
+        }
+    }
+
+    impl<T> Runnable for Vec<T>
+    where
+        T: Runnable,
+    {
+        fn run(&self) {
+            for runnable in self {
+                runnable.run();
+            }
+        }
+    }
+}
 
 #[derive(Debug, Parser)]
 struct Cli {
@@ -7,7 +70,7 @@ struct Cli {
     command: Command,
 }
 
-impl Cli {
+impl runnable::Runnable for Cli {
     fn run(&self) {
         self.command.run();
     }
@@ -19,10 +82,10 @@ enum Command {
     Web(Web),
 }
 
-impl Command {
+impl runnable::Runnable for Command {
     fn run(&self) {
         match self {
-            Command::Web(command) => command.run(),
+            Self::Web(command) => command.run(),
         }
     }
 }
@@ -34,7 +97,7 @@ struct Web {
     command: WebCommand,
 }
 
-impl Web {
+impl runnable::Runnable for Web {
     fn run(&self) {
         self.command.run();
     }
@@ -47,7 +110,7 @@ enum WebCommand {
     Dashboard(WebDashboard),
 }
 
-impl WebCommand {
+impl runnable::Runnable for WebCommand {
     fn run(&self) {
         match self {
             Self::Client(action) => action.run(),
@@ -63,7 +126,7 @@ struct WebDashboard {
     command: WebDashboardCommand,
 }
 
-impl WebDashboard {
+impl runnable::Runnable for WebDashboard {
     fn run(&self) {
         self.command.run();
     }
@@ -72,19 +135,30 @@ impl WebDashboard {
 #[derive(Debug, Parser)]
 #[clap(rename_all = "kebab-case")]
 enum WebDashboardCommand {
+    /// Check that the dependencies for the dashboard are ready
     Preflight,
+    /// Clears the dashboard dependencies
     Clean,
+    /// Installs the dashboard dependencies after checking the preflight
     Install,
+    /// Runs an install, builds the web client, builds the dashboard, then
+    /// copies the dashboard to the core
     Build,
 }
 
-impl WebDashboardCommand {
+impl runnable::Runnable for WebDashboardCommand {
     fn run(&self) {
         match self {
-            Self::Preflight => dashboard_preflight_check(),
-            Self::Clean => clean_dashboard(),
-            Self::Install => install_dashboard(),
-            Self::Build => build_dashboard(),
+            Self::Preflight => dashboard_preflight_check.run(),
+            Self::Clean => clean_dashboard.run(),
+            Self::Install => [dashboard_preflight_check, install_dashboard].run(),
+            Self::Build => [
+                dashboard_preflight_check,
+                install_dashboard,
+                build_web_crate,
+                build_dashboard,
+            ]
+            .run(),
         }
     }
 }
@@ -93,10 +167,10 @@ impl WebDashboardCommand {
 #[clap(rename_all = "kebab-case")]
 struct WebClient {
     #[clap(subcommand)]
-    command: WebCrateCommand,
+    command: WebClientCommand,
 }
 
-impl WebClient {
+impl runnable::Runnable for WebClient {
     fn run(&self) {
         self.command.run();
     }
@@ -104,11 +178,11 @@ impl WebClient {
 
 #[derive(Debug, Parser)]
 #[clap(rename_all = "kebab-case")]
-enum WebCrateCommand {
+enum WebClientCommand {
     Build,
 }
 
-impl WebCrateCommand {
+impl runnable::Runnable for WebClientCommand {
     fn run(&self) {
         match self {
             Self::Build => build_web_crate(),
@@ -134,38 +208,12 @@ fn build_web_crate() {
 ///  - pnpm
 ///  - node
 fn dashboard_preflight_check() {
-    let pnpm_version = cmd!("pnpm", "--version").run();
-    let node_version = cmd!("node", "--version").run();
-
-    match (pnpm_version, node_version) {
-        (Ok(pnpm_version), Ok(node_version)) => {
-            tracing::info!(
-                pnpm = format!("pnpm: {pnpm_version:?}"),
-                node = format!("node: {node_version:?}"),
-            );
-        }
-        (Err(pnpm_version), Ok(node_version)) => {
-            tracing::error!(
-                node = ?node_version,
-                pnpm = format!("pnpm not found: {pnpm_version}, install with `npm install -g pnpm`"),
-            );
-        }
-        (Ok(pnpm_version), Err(node_version)) => {
-            tracing::error!(
-                pnpm = ?pnpm_version,
-                node = format!("node not found: {node_version}, install directions on https://nodejs.org/en/"),
-            );
-        }
-        (Err(pnpm_version), Err(node_version)) => {
-            tracing::error!(
-                pnpm =
-                    format!("pnpm not found: {pnpm_version}, install with `npm install -g pnpm`"),
-                node = format!(
-                    "node not found: {node_version}, install directions on https://nodejs.org/en/"
-                ),
-            );
-        }
-    }
+    cmd!("pnpm", "--version")
+        .run()
+        .expect("Failed to find pnpm");
+    cmd!("node", "--version")
+        .run()
+        .expect("Failed to find node");
 }
 
 fn clean_dashboard() {
@@ -175,15 +223,12 @@ fn clean_dashboard() {
 }
 
 fn install_dashboard() {
-    dashboard_preflight_check();
     cmd!("pnpm", "i",)
         .run()
         .expect("Failed to install dashboard dependencies");
 }
 
 fn build_dashboard() {
-    install_dashboard();
-    build_web_crate();
     cmd!("pnpm", "run", "--recursive", "build")
         .run()
         .expect("Failed to build dashboard");
