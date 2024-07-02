@@ -1,6 +1,8 @@
 FROM rust:1.78.0-slim AS builder
 COPY . .
 ENV SQLX_OFFLINE true
+# add openssl
+RUN apt-get update && apt-get install -y libssl-dev pkg-config protobuf-compiler
 RUN cargo build -p service-kit --release --bin service-kit
 
 # FROM arm64v8/rust:1.71.1-slim AS chef
