@@ -1,7 +1,5 @@
-use duct::cmd;
-
 pub fn build() {
-    cmd!(
+    duct::cmd!(
         "wasm-pack",
         "build",
         "--target",

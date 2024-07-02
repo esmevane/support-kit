@@ -3,7 +3,7 @@ pub fn build() {
         "docker",
         "build",
         "-t",
-        "service-kit-container:latest",
+        "service-kit:latest",
         "-f",
         "infrastructure/containers/service-kit/Dockerfile",
         "."
@@ -25,7 +25,7 @@ pub fn clean() {
 }
 
 pub fn install() {
-    duct::cmd!("docker", "pull", "service-kit-container:latest")
+    duct::cmd!("docker", "pull", "service-kit:latest")
         .run()
         .expect("Failed to pull container");
 }
@@ -38,7 +38,7 @@ pub fn run() {
         "-it",
         "-p",
         "8080:8080",
-        "service-kit-container:latest",
+        "service-kit:latest",
     )
     .run()
     .expect("Failed to run container");

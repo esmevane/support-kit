@@ -1,7 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
-import Health from "../components/Health.astro";
 ---
 
 <Layout title="Dashboard index">
@@ -39,42 +38,8 @@ import Health from "../components/Health.astro";
       <span class="text-gradient">service-kit</span> dashboard, made with
       <span class="text-gradient"> Astro. </span>
     </h1>
-    <p class="instructions">
-      To get started, open the directory <code
-        >service-kit-dashboard/src/pages</code
-      > in your project.<br />
-      <strong>Code Challenge:</strong> Tweak the welcome message above.
-    </p>
-    <p>
-      Check out the <code>Health</code> component to see the WASM client in action:
-      <Health />
-    </p>
     <ul role="list" class="link-card-grid">
-      <Card
-        href="/about"
-        title="About"
-        body="An example about page to show off static page generation."
-      />
-      <Card
-        href="https://docs.astro.build/"
-        title="Documentation"
-        body="Learn how Astro works and explore the official API docs."
-      />
-      <Card
-        href="https://astro.build/integrations/"
-        title="Integrations"
-        body="Supercharge your project with new frameworks and libraries."
-      />
-      <Card
-        href="https://astro.build/themes/"
-        title="Themes"
-        body="Explore a galaxy of community-built starter themes."
-      />
-      <Card
-        href="https://astro.build/chat/"
-        title="Community"
-        body="Come say hi to our amazing Discord community. ❤️"
-      />
+      <Card href="/" title="Home" body="Back to home" />
     </ul>
   </main>
 </Layout>

@@ -1,0 +1,51 @@
+<figure class="health-check">
+  <div id="health-check-result"></div>
+  <figcaption>
+    <h5>Health Check</h5>
+  </figcaption>
+</figure>
+<style>
+  .health-check {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    border: 1px solid rgba(var(--accent-light), 25%);
+    background: linear-gradient(
+      rgba(var(--accent-dark), 66%),
+      rgba(var(--accent-dark), 33%)
+    );
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+  .health-check pre {
+    font-size: 0.8em;
+    font-weight: bold;
+    background: rgba(var(--accent-light), 12%);
+    color: rgb(var(--accent-light));
+    border-radius: 4px;
+    padding: 0.3em 0.4em;
+  }
+  .health-check strong {
+    color: rgb(var(--accent-light));
+  }
+</style>
+<script is:inline type="module">
+  import init, { health } from "./wasm/service_kit_web.js";
+
+  const result = document.getElementById("health-check-result");
+  async function run() {
+    await init();
+
+    result.classList.add("pending");
+    result.innerText = "Checking health...";
+    try {
+      const response = await health("localhost:8080");
+      result.innerHTML = `<pre>${JSON.stringify(response, null, 2)}</pre>`;
+    } catch (error) {
+      result.innerHTML = `<strong>Error:</strong> ${error}`;
+    }
+  }
+
+  run();
+</script>
