@@ -21,6 +21,8 @@ enum ContainerCommand {
     Install,
     /// Runs an install, builds the container, then copies the container to the core
     Build,
+    /// Runs the container
+    Run,
 }
 
 impl crate::runnable::Runnable for ContainerCommand {
@@ -30,6 +32,7 @@ impl crate::runnable::Runnable for ContainerCommand {
             Self::Clean => crate::tasks::container::clean(),
             Self::Install => crate::tasks::container::install(),
             Self::Build => crate::tasks::container::build(),
+            Self::Run => crate::tasks::container::run(),
         }
     }
 }

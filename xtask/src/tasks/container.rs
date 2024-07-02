@@ -25,7 +25,21 @@ pub fn clean() {
 }
 
 pub fn install() {
-    duct::cmd!("docker", "pull", "service-kit-container@latest")
+    duct::cmd!("docker", "pull", "service-kit-container:latest")
         .run()
         .expect("Failed to pull container");
+}
+
+pub fn run() {
+    duct::cmd!(
+        "docker",
+        "run",
+        "--rm",
+        "-it",
+        "-p",
+        "8080:8080",
+        "service-kit-container:latest",
+    )
+    .run()
+    .expect("Failed to run container");
 }
