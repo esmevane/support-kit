@@ -206,29 +206,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "axum-extra"
-version = "0.9.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0be6ea09c9b96cb5076af0de2e383bd2bc0c18f827cf1967bdd353e0b910d733"
-dependencies = [
- "axum",
- "axum-core",
- "bytes",
- "futures-util",
- "headers",
- "http",
- "http-body",
- "http-body-util",
- "mime",
- "pin-project-lite",
- "serde",
- "tower",
- "tower-layer",
- "tower-service",
- "tracing",
-]
-
-[[package]]
 name = "backtrace"
 version = "0.3.71"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -995,10 +972,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c4567c8db10ae91089c99af84c68c38da3ec2f087c3f82960bcdbf3656b6f4d7"
 dependencies = [
  "cfg-if",
- "js-sys",
  "libc",
  "wasi",
- "wasm-bindgen",
 ]
 
 [[package]]
@@ -1062,30 +1037,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8094feaf31ff591f651a2664fb9cfd92bba7a60ce3197265e9482ebe753c8f7"
 dependencies = [
  "hashbrown 0.14.5",
-]
-
-[[package]]
-name = "headers"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "322106e6bd0cba2d5ead589ddb8150a13d7c4217cf80d7c4f682ca994ccc6aa9"
-dependencies = [
- "base64 0.21.7",
- "bytes",
- "headers-core",
- "http",
- "httpdate",
- "mime",
- "sha1",
-]
-
-[[package]]
-name = "headers-core"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54b4a22553d4242c49fddb9ba998a99962b5cc6f22cb5a3482bec22522403ce4"
-dependencies = [
- "http",
 ]
 
 [[package]]
@@ -1309,29 +1260,6 @@ checksum = "168fb715dda47215e360912c096649d23d58bf392ac62f73919e831745e40f26"
 dependencies = [
  "equivalent",
  "hashbrown 0.14.5",
-]
-
-[[package]]
-name = "indicatif"
-version = "0.17.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "763a5a8f45087d6bcea4222e7b72c291a054edf80e4ef6efd2a4979878c7bea3"
-dependencies = [
- "console",
- "instant",
- "number_prefix",
- "portable-atomic",
- "tokio",
- "unicode-width",
-]
-
-[[package]]
-name = "instant"
-version = "0.1.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0242819d153cba4b4b05a5a8f2a7e9bbf97b6055b2a002b395c96b5ff3c0222"
-dependencies = [
- "cfg-if",
 ]
 
 [[package]]
@@ -1698,12 +1626,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "number_prefix"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "830b246a0e5f20af87141b25c173cd1b609bd7779a4617d6ec582abaf90870f3"
-
-[[package]]
 name = "object"
 version = "0.32.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1976,12 +1898,6 @@ dependencies = [
  "serde",
  "time",
 ]
-
-[[package]]
-name = "portable-atomic"
-version = "1.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7170ef9988bc169ba16dd36a7fa041e5c4cbeb6a35b76d4c03daded371eae7c0"
 
 [[package]]
 name = "powerfmt"
@@ -2583,38 +2499,8 @@ dependencies = [
 name = "service-kit"
 version = "0.1.0"
 dependencies = [
- "axum",
- "axum-extra",
- "chrono",
- "clap",
- "color-eyre",
- "config",
- "crossterm",
- "dialoguer",
- "dirs 5.0.1",
- "futures",
- "indicatif",
- "mime_guess",
- "rand",
- "ratatui",
- "reqwest",
- "rust-embed",
- "serde",
- "serde_json",
  "service-kit-core",
- "service-kit-web",
- "service-manager",
- "sqlx",
- "strum",
- "thiserror",
  "tokio",
- "tokio-util",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "tui-textarea",
- "wasm-bindgen",
- "wasm-bindgen-futures",
 ]
 
 [[package]]
@@ -2622,7 +2508,6 @@ name = "service-kit-core"
 version = "0.1.0"
 dependencies = [
  "axum",
- "axum-extra",
  "chrono",
  "clap",
  "color-eyre",
@@ -2631,10 +2516,6 @@ dependencies = [
  "dialoguer",
  "dirs 5.0.1",
  "futures",
- "indicatif",
- "mime_guess",
- "prost",
- "rand",
  "ratatui",
  "reqwest",
  "rust-embed",
@@ -2644,13 +2525,10 @@ dependencies = [
  "service-kit-support",
  "service-manager",
  "shadow-rs",
- "sqlx",
  "strum",
  "tempfile",
  "thiserror",
  "tokio",
- "tokio-util",
- "tower-http",
  "tracing",
  "tracing-subscriber",
  "tui-textarea",
@@ -2663,7 +2541,6 @@ dependencies = [
  "prost",
  "prost-build",
  "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -2685,14 +2562,12 @@ dependencies = [
 name = "service-kit-web"
 version = "0.1.0"
 dependencies = [
- "getrandom",
  "reqwest",
  "serde",
  "serde-wasm-bindgen",
  "service-kit-proto",
  "wasm-bindgen",
  "wasm-bindgen-futures",
- "web-sys",
 ]
 
 [[package]]
@@ -3422,22 +3297,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tower-http"
-version = "0.5.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e9cd434a998747dd2c4276bc96ee2e0c7a2eadf3cae88e52be55a05fa9053f5"
-dependencies = [
- "bitflags 2.6.0",
- "bytes",
- "http",
- "http-body",
- "http-body-util",
- "pin-project-lite",
- "tower-layer",
- "tower-service",
-]
-
-[[package]]
 name = "tower-layer"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4087,9 +3946,7 @@ name = "xtask"
 version = "0.1.0"
 dependencies = [
  "clap",
- "dirs 5.0.1",
  "duct",
- "tracing",
 ]
 
 [[package]]
