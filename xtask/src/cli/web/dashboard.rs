@@ -40,6 +40,7 @@ impl crate::runnable::Runnable for WebDashboardCommand {
                 crate::tasks::web::dashboard::install,
                 crate::tasks::web::client::build,
                 crate::tasks::web::dashboard::build,
+                crate::tasks::web::dashboard::copy,
             ]
             .run(),
         }

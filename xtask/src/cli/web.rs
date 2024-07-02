@@ -17,7 +17,9 @@ impl crate::runnable::Runnable for Web {
 #[derive(Debug, clap::Parser)]
 #[clap(rename_all = "kebab-case")]
 enum WebCommand {
+    /// Work with the wasm web client library
     Client(client::WebClient),
+    /// Manage the web dashboard: preflight, clean, install, build, etc.
     Dashboard(dashboard::WebDashboard),
 }
 
