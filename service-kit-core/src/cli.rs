@@ -77,7 +77,7 @@ pub struct GlobalOpts {
 
     /// Enable verbose output.
     #[command(flatten)]
-    pub verbose: Verbosity,
+    pub verbosity: Verbosity,
 }
 
 #[derive(ValueEnum, Clone, Copy, Debug)]

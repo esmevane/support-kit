@@ -36,11 +36,6 @@ pub struct Settings {
 impl Settings {
     pub fn parse() -> Result<Self, crate::errors::Error> {
         let cli = Cli::parse();
-
-        telemetry::init(&cli.global.verbose);
-        tracing::info!("Starting up");
-        tracing::info!("Getting configuration");
-
         let config_builder = Config::builder()
             .add_source(config::File::with_name(&cli.home_config()).required(false))
             .add_source(config::File::with_name(&cli.root_config()).required(false))
@@ -49,10 +44,13 @@ impl Settings {
             .build()?;
 
         let config: Configuration = config_builder.try_deserialize()?;
+        let settings = Settings { cli, config };
 
-        cli.global.color.init();
+        telemetry::init(&settings);
 
-        Ok(Self { cli, config })
+        settings.cli.global.color.init();
+
+        Ok(settings)
     }
 
     pub async fn exec(&self) -> crate::Result<()> {
