@@ -9,6 +9,7 @@ mod service_settings;
 use clap::Parser;
 use config::Config;
 use std::path::PathBuf;
+use tracing_appender::non_blocking::WorkerGuard;
 
 use crate::{
     cli::{Cli, Command},
@@ -34,7 +35,7 @@ pub struct Settings {
 }
 
 impl Settings {
-    pub fn parse() -> Result<Self, crate::errors::Error> {
+    pub fn parse() -> crate::Result<(Self, WorkerGuard)> {
         let cli = Cli::parse();
         let config_builder = Config::builder()
             .add_source(config::File::with_name(&cli.home_config()).required(false))
@@ -45,12 +46,11 @@ impl Settings {
 
         let config: Configuration = config_builder.try_deserialize()?;
         let settings = Settings { cli, config };
-
-        telemetry::init(&settings);
+        let guard = telemetry::init(&settings);
 
         settings.cli.global.color.init();
 
-        Ok(settings)
+        Ok((settings, guard))
     }
 
     pub async fn exec(&self) -> crate::Result<()> {

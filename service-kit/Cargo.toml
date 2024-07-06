@@ -11,3 +11,4 @@ homepage = "https://esmevane.github.io/service-kit"
 [dependencies]
 service-kit-core = { workspace = true }
 tokio = { workspace = true }
+tracing-appender = { workspace = true }
