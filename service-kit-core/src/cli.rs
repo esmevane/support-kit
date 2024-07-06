@@ -1,4 +1,5 @@
 use clap::Parser;
+use clap_verbosity_flag::Verbosity;
 use std::path::PathBuf;
 
 use crate::{
@@ -72,8 +73,8 @@ pub struct GlobalOpts {
     pub environment: Environment,
 
     /// Enable verbose output.
-    #[clap(short = 'v', long = "verbose")]
-    pub verbose: bool,
+    #[command(flatten)]
+    pub verbose: Verbosity,
 }
 
 #[derive(Clone, Debug, Parser)]

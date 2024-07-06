@@ -20,10 +20,6 @@ pub const APP_NAME: &str = env!("CARGO_PKG_NAME");
 shadow!(build);
 
 pub async fn run() -> Result<()> {
-    telemetry::init();
-
-    tracing::info!("Starting up");
-
     settings::Settings::parse()?.exec().await?;
 
     Ok(())

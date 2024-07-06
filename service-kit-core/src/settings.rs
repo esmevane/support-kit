@@ -12,7 +12,7 @@ use std::path::PathBuf;
 
 use crate::{
     cli::{Cli, Command},
-    APP_NAME,
+    telemetry, APP_NAME,
 };
 
 use client::ClientResource;
@@ -35,8 +35,10 @@ pub struct Settings {
 
 impl Settings {
     pub fn parse() -> Result<Self, crate::errors::Error> {
-        tracing::info!("Parsing CLI arguments");
         let cli = Cli::parse();
+
+        telemetry::init(&cli.global.verbose);
+        tracing::info!("Starting up");
 
         tracing::info!("Getting configuration");
         let config_builder = Config::builder()
