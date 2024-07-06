@@ -10,7 +10,10 @@ use clap::Parser;
 use config::Config;
 use std::path::PathBuf;
 
-use crate::cli::{Cli, Command};
+use crate::{
+    cli::{Cli, Command},
+    APP_NAME,
+};
 
 use client::ClientResource;
 use configuration::Configuration;
@@ -40,10 +43,7 @@ impl Settings {
             .add_source(config::File::with_name(&cli.home_config()).required(false))
             .add_source(config::File::with_name(&cli.root_config()).required(false))
             .add_source(config::File::with_name(&cli.env_config()).required(false))
-            .add_source(
-                config::Environment::with_prefix(&cli.global.app_name.to_uppercase())
-                    .separator("_"),
-            )
+            .add_source(config::Environment::with_prefix(&APP_NAME.to_uppercase()).separator("_"))
             .build()?;
 
         let config: Configuration = config_builder.try_deserialize()?;
@@ -100,16 +100,12 @@ impl Settings {
                 tracing::info!("Service command: {:?}", service_details);
 
                 match service_details.operation {
-                    Some(operation) => {
-                        operation
-                            .exec(self.cli.clone(), service_details.settings)
-                            .await?
-                    }
+                    Some(operation) => operation.exec(service_details.settings).await?,
                     None => {
                         tracing::info!("No service operation specified, prompting");
 
                         ServiceOperation::select()?
-                            .exec(self.cli.clone(), service_details.settings)
+                            .exec(service_details.settings)
                             .await?;
                     }
                 }
@@ -128,7 +124,7 @@ impl Settings {
                 // use directories to get a default data directory in user's config path
                 match dirs::config_local_dir() {
                     Some(mut path) => {
-                        path.push(self.cli.global.app_name.to_lowercase());
+                        path.push(APP_NAME.to_lowercase());
                         path.push("storage.db");
                         path
                     }

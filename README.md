@@ -1,5 +1,13 @@
 # Service Kit
 
+## Short list
+
+- [ ] Log directory
+- [ ] Keronado
+- [ ] TTY check in CLI
+- [ ] TUI harness
+- [ ] Handlers? Tower systems?
+
 ## Anatomy
 
 ### CLI

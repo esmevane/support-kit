@@ -8,14 +8,6 @@ pub struct Web {
     command: WebCommand,
 }
 
-impl Web {
-    pub fn dev() -> Self {
-        Self {
-            command: WebCommand::Dashboard(dashboard::WebDashboard::dev()),
-        }
-    }
-}
-
 impl crate::runnable::Runnable for Web {
     fn run(&self) {
         self.command.run();
