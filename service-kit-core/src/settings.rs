@@ -39,8 +39,8 @@ impl Settings {
 
         telemetry::init(&cli.global.verbose);
         tracing::info!("Starting up");
-
         tracing::info!("Getting configuration");
+
         let config_builder = Config::builder()
             .add_source(config::File::with_name(&cli.home_config()).required(false))
             .add_source(config::File::with_name(&cli.root_config()).required(false))
@@ -50,6 +50,8 @@ impl Settings {
 
         let config: Configuration = config_builder.try_deserialize()?;
 
+        cli.global.color.init();
+
         Ok(Self { cli, config })
     }
 
@@ -57,6 +59,11 @@ impl Settings {
         let cli = self.cli.clone();
 
         match cli.command {
+            Command::Version => {
+                tracing::info!("Version");
+
+                println!("{}", crate::build::PKG_VERSION);
+            }
             Command::Debug => {
                 tracing::info!("Debugging");
 

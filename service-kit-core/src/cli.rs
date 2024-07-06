@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use clap_verbosity_flag::Verbosity;
 use std::path::PathBuf;
 
@@ -64,6 +64,9 @@ impl Cli {
 
 #[derive(Clone, Debug, Parser)]
 pub struct GlobalOpts {
+    #[clap(long, value_enum, global = true, default_value = "auto")]
+    pub color: Color,
+
     /// The path to the configuration root.
     #[clap(short, long)]
     pub config: Option<String>,
@@ -77,6 +80,24 @@ pub struct GlobalOpts {
     pub verbose: Verbosity,
 }
 
+#[derive(ValueEnum, Clone, Copy, Debug)]
+pub enum Color {
+    Always,
+    Auto,
+    Never,
+}
+
+impl Color {
+    pub fn init(self) {
+        // Set a supports-color override based on the variable passed in.
+        match self {
+            Color::Always => owo_colors::set_override(true),
+            Color::Auto => {}
+            Color::Never => owo_colors::set_override(false),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Parser)]
 #[clap(rename_all = "kebab-case")]
 pub enum Command {
@@ -85,4 +106,5 @@ pub enum Command {
     Server(Server),
     Client(Client),
     Service(Service),
+    Version,
 }

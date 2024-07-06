@@ -19,6 +19,7 @@ crossterm = { workspace = true }
 dialoguer = { workspace = true }
 dirs = { workspace = true }
 futures = { workspace = true }
+owo-colors = { workspace = true }
 ratatui = { workspace = true }
 reqwest = { workspace = true }
 rust-embed = { workspace = true }
