@@ -1,3 +1,5 @@
+use std::io::BufRead;
+
 mod container;
 mod server;
 mod web;
@@ -34,11 +36,39 @@ impl crate::runnable::Runnable for Command {
             Self::Web(command) => command.run(),
             Self::Server(command) => command.run(),
             Self::Dev => {
-                let dashboard = std::thread::spawn(|| web::Web::dev().run());
-                let server = std::thread::spawn(|| crate::tasks::server::dev.run());
+                fn run_server(name: &str, cmd: duct::Expression) {
+                    let child = cmd
+                        .stdout_to_stderr()
+                        .stderr_to_stdout()
+                        .unchecked()
+                        .reader()
+                        .unwrap();
+                    let reader = std::io::BufReader::new(&child);
 
-                dashboard.join().expect("Unable to join dashboard thread");
-                server.join().expect("Unable to join server thread");
+                    for line in reader.lines() {
+                        println!("[{}] {}", name, line.unwrap());
+                    }
+
+                    child.try_wait().unwrap();
+                }
+
+                let dashboard = std::thread::spawn(|| {
+                    run_server(
+                        "dashboard",
+                        duct::cmd!("cargo", "xtask", "web", "dashboard", "dev"),
+                    );
+                });
+
+                let server = std::thread::spawn(|| {
+                    run_server("server", duct::cmd!("cargo", "xtask", "server", "dev"));
+                });
+
+                // let dashboard = std::thread::spawn(|| web::Web::dev().run());
+                // let server = std::thread::spawn(|| crate::tasks::server::dev.run());
+
+                for thread in [dashboard, server].into_iter() {
+                    thread.join().expect("Unable to join thread");
+                }
             }
         }
     }
