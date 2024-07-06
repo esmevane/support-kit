@@ -1,11 +1,10 @@
-use crate::tui::action::Action;
 use ratatui::{
     layout::{Constraint, Direction, Layout},
     widgets::{Block, Borders},
 };
 use tui_textarea::TextArea;
 
-use super::{ActionContext, Component};
+use service_kit_support::tui::{Action, ActionContext, Component};
 
 const MIN_HEIGHT: usize = 2;
 
@@ -38,7 +37,7 @@ impl<'a> Input<'a> {
 }
 
 impl<'a> Component for Input<'a> {
-    fn update(&mut self, context: ActionContext) -> crate::Result<Option<Action>> {
+    fn update(&mut self, context: ActionContext) -> service_kit_support::Result<Option<Action>> {
         match context.action {
             Action::Input(input) => {
                 self.last_input(input);

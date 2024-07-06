@@ -16,7 +16,10 @@ rust-embed = { workspace = true }
 sqlx = { workspace = true }
 tokio = { workspace = true }
 thiserror = { workspace = true }
+color-eyre = { workspace = true }
+futures = { workspace = true }
 chrono = { workspace = true }
+ratatui = { workspace = true }
 
 [dev-dependencies]
 tempfile = { workspace = true }

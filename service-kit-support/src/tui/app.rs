@@ -1,7 +1,8 @@
-use crate::tui::{
-    action::Action,
-    components::{window::Window, ActionContext},
-};
+use crate::tui::{action::Action, components::ActionContext};
+
+use super::{event::TerminalEvent, terminal::Terminal};
+
+pub type Components = Vec<Box<dyn crate::tui::components::Component>>;
 
 /// Application state
 #[derive(Debug)]
@@ -16,12 +17,49 @@ pub struct App {
 
 impl App {
     /// Create a new application
-    pub fn new(action_tx: tokio::sync::mpsc::UnboundedSender<Action>) -> Self {
+    pub fn new(
+        action_tx: tokio::sync::mpsc::UnboundedSender<Action>,
+        components: Components,
+    ) -> Self {
         App {
             should_quit: false,
             action_tx,
-            components: vec![Box::new(Window::new())],
+            components,
         }
+    }
+
+    pub async fn init(components: Components) -> crate::Result<()> {
+        // Create an application.
+        let (action_tx, mut action_rx) = tokio::sync::mpsc::unbounded_channel();
+        let mut app = Self::new(action_tx.clone(), components);
+
+        let mut terminal = Terminal::create()?;
+
+        terminal.enter()?;
+
+        // Start the main loop.
+        while !app.should_quit {
+            let event = terminal.next().await?;
+
+            // Render if requested.
+            if let TerminalEvent::Render = event {
+                terminal.draw(|frame| app.render(frame))?;
+            }
+
+            if let Ok(action) = event.try_into() {
+                action_tx.send(action).unwrap();
+            }
+
+            // Update the application state.
+            if let Ok(action) = action_rx.try_recv() {
+                app.update(action);
+            }
+        }
+
+        // Exit the user interface.
+        terminal.exit()?;
+
+        Ok(())
     }
 
     /// Update a running application

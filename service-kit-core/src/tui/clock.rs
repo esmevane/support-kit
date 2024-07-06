@@ -1,10 +1,8 @@
-use crate::tui::action::Action;
 use ratatui::{
     layout::Alignment,
     widgets::{Block, Borders, Paragraph},
 };
-
-use super::{ActionContext, Component};
+use service_kit_support::tui::{Action, ActionContext, Component};
 
 fn time() -> String {
     chrono::Local::now().format("%H:%M:%S").to_string()
@@ -23,7 +21,7 @@ impl Clock {
 }
 
 impl Component for Clock {
-    fn update(&mut self, _: ActionContext) -> crate::Result<Option<Action>> {
+    fn update(&mut self, _: ActionContext) -> service_kit_support::Result<Option<Action>> {
         self.time = time();
 
         Ok(None)

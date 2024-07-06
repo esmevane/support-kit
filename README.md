@@ -1,43 +1,13 @@
 # Service Kit
 
-## Short list
+## Todo
 
 - [ ] Log directory
-- [ ] Keronado
+- [ ] Color toggle
+- [ ] Verbosity toggle
 - [ ] TTY check in CLI
-- [ ] TUI harness
 - [ ] Handlers? Tower systems?
 
-## Anatomy
+## WIP
 
-### CLI
-
-### TUI
-
-### Network
-
-#### Clients
-
-##### Browser
-
-##### Rust
-
-#### Server
-
-##### API
-
-##### Embedded Web Dashboard
-
-##### File Storage
-
-#### Protocol
-
-### Book
-
-### Website
-
-### Releases
-
-### Builds
-
-### Xtask
+- [ ] TUI harness

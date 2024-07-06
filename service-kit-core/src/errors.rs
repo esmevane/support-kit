@@ -8,8 +8,6 @@ pub enum Error {
     SerializationError(#[from] serde_json::Error),
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
-    #[error("Unable to get next terminal event")]
-    TerminalEventError,
     #[error("Unable to initialize tcp listener: {0}")]
     ListenerInitFailure(std::io::Error),
     #[error("Unable to parse selected option: {0}")]

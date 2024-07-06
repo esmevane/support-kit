@@ -1,7 +1,8 @@
-use crate::tui::action::Action;
 use ratatui::layout::{Constraint, Direction, Layout};
 
-use super::{display::Display, input::Input, ActionContext, Component};
+use service_kit_support::tui::{Action, ActionContext, Component};
+
+use super::{display::Display, input::Input};
 
 #[derive(Clone, Debug)]
 pub struct Window<'a> {
@@ -20,7 +21,7 @@ impl<'a> Window<'a> {
 }
 
 impl<'a> Component for Window<'a> {
-    fn update(&mut self, context: ActionContext) -> crate::Result<Option<Action>> {
+    fn update(&mut self, context: ActionContext) -> service_kit_support::Result<Option<Action>> {
         let text = self.textarea.update(context.clone())?;
         let display = self.display.update(context.clone())?;
 

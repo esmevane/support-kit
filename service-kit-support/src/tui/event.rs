@@ -1,5 +1,5 @@
 use color_eyre::{eyre::Error, Result};
-use crossterm::event::Event as CrosstermEvent;
+use ratatui::crossterm::event::Event as CrosstermEvent;
 
 #[derive(Debug)]
 pub enum TerminalEvent {
@@ -10,9 +10,9 @@ pub enum TerminalEvent {
     FocusGained,
     FocusLost,
     Paste(String),
-    Key(crossterm::event::KeyEvent),
-    Release(crossterm::event::KeyEvent),
-    Mouse(crossterm::event::MouseEvent),
+    Key(ratatui::crossterm::event::KeyEvent),
+    Release(ratatui::crossterm::event::KeyEvent),
+    Mouse(ratatui::crossterm::event::MouseEvent),
     Resize(u16, u16),
 }
 
@@ -21,9 +21,9 @@ impl TerminalEvent {
         match event {
             Ok(given_event) => match given_event {
                 CrosstermEvent::Key(key) => {
-                    if key.kind == crossterm::event::KeyEventKind::Press {
+                    if key.kind == ratatui::crossterm::event::KeyEventKind::Press {
                         Some(TerminalEvent::Key(key))
-                    } else if key.kind == crossterm::event::KeyEventKind::Release {
+                    } else if key.kind == ratatui::crossterm::event::KeyEventKind::Release {
                         Some(TerminalEvent::Release(key))
                     } else {
                         None

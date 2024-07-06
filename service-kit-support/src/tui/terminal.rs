@@ -1,10 +1,10 @@
 use color_eyre::eyre::WrapErr;
-use crossterm::{
+use futures::{FutureExt, StreamExt};
+use ratatui::backend::CrosstermBackend;
+use ratatui::crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture},
     terminal::{EnterAlternateScreen, LeaveAlternateScreen},
 };
-use futures::{FutureExt, StreamExt};
-use ratatui::backend::CrosstermBackend;
 use std::{io, panic};
 
 use crate::tui::event::TerminalEvent;
@@ -68,7 +68,7 @@ impl Terminal {
         let tx = self.tx.clone();
 
         self.task = tokio::spawn(async move {
-            let mut terminal_event_stream = crossterm::event::EventStream::new();
+            let mut terminal_event_stream = ratatui::crossterm::event::EventStream::new();
             let mut tick_interval = tokio::time::interval(tick_rate);
             let mut render_interval = tokio::time::interval(frame_rate);
 
@@ -118,8 +118,8 @@ impl Terminal {
     ///
     /// It enables the raw mode and sets terminal properties.
     pub fn enter(&mut self) -> crate::Result<()> {
-        crossterm::terminal::enable_raw_mode()?;
-        crossterm::execute!(io::stderr(), EnterAlternateScreen, EnableMouseCapture)?;
+        ratatui::crossterm::terminal::enable_raw_mode()?;
+        ratatui::crossterm::execute!(io::stderr(), EnterAlternateScreen, EnableMouseCapture)?;
 
         // Define a custom panic hook to reset the terminal properties.
         // This way, you won't have your terminal messed up if an unexpected error happens.
@@ -141,8 +141,8 @@ impl Terminal {
     /// This function is also used for the panic hook to revert
     /// the terminal properties if unexpected errors occur.
     fn reset() -> crate::Result<()> {
-        crossterm::terminal::disable_raw_mode()?;
-        crossterm::execute!(io::stderr(), LeaveAlternateScreen, DisableMouseCapture)?;
+        ratatui::crossterm::terminal::disable_raw_mode()?;
+        ratatui::crossterm::execute!(io::stderr(), LeaveAlternateScreen, DisableMouseCapture)?;
         Ok(())
     }
 
@@ -157,7 +157,10 @@ impl Terminal {
     }
 
     pub async fn next(&mut self) -> crate::Result<TerminalEvent> {
-        self.rx.recv().await.ok_or(crate::Error::TerminalEventError)
+        self.rx
+            .recv()
+            .await
+            .ok_or(crate::errors::Error::TerminalEventError)
     }
 }
 

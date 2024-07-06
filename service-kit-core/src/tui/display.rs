@@ -1,12 +1,12 @@
-use crate::tui::action::Action;
 use ratatui::{
     layout::Alignment,
     style::{Color, Style},
     text::Line,
     widgets::{Block, BorderType, Borders, Paragraph},
 };
+use service_kit_support::tui::{Action, ActionContext, Component};
 
-use super::{clock::Clock, ActionContext, Component};
+use super::clock::Clock;
 
 /// Text display for terminal UI
 #[derive(Clone, Debug)]
@@ -26,7 +26,7 @@ impl Display {
 }
 
 impl Component for Display {
-    fn update(&mut self, context: ActionContext) -> crate::Result<Option<Action>> {
+    fn update(&mut self, context: ActionContext) -> service_kit_support::Result<Option<Action>> {
         if context.action != Action::Update {
             self.text.push(format!("{:?}", context.action));
         }

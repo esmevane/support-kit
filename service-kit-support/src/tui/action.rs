@@ -1,11 +1,11 @@
-use crossterm::event::{KeyCode, KeyEventKind};
+use ratatui::crossterm::event::{KeyCode, KeyEventKind};
 
 use crate::tui::event::TerminalEvent;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Action {
-    Input(crossterm::event::KeyEvent),
-    Mouse(crossterm::event::MouseEvent),
+    Input(ratatui::crossterm::event::KeyEvent),
+    Mouse(ratatui::crossterm::event::MouseEvent),
     Quit,
     Update,
 }

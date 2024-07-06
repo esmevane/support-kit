@@ -2549,7 +2549,10 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "chrono",
+ "color-eyre",
+ "futures",
  "mime_guess",
+ "ratatui",
  "rust-embed",
  "sqlx",
  "tempfile",
