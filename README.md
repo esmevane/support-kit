@@ -7,7 +7,4 @@
 - [ ] Verbosity toggle
 - [ ] TTY check in CLI
 - [ ] Handlers? Tower systems?
-
-## WIP
-
-- [ ] TUI harness
+- [x] TUI harness
