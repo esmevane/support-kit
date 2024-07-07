@@ -16,7 +16,7 @@ pub use errors::Error;
 use tracing_appender::non_blocking::WorkerGuard;
 
 pub type Result<T> = color_eyre::eyre::Result<T, Error>;
-pub const APP_NAME: &str = env!("CARGO_PKG_NAME");
+pub const APP_NAME: &str = "service-kit";
 
 shadow!(build);
 

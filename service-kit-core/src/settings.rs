@@ -32,20 +32,45 @@ pub use service_settings::ServiceSettings;
 pub struct Settings {
     pub cli: Cli,
     pub config: Configuration,
+    pub sources: ConfigurationSources,
+}
+
+#[derive(Debug, Clone)]
+pub struct ConfigurationSources {
+    pub home_config: String,
+    pub root_config: String,
+    pub env_config: String,
+    pub env_prefix: String,
+    pub env_separator: String,
 }
 
 impl Settings {
     pub fn parse() -> crate::Result<(Self, WorkerGuard)> {
         let cli = Cli::parse();
+        let sources = ConfigurationSources {
+            home_config: cli.home_config(),
+            root_config: cli.root_config(),
+            env_config: cli.env_config(),
+            env_prefix: APP_NAME.to_uppercase(),
+            env_separator: "_".to_string(),
+        };
+
         let config_builder = Config::builder()
-            .add_source(config::File::with_name(&cli.home_config()).required(false))
-            .add_source(config::File::with_name(&cli.root_config()).required(false))
-            .add_source(config::File::with_name(&cli.env_config()).required(false))
-            .add_source(config::Environment::with_prefix(&APP_NAME.to_uppercase()).separator("_"))
+            .add_source(config::File::with_name(&sources.home_config).required(false))
+            .add_source(config::File::with_name(&sources.root_config).required(false))
+            .add_source(config::File::with_name(&sources.env_config).required(false))
+            .add_source(
+                config::Environment::with_prefix(&sources.env_prefix)
+                    .separator(&sources.env_separator),
+            )
             .build()?;
 
         let config: Configuration = config_builder.try_deserialize()?;
-        let settings = Settings { cli, config };
+        let settings = Settings {
+            cli,
+            config,
+            sources,
+        };
         let guard = telemetry::init(&settings);
 
         settings.cli.global.color.init();
