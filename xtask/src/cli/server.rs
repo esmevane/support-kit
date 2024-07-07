@@ -5,6 +5,14 @@ pub struct Server {
     command: Command,
 }
 
+impl Server {
+    pub fn dev() -> Self {
+        Self {
+            command: Command::Dev,
+        }
+    }
+}
+
 impl crate::runnable::Runnable for Server {
     fn run(&self) {
         self.command.run();

@@ -1,5 +1,12 @@
 pub trait Runnable {
     fn run(&self);
+
+    fn background(self) -> std::thread::JoinHandle<()>
+    where
+        Self: Sized + Send + 'static,
+    {
+        std::thread::spawn(move || self.run())
+    }
 }
 
 impl<T> Runnable for T

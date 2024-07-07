@@ -19,12 +19,13 @@ Check out the <code data-astro-cid-j7pv25f6>Health</code> component to see the W
     url.port = window.location.port;
     url.pathname = "/api";
 
-    result.classList.add("pending");
     result.innerText = "Checking health...";
     try {
       const response = await health(url.toString());
       result.innerHTML = `<pre>${JSON.stringify(response, null, 2)}</pre>`;
     } catch (error) {
+      debugger;
+      console.error(error);
       result.innerHTML = `<strong>Error:</strong> ${error}`;
     }
   }
