@@ -1,23 +1,23 @@
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Default, Debug, Deserialize)]
 #[serde(default)]
 pub struct Configuration {
     pub db: Option<Database>,
     pub storage: Option<Storage>,
-    pub logging: Option<Logging>,
+    pub logging: Logging,
 }
 
-impl Default for Configuration {
-    fn default() -> Self {
-        Self {
-            db: None,
-            storage: None,
-            logging: Logging::default().into(),
-        }
-    }
-}
+// impl Default for Configuration {
+//     fn default() -> Self {
+//         Self {
+//             db: None,
+//             storage: None,
+//             ..Default::default()
+//         }
+//     }
+// }
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Storage {
@@ -60,8 +60,8 @@ impl Default for Logging {
         });
 
         let loggers = vec![
-            Logger::File(FileLogger::error()),
-            Logger::Rolling(RollingFileLogger::out()),
+            Logger::File(FileLogger::error_logger()),
+            Logger::Rolling(RollingFileLogger::daily_info_logger()),
         ];
 
         Self {
@@ -86,7 +86,7 @@ pub struct FileLogger {
 }
 
 impl FileLogger {
-    pub fn error() -> Self {
+    pub fn error_logger() -> Self {
         Self {
             path: PathBuf::from("logs"),
             level: Verbosity::MinMax(MinMax {
@@ -107,22 +107,21 @@ pub struct RollingFileLogger {
 }
 
 impl RollingFileLogger {
-    pub fn out() -> Self {
+    pub fn daily_info_logger() -> Self {
         Self {
+            name: "out".to_string(),
             path: PathBuf::from("logs"),
+            rotation: Rotation::Daily,
             level: Verbosity::Single(Level {
                 verbosity: VerbosityLevel::Info,
             }),
-            name: "out".to_string(),
-            rotation: Rotation::Daily,
         }
     }
 }
 
-#[derive(Clone, Default, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum Rotation {
-    #[default]
     Daily,
     Hourly,
     Minutely,
