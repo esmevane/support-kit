@@ -5,6 +5,7 @@ use std::path::PathBuf;
 pub struct Configuration {
     pub db: Option<Database>,
     pub storage: Option<Storage>,
+    pub logging: Option<Logging>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -33,4 +34,71 @@ impl std::fmt::Display for Database {
             self.database.as_deref().unwrap_or("acore_world"),
         )
     }
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct Logging {
+    pub loggers: Option<Vec<Logger>>,
+    pub console: Verbosity,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "kebab-case", tag = "kind")]
+pub enum Logger {
+    File(FileLogger),
+    Rolling(RollingFileLogger),
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct FileLogger {
+    pub path: PathBuf,
+    pub level: Verbosity,
+    pub name: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct RollingFileLogger {
+    pub path: PathBuf,
+    pub level: Verbosity,
+    pub name: String,
+    pub rotation: Rotation,
+}
+
+#[derive(Clone, Default, Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum Rotation {
+    #[default]
+    Daily,
+    Hourly,
+    Minutely,
+    Never,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "kebab-case", tag = "kind")]
+pub enum Verbosity {
+    MinMax(MinMax),
+    Single(Level),
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct MinMax {
+    pub min: VerbosityLevel,
+    pub max: VerbosityLevel,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct Level {
+    pub verbosity: VerbosityLevel,
+}
+
+#[derive(Clone, Default, Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum VerbosityLevel {
+    Error,
+    Warn,
+    #[default]
+    Info,
+    Debug,
+    Trace,
 }
