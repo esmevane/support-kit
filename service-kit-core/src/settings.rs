@@ -56,22 +56,6 @@ impl Settings {
         };
 
         let config_builder = Config::builder()
-            .set_default("logging.console.kind", "single")?
-            .set_default("logging.console.verbosity", "info")?
-            .set_default("logging.loggers[0].kind", "file")?
-            .set_default("logging.loggers[0].path", "logs")?
-            .set_default("logging.loggers[0].name", "error")?
-            // .set_default("logging.loggers[0].level.kind", "single")?
-            // .set_default("logging.loggers[0].level.verbosity", "error")?
-            .set_default("logging.loggers[0].level.kind", "min-max")?
-            .set_default("logging.loggers[0].level.min", "error")?
-            .set_default("logging.loggers[0].level.max", "warn")?
-            .set_default("logging.loggers[1].kind", "rolling")?
-            .set_default("logging.loggers[1].path", "logs")?
-            .set_default("logging.loggers[1].name", "out")?
-            .set_default("logging.loggers[1].rotation", "daily")?
-            .set_default("logging.loggers[1].level.kind", "single")?
-            .set_default("logging.loggers[1].level.verbosity", "info")?
             .add_source(config::File::with_name(&sources.home_config).required(false))
             .add_source(config::File::with_name(&sources.root_config).required(false))
             .add_source(config::File::with_name(&sources.env_config).required(false))
