@@ -5,6 +5,8 @@ use std::path::PathBuf;
 
 use crate::APP_NAME;
 
+pub use logging::{MinMax, VerbosityDefinition};
+
 #[derive(Clone, Default, Debug, Deserialize)]
 #[serde(default)]
 pub struct Configuration {

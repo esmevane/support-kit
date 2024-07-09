@@ -6,7 +6,7 @@ use clap_verbosity_flag::Verbosity;
 use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::{
     fmt::{time::ChronoLocal, writer::MakeWriterExt},
-    layer::SubscriberExt,
+    layer::{self, SubscriberExt},
     util::SubscriberInitExt,
     Layer,
 };
@@ -27,51 +27,55 @@ pub fn init(settings: &Settings) -> Vec<WorkerGuard> {
         "Logging initialized: {env_filter_config}",
     );
 
-    let mut min_max_layers = Vec::new();
-    let mut simple_layers = Vec::new();
+    let mut layers = Vec::new();
+    // let mut min_max_layers = Vec::new();
+    // let mut simple_layers = Vec::new();
     let mut guards = Vec::new();
 
     for logger in settings.config.logging.loggers.clone() {
-        match logger.level() {
-            VerbosityDefinition::MinMax(MinMax { min, max }) => {
-                let appender = logger.appender();
-                let (non_blocking, guard) = tracing_appender::non_blocking(appender)
-                let writer = non_blocking.with_max_level(max.as_level_filter()).with_min_level(min.as_level_filter());
+        let (layer, guard) = logger.setup_logging();
+        layers.push(layer);
+        // match logger.level() {
+        //     VerbosityDefinition::MinMax(MinMax { min, max }) => {
+        //         let appender = logger.appender();
+        //         let (non_blocking, guard) = tracing_appender::non_blocking(appender)
+        //         let writer = non_blocking.with_max_level(max.as_level_filter()).with_min_level(min.as_level_filter());
 
-                let layer = tracing_subscriber::fmt::layer()
-                    .json()
-                    .with_writer(
-                        non_blocking
-                            .with_max_level(max.as_level_filter())
-                            .with_min_level(min.as_level_filter()),
-                    )
-                    .with_timer(ChronoLocal::default());
+        //         let layer = tracing_subscriber::fmt::layer()
+        //             .json()
+        //             .with_writer(
+        //                 non_blocking
+        //                     .with_max_level(max.as_level_filter())
+        //                     .with_min_level(min.as_level_filter()),
+        //             )
+        //             .with_timer(ChronoLocal::default());
 
-                min_max_layers.push(layer);
-                guards.push(guard);
-            }
-            VerbosityDefinition::Single(level) => {
-                let appender = logger.appender();
-                let (non_blocking, guard) = tracing_appender::non_blocking(appender);
-                let layer = tracing_subscriber::fmt::layer()
-                    .json()
-                    .with_writer(non_blocking)
-                    .with_timer(ChronoLocal::default())
-                    .with_filter(
-                        tracing_subscriber::EnvFilter::from_default_env()
-                            .add_directive(level.as_level_filter().into()),
-                    );
+        //         min_max_layers.push(layer);
+        //         guards.push(guard);
+        //     }
+        //     VerbosityDefinition::Single(level) => {
+        //         let appender = logger.appender();
+        //         let (non_blocking, guard) = tracing_appender::non_blocking(appender);
+        //         let layer = tracing_subscriber::fmt::layer()
+        //             .json()
+        //             .with_writer(non_blocking)
+        //             .with_timer(ChronoLocal::default())
+        //             .with_filter(
+        //                 tracing_subscriber::EnvFilter::from_default_env()
+        //                     .add_directive(level.as_level_filter().into()),
+        //             );
 
-                simple_layers.push(layer);
-                guards.push(guard);
-            }
-        }
+        //         simple_layers.push(layer);
+        //         guards.push(guard);
+        //     }
+        // }
     }
 
     tracing_subscriber::registry()
         .with(env_filter)
-        .with(min_max_layers)
-        .with(simple_layers)
+        .with(layers)
+        // .with(min_max_layers)
+        // .with(simple_layers)
         .init();
 
     guards
