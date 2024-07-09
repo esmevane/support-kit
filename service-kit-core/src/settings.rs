@@ -22,7 +22,7 @@ use server::ServerMode;
 use service::ServiceOperation;
 
 pub use client::Client;
-pub use configuration::{MinMax, VerbosityDefinition};
+// pub use configuration::{MinMax, VerbosityDefinition};
 pub use environment::Environment;
 pub use network_settings::NetworkSettings;
 pub use server::Server;

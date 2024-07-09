@@ -22,6 +22,11 @@ pub fn init(settings: &Settings) -> Vec<WorkerGuard> {
     let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
         .unwrap_or_else(|_| env_filter_config.clone().into());
 
+    tracing::info!(
+        app_name = APP_NAME,
+        "Logging initialized: {env_filter_config}",
+    );
+
     let mut min_max_layers = Vec::new();
     let mut simple_layers = Vec::new();
     let mut guards = Vec::new();
@@ -30,7 +35,9 @@ pub fn init(settings: &Settings) -> Vec<WorkerGuard> {
         match logger.level() {
             VerbosityDefinition::MinMax(MinMax { min, max }) => {
                 let appender = logger.appender();
-                let (non_blocking, guard) = tracing_appender::non_blocking(appender);
+                let (non_blocking, guard) = tracing_appender::non_blocking(appender)
+                let writer = non_blocking.with_max_level(max.as_level_filter()).with_min_level(min.as_level_filter());
+
                 let layer = tracing_subscriber::fmt::layer()
                     .json()
                     .with_writer(
@@ -63,14 +70,9 @@ pub fn init(settings: &Settings) -> Vec<WorkerGuard> {
 
     tracing_subscriber::registry()
         .with(env_filter)
-        .with(simple_layers)
         .with(min_max_layers)
+        .with(simple_layers)
         .init();
-
-    tracing::info!(
-        app_name = APP_NAME,
-        "Logging initialized: {env_filter_config}",
-    );
 
     guards
 }
