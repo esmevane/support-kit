@@ -1,10 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tracing_appender::rolling;
-use tracing_subscriber::{
-    fmt::{writer::MakeWriterExt, MakeWriter},
-    Layer,
-};
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Logging {
@@ -68,69 +64,6 @@ impl Logger {
         match self {
             Self::File(logger) => logger.level.clone(),
             Self::Rolling(logger) => logger.level.clone(),
-        }
-    }
-
-    // pub fn as_make_writer<Writer>(&self) -> Writer
-    // where
-    //     Writer: for<'writer> MakeWriter<'writer>,
-    // {
-    //     match self.level() {
-    //         VerbosityDefinition::MinMax(MinMax { min, max }) => {
-    //             let appender = self.appender();
-    //             let (non_blocking, _) = tracing_appender::non_blocking(appender);
-
-    //             non_blocking
-    //                 .with_max_level(max.as_level_filter())
-    //                 .with_min_level(min.as_level_filter())
-    //         }
-    //         VerbosityDefinition::Single(level) => {
-    //             let appender = self.appender();
-    //             let (non_blocking, guard) = tracing_appender::non_blocking(appender);
-
-    //             tracing_subscriber::EnvFilter::from_default_env()
-    //                 .add_directive(level.as_level_filter().into())
-    //         }
-    //     }
-    // }
-
-    pub fn setup_logging<
-        T: tracing::Subscriber + for<'a> tracing_subscriber::registry::LookupSpan<'a>,
-    >(
-        &self,
-    ) -> (
-        Box<dyn Layer<T> + Send + 'static>,
-        tracing_appender::non_blocking::WorkerGuard,
-    ) {
-        let appender = self.appender();
-
-        match self.level() {
-            VerbosityDefinition::MinMax(MinMax { min, max }) => {
-                let (non_blocking, guard) = tracing_appender::non_blocking(appender);
-                let layer = tracing_subscriber::fmt::layer()
-                    .json()
-                    .with_writer(
-                        non_blocking
-                            .with_max_level(max.as_level_filter())
-                            .with_min_level(min.as_level_filter()),
-                    )
-                    .with_timer(tracing_subscriber::fmt::time::ChronoLocal::default());
-
-                (layer.boxed(), guard)
-            }
-            VerbosityDefinition::Single(level) => {
-                let (non_blocking, guard) = tracing_appender::non_blocking(appender);
-                let layer = tracing_subscriber::fmt::layer()
-                    .json()
-                    .with_writer(non_blocking)
-                    .with_timer(tracing_subscriber::fmt::time::ChronoLocal::default())
-                    .with_filter(
-                        tracing_subscriber::EnvFilter::from_default_env()
-                            .add_directive(level.as_level_filter().into()),
-                    );
-
-                (layer.boxed(), guard)
-            }
         }
     }
 }
