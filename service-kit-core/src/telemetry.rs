@@ -61,29 +61,8 @@ pub fn init(settings: &Settings) -> Vec<WorkerGuard> {
         }
     }
 
-    // let (non_blocking, guard) = tracing_appender::non_blocking();
-    // let logging_appender = tracing_subscriber::fmt::Layer::new()
-    //     .with_writer(non_blocking)
-    //     .with_timer(ChronoLocal::default())
-    //     .json();
-    // let subscriber = tracing_subscriber::registry().with(env_filter);
-    //     subscriber = subscriber.with(logging_appender);
-
-    // let directory = "logs";
-    // let file_name_prefix = "monitor.log";
-
-    // let appender = tracing_appender::rolling::daily(directory, file_name_prefix);
-    // let (non_blocking, guard) = tracing_appender::non_blocking(appender);
-
-    // let log_subscriber = tracing_subscriber::fmt::Layer::new()
-    //     .json()
-    //     .with_writer(non_blocking)
-    //     .with_timer(ChronoLocal::default());
-
     tracing_subscriber::registry()
         .with(env_filter)
-        // .with(tracing_subscriber::fmt::layer())
-        // .with(log_subscriber)
         .with(simple_layers)
         .with(min_max_layers)
         .init();
