@@ -2598,16 +2598,24 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "chrono",
+ "clap",
  "color-eyre",
+ "config",
+ "dirs 5.0.1",
  "futures",
  "mime_guess",
  "ratatui",
  "rust-embed",
+ "serde",
+ "service-manager",
  "sqlx",
+ "strum",
  "tempfile",
  "thiserror",
  "tokio",
  "tracing",
+ "tracing-appender",
+ "tracing-subscriber",
 ]
 
 [[package]]

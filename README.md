@@ -3,8 +3,10 @@
 ## Todo
 
 - [ ] TTY check in CLI
-- [ ] Configure logs, color, verbosity, fine-grained verbosity
 - [ ] Configuration in support lib
+- [ ] switch to figment
+- [ ] move stuff to support library mostly
+- [x] Configure logs, color, verbosity, fine-grained verbosity
 - [x] Log directory
 - [x] Color support
 - [x] Version CLI
