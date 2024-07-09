@@ -2,110 +2,79 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tracing_appender::rolling;
 
+use crate::APP_NAME;
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct Logging {
-    pub loggers: Vec<Logger>,
-    pub console: VerbosityDefinition,
+    pub loggers: Vec<Log>,
 }
 
 impl Default for Logging {
     fn default() -> Self {
-        let console = VerbosityDefinition::Single(Level {
-            verbosity: VerbosityLevel::Info,
-        });
+        let loggers = vec![Log::error_logger(), Log::rolling_info_logger()];
 
-        let loggers = vec![
-            Logger::File(FileLogger::error_logger()),
-            Logger::Rolling(RollingFileLogger::daily_info_logger()),
-        ];
-
-        Self { loggers, console }
+        Self { loggers }
     }
 }
 
 #[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all = "kebab-case", tag = "kind")]
-pub enum Logger {
-    File(FileLogger),
-    Rolling(RollingFileLogger),
-}
-
-impl Logger {
-    pub fn appender(&self) -> rolling::RollingFileAppender {
-        match self {
-            Self::File(_) => rolling::never(self.directory(), self.file_name_prefix()),
-            Self::Rolling(logger) => match logger.rotation {
-                Rotation::Daily => rolling::daily(self.directory(), self.file_name_prefix()),
-                Rotation::Hourly => rolling::hourly(self.directory(), self.file_name_prefix()),
-                Rotation::Minutely => rolling::minutely(self.directory(), self.file_name_prefix()),
-                Rotation::Never => rolling::never(self.directory(), self.file_name_prefix()),
-            },
-        }
-    }
-
-    pub fn directory(&self) -> PathBuf {
-        match self {
-            Self::File(logger) => logger.path.clone(),
-            Self::Rolling(logger) => logger.path.clone(),
-        }
-    }
-
-    pub fn file_name_prefix(&self) -> String {
-        format!(
-            "{}.log",
-            match self {
-                Self::File(logger) => &logger.name,
-                Self::Rolling(logger) => &logger.name,
-            }
-        )
-    }
-
-    pub fn level(&self) -> VerbosityDefinition {
-        match self {
-            Self::File(logger) => logger.level.clone(),
-            Self::Rolling(logger) => logger.level.clone(),
-        }
-    }
-}
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct FileLogger {
-    pub path: PathBuf,
-    pub level: VerbosityDefinition,
-    pub name: String,
-}
-
-impl FileLogger {
-    pub fn error_logger() -> Self {
-        Self {
-            path: PathBuf::from("logs"),
-            level: VerbosityDefinition::MinMax(MinMax {
-                min: VerbosityLevel::Error,
-                max: VerbosityLevel::Warn,
-            }),
-            name: "error".to_string(),
-        }
-    }
-}
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct RollingFileLogger {
-    pub path: PathBuf,
-    pub level: VerbosityDefinition,
+pub struct Log {
+    pub directory: PathBuf,
+    pub max: Option<LogLevel>,
+    pub min: Option<LogLevel>,
     pub name: String,
     pub rotation: Rotation,
 }
 
-impl RollingFileLogger {
-    pub fn daily_info_logger() -> Self {
+impl Log {
+    pub fn error_logger() -> Self {
         Self {
-            name: "out".to_string(),
-            path: PathBuf::from("logs"),
-            rotation: Rotation::Daily,
-            level: VerbosityDefinition::Single(Level {
-                verbosity: VerbosityLevel::Info,
-            }),
+            min: LogLevel::Error.into(),
+            max: LogLevel::Warn.into(),
+            name: format!("{APP_NAME}.error"),
+            directory: PathBuf::from("logs"),
+            rotation: Rotation::Never,
         }
+    }
+
+    pub fn rolling_info_logger() -> Self {
+        Self {
+            max: LogLevel::Info.into(),
+            min: LogLevel::Info.into(),
+            name: format!("{APP_NAME}"),
+            directory: PathBuf::from("logs"),
+            rotation: Rotation::Daily,
+        }
+    }
+
+    pub fn rolling_debug_logger() -> Self {
+        Self {
+            max: LogLevel::Trace.into(),
+            min: LogLevel::Error.into(),
+            name: format!("{APP_NAME}.debug"),
+            directory: PathBuf::from("logs"),
+            rotation: Rotation::Minutely,
+        }
+    }
+
+    pub fn appender(&self) -> rolling::RollingFileAppender {
+        let directory = self.directory.clone();
+        let file_name_prefix = format!("{}.log", &self.name);
+
+        match self.rotation {
+            Rotation::Daily => rolling::daily(directory, file_name_prefix),
+            Rotation::Hourly => rolling::hourly(directory, file_name_prefix),
+            Rotation::Minutely => rolling::minutely(directory, file_name_prefix),
+            Rotation::Never => rolling::never(directory, file_name_prefix),
+        }
+    }
+
+    pub fn min_level(&self) -> tracing::Level {
+        self.min.clone().unwrap_or_default().as_level_filter()
+    }
+
+    pub fn max_level(&self) -> tracing::Level {
+        self.max.clone().unwrap_or_default().as_level_filter()
     }
 }
 
@@ -118,42 +87,18 @@ pub enum Rotation {
     Never,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case", tag = "kind")]
-pub enum VerbosityDefinition {
-    MinMax(MinMax),
-    Single(Level),
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct MinMax {
-    pub min: VerbosityLevel,
-    pub max: VerbosityLevel,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Level {
-    pub verbosity: VerbosityLevel,
-}
-
-impl Level {
-    pub fn as_level_filter(&self) -> tracing::Level {
-        self.verbosity.as_level_filter()
-    }
-}
-
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
-pub enum VerbosityLevel {
-    Error,
-    Warn,
+pub enum LogLevel {
+    Error = 0,
+    Warn = 1,
     #[default]
-    Info,
-    Debug,
-    Trace,
+    Info = 2,
+    Debug = 3,
+    Trace = 4,
 }
 
-impl VerbosityLevel {
+impl LogLevel {
     pub fn as_level_filter(&self) -> tracing::Level {
         match self {
             Self::Error => tracing::Level::ERROR,

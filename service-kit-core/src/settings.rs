@@ -22,7 +22,6 @@ use server::ServerMode;
 use service::ServiceOperation;
 
 pub use client::Client;
-pub use configuration::{MinMax, VerbosityDefinition};
 pub use environment::Environment;
 pub use network_settings::NetworkSettings;
 pub use server::Server;
@@ -146,6 +145,17 @@ impl Settings {
         }
 
         Ok(())
+    }
+
+    #[tracing::instrument(level = "debug", skip(self))]
+    pub fn loggers(&self) -> Vec<configuration::logging::Log> {
+        let mut loggers = self.config.logging.loggers.clone();
+
+        if self.cli.global.environment.is_development() {
+            loggers.push(configuration::logging::Log::rolling_debug_logger())
+        }
+
+        loggers
     }
 
     #[tracing::instrument(level = "debug", skip(self))]
