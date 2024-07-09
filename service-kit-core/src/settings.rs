@@ -22,6 +22,7 @@ use server::ServerMode;
 use service::ServiceOperation;
 
 pub use client::Client;
+pub use configuration::{MinMax, VerbosityDefinition};
 pub use environment::Environment;
 pub use network_settings::NetworkSettings;
 pub use server::Server;
@@ -45,7 +46,7 @@ pub struct ConfigurationSources {
 }
 
 impl Settings {
-    pub fn parse() -> crate::Result<(Self, WorkerGuard)> {
+    pub fn parse() -> crate::Result<(Self, Vec<WorkerGuard>)> {
         let cli = Cli::parse();
         let sources = ConfigurationSources {
             home_config: cli.home_config(),
@@ -71,11 +72,11 @@ impl Settings {
             config,
             sources,
         };
-        let guard = telemetry::init(&settings);
+        let guards = telemetry::init(&settings);
 
         settings.cli.global.color.init();
 
-        Ok((settings, guard))
+        Ok((settings, guards))
     }
 
     pub async fn exec(&self) -> crate::Result<()> {

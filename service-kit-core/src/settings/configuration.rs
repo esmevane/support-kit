@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use tracing_appender::rolling;
 
 use crate::APP_NAME;
 
@@ -87,13 +88,13 @@ impl std::fmt::Display for Database {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Logging {
-    pub loggers: Option<Vec<Logger>>,
-    pub console: Verbosity,
+    pub loggers: Vec<Logger>,
+    pub console: VerbosityDefinition,
 }
 
 impl Default for Logging {
     fn default() -> Self {
-        let console = Verbosity::Single(Level {
+        let console = VerbosityDefinition::Single(Level {
             verbosity: VerbosityLevel::Info,
         });
 
@@ -102,10 +103,7 @@ impl Default for Logging {
             Logger::Rolling(RollingFileLogger::daily_info_logger()),
         ];
 
-        Self {
-            loggers: Some(loggers),
-            console,
-        }
+        Self { loggers, console }
     }
 }
 
@@ -116,10 +114,48 @@ pub enum Logger {
     Rolling(RollingFileLogger),
 }
 
+impl Logger {
+    pub fn appender(&self) -> rolling::RollingFileAppender {
+        match self {
+            Self::File(_) => rolling::never(self.directory(), self.file_name_prefix()),
+            Self::Rolling(logger) => match logger.rotation {
+                Rotation::Daily => rolling::daily(self.directory(), self.file_name_prefix()),
+                Rotation::Hourly => rolling::hourly(self.directory(), self.file_name_prefix()),
+                Rotation::Minutely => rolling::minutely(self.directory(), self.file_name_prefix()),
+                Rotation::Never => rolling::never(self.directory(), self.file_name_prefix()),
+            },
+        }
+    }
+
+    pub fn directory(&self) -> PathBuf {
+        match self {
+            Self::File(logger) => logger.path.clone(),
+            Self::Rolling(logger) => logger.path.clone(),
+        }
+    }
+
+    pub fn file_name_prefix(&self) -> String {
+        format!(
+            "{}.log",
+            match self {
+                Self::File(logger) => &logger.name,
+                Self::Rolling(logger) => &logger.name,
+            }
+        )
+    }
+
+    pub fn level(&self) -> VerbosityDefinition {
+        match self {
+            Self::File(logger) => logger.level.clone(),
+            Self::Rolling(logger) => logger.level.clone(),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct FileLogger {
     pub path: PathBuf,
-    pub level: Verbosity,
+    pub level: VerbosityDefinition,
     pub name: String,
 }
 
@@ -127,7 +163,7 @@ impl FileLogger {
     pub fn error_logger() -> Self {
         Self {
             path: PathBuf::from("logs"),
-            level: Verbosity::MinMax(MinMax {
+            level: VerbosityDefinition::MinMax(MinMax {
                 min: VerbosityLevel::Error,
                 max: VerbosityLevel::Warn,
             }),
@@ -139,7 +175,7 @@ impl FileLogger {
 #[derive(Clone, Debug, Deserialize)]
 pub struct RollingFileLogger {
     pub path: PathBuf,
-    pub level: Verbosity,
+    pub level: VerbosityDefinition,
     pub name: String,
     pub rotation: Rotation,
 }
@@ -150,7 +186,7 @@ impl RollingFileLogger {
             name: "out".to_string(),
             path: PathBuf::from("logs"),
             rotation: Rotation::Daily,
-            level: Verbosity::Single(Level {
+            level: VerbosityDefinition::Single(Level {
                 verbosity: VerbosityLevel::Info,
             }),
         }
@@ -168,7 +204,7 @@ pub enum Rotation {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case", tag = "kind")]
-pub enum Verbosity {
+pub enum VerbosityDefinition {
     MinMax(MinMax),
     Single(Level),
 }
@@ -184,6 +220,12 @@ pub struct Level {
     pub verbosity: VerbosityLevel,
 }
 
+impl Level {
+    pub fn as_level_filter(&self) -> tracing::Level {
+        self.verbosity.as_level_filter()
+    }
+}
+
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum VerbosityLevel {
@@ -193,4 +235,16 @@ pub enum VerbosityLevel {
     Info,
     Debug,
     Trace,
+}
+
+impl VerbosityLevel {
+    pub fn as_level_filter(&self) -> tracing::Level {
+        match self {
+            Self::Error => tracing::Level::ERROR,
+            Self::Warn => tracing::Level::WARN,
+            Self::Info => tracing::Level::INFO,
+            Self::Debug => tracing::Level::DEBUG,
+            Self::Trace => tracing::Level::TRACE,
+        }
+    }
 }

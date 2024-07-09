@@ -20,10 +20,10 @@ pub const APP_NAME: &str = "service-kit";
 
 shadow!(build);
 
-pub async fn run() -> Result<WorkerGuard> {
-    let (settings, guard) = settings::Settings::parse()?;
+pub async fn run() -> Result<Vec<WorkerGuard>> {
+    let (settings, guards) = settings::Settings::parse()?;
 
     settings.exec().await?;
 
-    Ok(guard)
+    Ok(guards)
 }
