@@ -7,7 +7,7 @@ use super::{Environment, Logging, Settings};
 #[serde(default)]
 pub struct Configuration {
     pub environment: Environment,
-    pub db: Database,
+    // pub db: Database,
     pub storage: Storage,
     pub logging: Logging,
 }
@@ -57,36 +57,36 @@ impl Storage {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
-pub struct Database {
-    host: String,
-    port: u16,
-    user: String,
-    password: String,
-    database: Option<String>,
-}
+// #[derive(Clone, Debug, Deserialize)]
+// pub struct Database {
+//     host: String,
+//     port: u16,
+//     user: String,
+//     password: String,
+//     database: Option<String>,
+// }
 
-impl Default for Database {
-    fn default() -> Self {
-        Self {
-            host: "localhost".to_string(),
-            port: 3306,
-            user: "root".to_string(),
-            password: "password".to_string(),
-            database: None,
-        }
-    }
-}
+// impl Default for Database {
+//     fn default() -> Self {
+//         Self {
+//             host: "localhost".to_string(),
+//             port: 3306,
+//             user: "root".to_string(),
+//             password: "password".to_string(),
+//             database: None,
+//         }
+//     }
+// }
 
-impl Database {
-    fn connection_string(&self, settings: &Settings) -> String {
-        format!(
-            "mysql://{}:{}@{}:{}/{}",
-            self.user,
-            self.password,
-            self.host,
-            self.port,
-            self.database.as_deref().unwrap_or(&settings.app_name),
-        )
-    }
-}
+// impl Database {
+//     fn connection_string(&self, settings: &Settings) -> String {
+//         format!(
+//             "mysql://{}:{}@{}:{}/{}",
+//             self.user,
+//             self.password,
+//             self.host,
+//             self.port,
+//             self.database.as_deref().unwrap_or(&settings.app_name),
+//         )
+//     }
+// }

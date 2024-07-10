@@ -2,6 +2,9 @@ use service_manager::*;
 use std::ffi::OsString;
 use std::path::PathBuf;
 
+use crate::contexts::ServiceContext;
+use crate::settings::ServiceOperation;
+
 pub struct Service {
     label: ServiceLabel,
     manager: Box<dyn ServiceManager>,
@@ -22,6 +25,15 @@ impl Service {
         }
 
         Ok(Self { label, manager })
+    }
+
+    pub fn execute(&self, context: &ServiceContext) -> crate::Result<()> {
+        match context.operation {
+            ServiceOperation::Install => self.install(PathBuf::new(), vec![]),
+            ServiceOperation::Start => self.start(),
+            ServiceOperation::Stop => self.stop(),
+            ServiceOperation::Uninstall => self.uninstall(),
+        }
     }
 
     pub fn install(&self, program: PathBuf, args: Vec<OsString>) -> crate::Result<()> {

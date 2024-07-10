@@ -16,7 +16,7 @@ use logging::Log;
 pub use environment::Environment;
 pub use logging::Logging;
 pub use network::Network;
-pub use service::Service;
+pub use service::{Service, ServiceOperation};
 
 use crate::telemetry;
 
