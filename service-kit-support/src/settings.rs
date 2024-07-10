@@ -1,3 +1,4 @@
+mod color;
 mod configuration;
 mod environment;
 mod logging;
@@ -13,6 +14,7 @@ use tracing_appender::non_blocking::WorkerGuard;
 use configuration::Configuration;
 use logging::Log;
 
+pub use color::Color;
 pub use environment::Environment;
 pub use logging::Logging;
 pub use network::Network;
@@ -45,6 +47,8 @@ pub trait SourceProvider {
 #[derive(Debug, Clone)]
 pub struct BaseConfig {
     pub verbosity: Level,
+    pub color: Color,
+    pub environment: Environment,
 }
 
 #[derive(Debug, Clone)]
@@ -61,6 +65,8 @@ pub struct ConfigurationSources {
 pub struct Settings {
     pub app_name: String,
     pub verbosity: Level,
+    pub color: Color,
+    pub environment: Environment,
     pub config: Configuration,
     pub sources: ConfigurationSources,
 }
@@ -80,9 +86,12 @@ impl Settings {
             .build()?;
 
         let config: Configuration = config_builder.try_deserialize()?;
+        let base_config = cli.base_config();
         let mut settings = Settings {
             app_name: T::APP_NAME.into(),
-            verbosity: cli.base_config().verbosity,
+            verbosity: base_config.verbosity,
+            color: base_config.color,
+            environment: base_config.environment,
             config,
             sources,
         };
@@ -104,7 +113,7 @@ impl Settings {
         if loggers.is_empty() {
             loggers = vec![Log::error_logger(self), Log::rolling_info_logger(self)];
 
-            if self.config.environment.is_development() {
+            if self.environment.is_development() {
                 loggers.push(Log::rolling_debug_logger(self))
             }
         }

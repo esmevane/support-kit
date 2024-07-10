@@ -1,7 +1,8 @@
+use clap::Parser;
 use service_manager::ServiceManagerKind;
 use strum::{EnumString, VariantNames};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Parser)]
 pub struct Service {
     pub service_label: Option<String>,
     pub service_manager: Option<ServiceManagerKind>,
