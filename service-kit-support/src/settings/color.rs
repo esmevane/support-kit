@@ -1,6 +1,9 @@
 use clap::ValueEnum;
+use serde::Serialize;
 
-#[derive(ValueEnum, Clone, Copy, Debug)]
+#[derive(ValueEnum, Clone, Copy, Debug, Serialize)]
+#[serde(rename_all = "kebab-case")]
+#[clap(rename_all = "kebab-case")]
 pub enum Color {
     Always,
     Auto,

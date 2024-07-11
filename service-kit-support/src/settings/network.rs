@@ -1,4 +1,6 @@
-#[derive(Clone, Debug, Default)]
+use serde::Deserialize;
+
+#[derive(Clone, Debug, Default, Deserialize)]
 pub struct Network {
     pub host: String,
     pub port: u16,

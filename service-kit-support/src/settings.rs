@@ -26,8 +26,17 @@ pub trait SourceProvider {
     const APP_NAME: &'static str;
 
     fn base_config(&self) -> BaseConfig;
+
+    /// Build an OS agnostic path to the home configuration directory
+    /// based on the given config.
     fn home_config_path(&self) -> String;
+
+    /// Build an OS agnostic path to the root configuration directory
+    /// based on the given config, app_name, and environment.
     fn environment_scoped_config_path(&self) -> String;
+
+    /// Build an OS agnostic path to the root configuration directory
+    /// based on the given config, app_name.
     fn root_config_path(&self) -> String;
     fn env_var_prefix(&self) -> String;
     fn env_var_separator(&self) -> String;
@@ -104,6 +113,11 @@ impl Settings {
         // settings.cli.global.color.init();
 
         Ok((settings, guards))
+    }
+
+    #[tracing::instrument(level = "debug", skip(self))]
+    pub async fn listener(&self) -> crate::Result<tokio::net::TcpListener> {
+        Ok(self.config.server.listener().await?)
     }
 
     #[tracing::instrument(level = "debug", skip(self))]

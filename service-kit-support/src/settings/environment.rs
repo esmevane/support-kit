@@ -1,8 +1,10 @@
 use clap::ValueEnum;
 use config::ValueKind;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug, Default, Deserialize, strum::Display, strum::EnumIs, ValueEnum)]
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, strum::Display, strum::EnumIs, ValueEnum, Serialize,
+)]
 #[serde(rename_all = "kebab-case")]
 #[strum(serialize_all = "kebab-case")]
 pub enum Environment {

@@ -1,3 +1,4 @@
+use clap::Parser;
 use shadow_rs::shadow;
 
 mod cli;
@@ -6,8 +7,6 @@ mod context;
 mod errors;
 mod server;
 mod service;
-mod settings;
-mod telemetry;
 mod tui;
 
 pub use client::WebClient;
@@ -21,9 +20,9 @@ pub const APP_NAME: &str = "service-kit";
 shadow!(build);
 
 pub async fn run() -> Result<Vec<WorkerGuard>> {
-    let (settings, guards) = settings::Settings::parse()?;
+    let (settings, guards) = service_kit_support::settings::Settings::parse(cli::Cli::parse())?;
 
-    settings.exec().await?;
+    // settings.exec().await?;
 
     Ok(guards)
 }

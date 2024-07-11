@@ -1,10 +1,11 @@
 use clap::Parser;
 use clap_verbosity_flag::Verbosity;
+use serde::Serialize;
 
 use crate::settings::{Color, Environment, Service};
 
 /// A CLI application that helps do non-standard AzerothCore db tasks
-#[derive(Clone, Debug, Parser)]
+#[derive(Clone, Debug, Parser, Serialize)]
 pub struct Cli {
     #[clap(subcommand)]
     pub command: Command,
@@ -13,7 +14,8 @@ pub struct Cli {
     pub global: GlobalOpts,
 }
 
-#[derive(Clone, Debug, Parser)]
+#[derive(Clone, Debug, Parser, Serialize)]
+#[serde(rename_all = "kebab-case")]
 #[clap(rename_all = "kebab-case")]
 pub enum Command {
     /// Bootstrap all systems and configuration and print a debug report.
@@ -28,7 +30,7 @@ pub enum Command {
     Version,
 }
 
-#[derive(Clone, Debug, Parser)]
+#[derive(Clone, Debug, Parser, Serialize)]
 pub struct GlobalOpts {
     /// Enable or disable colored output.
     #[clap(long, value_enum, global = true, default_value = "auto")]
@@ -41,5 +43,6 @@ pub struct GlobalOpts {
     pub environment: Environment,
     /// Enable verbose output.
     #[command(flatten)]
+    #[serde(skip_serializing)]
     pub verbosity: Verbosity,
 }

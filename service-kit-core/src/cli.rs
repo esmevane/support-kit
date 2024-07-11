@@ -1,33 +1,34 @@
-use clap::{Parser, ValueEnum};
-use clap_verbosity_flag::Verbosity;
 use std::path::PathBuf;
 
-use crate::{
-    settings::{Client, Environment, Server, Service},
-    APP_NAME,
-};
+use serde::Serialize;
+use service_kit_support::settings::SourceProvider;
+
+use crate::APP_NAME;
 
 /// A CLI application that helps do non-standard AzerothCore db tasks
-#[derive(Clone, Debug, Parser)]
+#[derive(Clone, Debug, clap::Parser, Serialize)]
 pub struct Cli {
-    #[clap(subcommand)]
-    pub command: Command,
-
     #[clap(flatten)]
-    pub global: GlobalOpts,
+    pub support_cli: service_kit_support::cli::Cli,
 }
 
 impl Cli {
     fn base_config_path(&self) -> String {
-        match self.global.config {
+        match self.support_cli.global.config {
             Some(ref config) => config.clone(),
             None => String::new(),
         }
     }
+}
 
-    /// Build an OS agnostic path to the home configuration directory
-    /// based on the given config.
-    pub fn home_config(&self) -> String {
+impl SourceProvider for Cli {
+    const APP_NAME: &'static str = APP_NAME;
+
+    fn base_config(&self) -> service_kit_support::settings::BaseConfig {
+        todo!()
+    }
+
+    fn home_config_path(&self) -> String {
         let mut path = PathBuf::new();
         path.push(dirs::home_dir().unwrap_or_default());
         path.push(".config");
@@ -37,74 +38,31 @@ impl Cli {
         path.to_string_lossy().into()
     }
 
-    /// Build an OS agnostic path to the root configuration directory
-    /// based on the given config, app_name, and environment.
-    pub fn env_config(&self) -> String {
+    fn environment_scoped_config_path(&self) -> String {
         let mut path = PathBuf::new();
         path.push(self.base_config_path());
         path.push(format!(
             "{}.{}",
             APP_NAME.to_lowercase(),
-            self.global.environment.clone()
+            self.support_cli.global.environment.clone()
         ));
 
         path.to_string_lossy().into()
     }
 
-    /// Build an OS agnostic path to the root configuration directory
-    /// based on the given config, app_name.
-    pub fn root_config(&self) -> String {
+    fn root_config_path(&self) -> String {
         let mut path = PathBuf::new();
         path.push(self.base_config_path());
         path.push(APP_NAME.to_lowercase());
 
         path.to_string_lossy().into()
     }
-}
 
-#[derive(Clone, Debug, Parser)]
-pub struct GlobalOpts {
-    #[clap(long, value_enum, global = true, default_value = "auto")]
-    pub color: Color,
-
-    /// The path to the configuration root.
-    #[clap(short, long)]
-    pub config: Option<String>,
-
-    /// What environment to run the program in.
-    #[clap(short, long, default_value = "development")]
-    pub environment: Environment,
-
-    /// Enable verbose output.
-    #[command(flatten)]
-    pub verbosity: Verbosity,
-}
-
-#[derive(ValueEnum, Clone, Copy, Debug)]
-pub enum Color {
-    Always,
-    Auto,
-    Never,
-}
-
-impl Color {
-    pub fn init(self) {
-        // Set a supports-color override based on the variable passed in.
-        match self {
-            Color::Always => owo_colors::set_override(true),
-            Color::Auto => {}
-            Color::Never => owo_colors::set_override(false),
-        }
+    fn env_var_prefix(&self) -> String {
+        todo!()
     }
-}
 
-#[derive(Clone, Debug, Parser)]
-#[clap(rename_all = "kebab-case")]
-pub enum Command {
-    Debug,
-    Tui,
-    Server(Server),
-    Client(Client),
-    Service(Service),
-    Version,
+    fn env_var_separator(&self) -> String {
+        todo!()
+    }
 }
