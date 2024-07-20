@@ -1,15 +1,57 @@
-use std::path::PathBuf;
+mod client;
 
 use serde::Serialize;
-use service_kit_support::settings::SourceProvider;
+use service_kit_support::{args::SupportCommands, settings::SourceProvider};
+use std::path::PathBuf;
+
+use client::{Client, ClientResource};
 
 use crate::APP_NAME;
 
 /// A CLI application that helps do non-standard AzerothCore db tasks
 #[derive(Clone, Debug, clap::Parser, Serialize)]
 pub struct Cli {
+    #[clap(subcommand)]
+    pub command: Command,
     #[clap(flatten)]
-    pub support_cli: service_kit_support::cli::Cli,
+    pub support_cli: service_kit_support::args::Args,
+}
+
+impl Cli {
+    #[tracing::instrument(level = "debug", name = "Execute cli command")]
+    pub async fn execute(&self) -> crate::Result<()> {
+        match &self.command {
+            Command::Client(client) => {
+                tracing::info!("Client command");
+
+                let response = match &client.resource {
+                    Some(resource) => resource.exec(client.settings.clone()).await?,
+                    None => {
+                        tracing::debug!("No client resource specified, prompting");
+
+                        ClientResource::select()?
+                            .exec(client.settings.clone())
+                            .await?
+                    }
+                };
+
+                tracing::info!("{}", response);
+            }
+            Command::Tools(support) => support.execute().await?,
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, clap::Parser, Serialize)]
+#[serde(rename_all = "kebab-case")]
+#[clap(rename_all = "kebab-case")]
+pub enum Command {
+    /// Operate the rust client from the command line.
+    Client(Client),
+    /// Service kit support tools and commands to manage service-kit service.
+    Tools(SupportCommands),
 }
 
 impl Cli {

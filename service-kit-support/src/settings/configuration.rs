@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::path::PathBuf;
 
-use super::{Logging, Network, Settings};
+use super::{Logging, Network, Service, Settings};
 
 #[derive(Clone, Default, Debug, Deserialize)]
 #[serde(default)]
@@ -11,6 +11,7 @@ pub struct Configuration {
     pub logging: Logging,
     pub server: Network,
     pub client: Network,
+    pub service: Service,
 }
 
 #[derive(Clone, Debug, Default, Deserialize)]

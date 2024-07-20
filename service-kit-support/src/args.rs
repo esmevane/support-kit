@@ -2,18 +2,47 @@ use clap::Parser;
 use clap_verbosity_flag::Verbosity;
 use serde::Serialize;
 
-use crate::settings::{Color, Environment, Service};
+use crate::settings::{Color, Environment, Service, Settings};
 
 /// A CLI application that helps do non-standard AzerothCore db tasks
 #[derive(Clone, Debug, Parser, Serialize)]
-pub struct Cli {
-    #[clap(subcommand)]
-    pub command: Command,
-
+pub struct Args {
     #[clap(flatten)]
     pub global: GlobalOpts,
 }
 
+/// Service kit support tools and commands to manage your support kit service.
+#[derive(Clone, Debug, Parser, Serialize)]
+pub struct SupportCommands {
+    #[clap(subcommand)]
+    pub command: Command,
+}
+
+impl SupportCommands {
+    pub async fn execute(&self) -> crate::Result<()> {
+        match &self.command {
+            Command::Debug => {
+                println!("{:#?}", self);
+            }
+            Command::Tui => {
+                todo!()
+            }
+            Command::Server => {
+                todo!()
+            }
+            Command::Service(_service) => {
+                todo!()
+            }
+            Command::Version => {
+                println!("Version: {}", env!("CARGO_PKG_VERSION"));
+            }
+        }
+
+        Ok(())
+    }
+}
+
+/// Commands to manage the support kit service itself.
 #[derive(Clone, Debug, Parser, Serialize)]
 #[serde(rename_all = "kebab-case")]
 #[clap(rename_all = "kebab-case")]
@@ -28,6 +57,10 @@ pub enum Command {
     Service(Service),
     /// Print the version of the application.
     Version,
+}
+
+pub trait ArgsExecutor {
+    fn execute(&self, settings: &Settings) -> crate::Result<()>;
 }
 
 #[derive(Clone, Debug, Parser, Serialize)]

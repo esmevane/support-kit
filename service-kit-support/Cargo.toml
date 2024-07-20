@@ -15,6 +15,7 @@ clap = { workspace = true }
 clap-verbosity-flag = { workspace = true }
 color-eyre = { workspace = true }
 config = { workspace = true }
+dialoguer = { workspace = true }
 dirs = { workspace = true }
 futures = { workspace = true }
 mime_guess = { workspace = true }

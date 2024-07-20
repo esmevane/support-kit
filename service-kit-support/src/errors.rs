@@ -8,6 +8,8 @@ pub enum Error {
     StorageError(#[from] crate::storage::StorageError),
     #[error("Storage file error: {0}")]
     StorageFileError(#[from] sqlx::Error),
+    #[error("Service not configured, unable to initialize service context")]
+    ServiceNotConfiguredError,
     #[error("Storage not configured, unable to initialize storage collection")]
     StorageNotConfiguredError,
     #[error("Unable to get next terminal event")]

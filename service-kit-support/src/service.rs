@@ -2,16 +2,18 @@ use service_manager::*;
 use std::ffi::OsString;
 use std::path::PathBuf;
 
-use crate::contexts::ServiceContext;
-use crate::settings::ServiceOperation;
+use crate::contexts::{self, ServiceContext};
+use crate::settings::{self, ServiceOperation};
 
 pub struct Service {
-    label: ServiceLabel,
+    context: contexts::ServiceContext,
     manager: Box<dyn ServiceManager>,
 }
 
 impl Service {
-    pub fn init(label: ServiceLabel) -> crate::Result<Self> {
+    pub fn init(settings: &settings::Settings) -> crate::Result<Self> {
+        // build a service context
+        let context = contexts::ServiceContext::try_from(settings)?;
         let mut manager = <dyn ServiceManager>::native()?;
 
         match manager.set_level(ServiceLevel::User) {
@@ -24,7 +26,7 @@ impl Service {
             }
         }
 
-        Ok(Self { label, manager })
+        Ok(Self { context, manager })
     }
 
     pub fn execute(&self, context: &ServiceContext) -> crate::Result<()> {
@@ -38,7 +40,7 @@ impl Service {
 
     pub fn install(&self, program: PathBuf, args: Vec<OsString>) -> crate::Result<()> {
         self.manager.install(ServiceInstallCtx {
-            label: self.label.clone(),
+            label: self.context.label.clone(),
             program,
             args,
             contents: None,
@@ -52,7 +54,7 @@ impl Service {
 
     pub fn start(&self) -> crate::Result<()> {
         self.manager.start(ServiceStartCtx {
-            label: self.label.clone(),
+            label: self.context.label.clone(),
         })?;
 
         Ok(())
@@ -60,7 +62,7 @@ impl Service {
 
     pub fn stop(&self) -> crate::Result<()> {
         self.manager.stop(ServiceStopCtx {
-            label: self.label.clone(),
+            label: self.context.label.clone(),
         })?;
 
         Ok(())
@@ -68,7 +70,7 @@ impl Service {
 
     pub fn uninstall(&self) -> crate::Result<()> {
         self.manager.uninstall(ServiceUninstallCtx {
-            label: self.label.clone(),
+            label: self.context.label.clone(),
         })?;
 
         Ok(())
