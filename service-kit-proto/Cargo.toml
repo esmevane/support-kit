@@ -11,7 +11,9 @@ homepage = "https://esmevane.github.io/service-kit"
 [dependencies]
 prost = { workspace = true }
 serde = { workspace = true }
-serde_json = { workspace = true }
 
 [build-dependencies]
 prost-build = { workspace = true }
+
+[package.metadata.cargo-machete]
+ignored = ["prost", "serde"]

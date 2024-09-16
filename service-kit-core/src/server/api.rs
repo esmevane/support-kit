@@ -7,9 +7,7 @@ pub async fn router(_context: crate::WebContext) -> Router<crate::WebContext> {
     Router::new().route(
         "/health",
         get(|| {
-            let response = super::protocol_service::ProtocolService::health(
-                service_kit_proto::prelude::HealthCheck { ping: true },
-            );
+            let response = super::protocol_service::ProtocolService::health();
 
             async move { Json(response) }
         }),

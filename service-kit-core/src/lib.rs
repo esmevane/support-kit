@@ -1,3 +1,4 @@
+use clap::Parser;
 use shadow_rs::shadow;
 
 mod cli;
@@ -6,25 +7,22 @@ mod context;
 mod errors;
 mod server;
 mod service;
-mod settings;
-mod storage;
-mod telemetry;
 mod tui;
 
 pub use client::WebClient;
 pub use context::WebContext;
 pub use errors::Error;
+use tracing_appender::non_blocking::WorkerGuard;
 
 pub type Result<T> = color_eyre::eyre::Result<T, Error>;
+pub const APP_NAME: &str = "service-kit";
 
 shadow!(build);
 
-pub async fn run() -> Result<()> {
-    telemetry::init();
+pub async fn run() -> Result<Vec<WorkerGuard>> {
+    let (settings, guards) = service_kit_support::settings::Settings::parse(cli::Cli::parse())?;
 
-    tracing::info!("Starting up");
+    // settings.exec().await?;
 
-    settings::Settings::parse()?.exec().await?;
-
-    Ok(())
+    Ok(guards)
 }

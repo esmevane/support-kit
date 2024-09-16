@@ -15,10 +15,10 @@ where
 
 #[wasm_bindgen]
 pub async fn health(address: &str) -> Result<JsValue, JsValue> {
-    let uri = format!("http://{}/health", address);
+    let uri = format!("{address}/health");
     let response = reqwest::get(&uri).await.map_err(|e| e.to_string())?;
 
-    Ok(Json::<HealthCheckResponse>(
+    Ok(Json::<HealthResponse>(
         response
             .json()
             .await
