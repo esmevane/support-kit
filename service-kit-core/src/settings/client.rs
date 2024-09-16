@@ -30,7 +30,7 @@ impl ClientResource {
     }
 
     pub async fn exec(&self, config: NetworkSettings) -> crate::Result<Value> {
-        Ok(serde_json::to_value(&match self {
+        Ok(serde_json::to_value(match self {
             ClientResource::Health => crate::client::health(config).await?,
         })?)
     }

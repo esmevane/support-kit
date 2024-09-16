@@ -2,7 +2,9 @@ use clap::Parser;
 use std::str::FromStr;
 use strum::{EnumString, VariantNames};
 
-use super::{Cli, ServiceSettings};
+use crate::APP_NAME;
+
+use super::ServiceSettings;
 
 #[derive(Clone, Debug, Parser)]
 #[clap(rename_all = "kebab-case")]
@@ -41,19 +43,15 @@ impl ServiceOperation {
         Ok(Self::from_str(options[result])?)
     }
 
-    pub async fn exec(&self, cli: Cli, settings: ServiceSettings) -> crate::Result<()> {
+    pub async fn exec(&self, settings: ServiceSettings) -> crate::Result<()> {
         let program = std::env::current_exe()?;
-        let args: Vec<std::ffi::OsString> = vec![
-            "-a".into(),
-            cli.global.app_name.clone().into(),
-            "server".into(),
-            "api".into(),
-        ];
+        let args: Vec<std::ffi::OsString> =
+            vec!["-a".into(), APP_NAME.into(), "server".into(), "api".into()];
         let service = crate::service::Service::init(
             settings
                 .service_label
                 .clone()
-                .unwrap_or_else(|| format!("local.service.{}", cli.global.app_name))
+                .unwrap_or_else(|| format!("local.service.{}", APP_NAME))
                 .parse()?,
         )?;
 

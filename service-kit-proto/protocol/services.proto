@@ -1,11 +1,14 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 package protocol.services;
 
-message HealthCheckResponse {
+message HealthResponse {
   string version = 1;
+  string commit = 2;
 }
 
 service WebService {
-  rpc Health() returns (HealthCheckResponse) {}
+  rpc Health(google.protobuf.Empty) returns (HealthResponse) {}
 }

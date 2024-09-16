@@ -10,11 +10,10 @@ pub mod protocol_service {
     pub struct ProtocolService;
 
     impl service_kit_proto::prelude::WebService for ProtocolService {
-        fn health(
-            _: service_kit_proto::prelude::HealthCheck,
-        ) -> service_kit_proto::prelude::HealthCheckResponse {
-            service_kit_proto::prelude::HealthCheckResponse {
-                version: env!("CARGO_PKG_VERSION").to_string(),
+        fn health() -> service_kit_proto::prelude::HealthResponse {
+            service_kit_proto::prelude::HealthResponse {
+                commit: crate::build::SHORT_COMMIT.to_string(),
+                version: crate::build::PKG_VERSION.to_string(),
             }
         }
     }

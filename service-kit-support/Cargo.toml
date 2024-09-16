@@ -1,0 +1,36 @@
+[package]
+name = "service-kit-support"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/esmevane/service-kit"
+authors = ["Joseph McCormick <esmevane@gmail.com>"]
+description = "A service kit for building web services in Rust"
+homepage = "https://esmevane.github.io/service-kit"
+
+[dependencies]
+axum = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true }
+clap-verbosity-flag = { workspace = true }
+color-eyre = { workspace = true }
+config = { workspace = true }
+dialoguer = { workspace = true }
+dirs = { workspace = true }
+futures = { workspace = true }
+mime_guess = { workspace = true }
+owo-colors = { workspace = true }
+ratatui = { workspace = true }
+rust-embed = { workspace = true }
+serde = { workspace = true }
+service-manager = { workspace = true }
+sqlx = { workspace = true }
+strum = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-appender = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }

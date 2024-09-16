@@ -5,7 +5,7 @@ use crate::Error;
 #[derive(Clone, Debug, Default, Parser)]
 pub struct NetworkSettings {
     /// The host to connect to.
-    #[clap(long, default_value = "localhost")]
+    #[clap(long, default_value = "0.0.0.0")]
     pub host: String,
 
     /// The port to connect to.

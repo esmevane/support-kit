@@ -1,0 +1,24 @@
+{"timestamp":"2024-09-25T10:55:21.539015-05:00","level":"INFO","fields":{"message":"Logging initialized: \"info\",support_kit=\"info\",tower_http=debug,axum::rejection=trace","app_name":"support-kit"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:21.539064-05:00","level":"ERROR","fields":{"message":"Error log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:21.539099-05:00","level":"WARN","fields":{"message":"Warn log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:21.539135-05:00","level":"INFO","fields":{"message":"Info log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:21.539168-05:00","level":"DEBUG","fields":{"message":"Debug log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:21.539200-05:00","level":"TRACE","fields":{"message":"Trace log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:22.488679-05:00","level":"INFO","fields":{"message":"Logging initialized: \"info\",support_kit=\"info\",tower_http=debug,axum::rejection=trace","app_name":"support-kit"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:22.488723-05:00","level":"ERROR","fields":{"message":"Error log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:22.488754-05:00","level":"WARN","fields":{"message":"Warn log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:22.488782-05:00","level":"INFO","fields":{"message":"Info log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:22.488810-05:00","level":"DEBUG","fields":{"message":"Debug log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:22.488838-05:00","level":"TRACE","fields":{"message":"Trace log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:45.330952-05:00","level":"INFO","fields":{"message":"Logging initialized: \"info\",support_kit=\"info\",tower_http=debug,axum::rejection=trace","app_name":"support-kit"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:45.331001-05:00","level":"ERROR","fields":{"message":"Error log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:45.331036-05:00","level":"WARN","fields":{"message":"Warn log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:45.331065-05:00","level":"INFO","fields":{"message":"Info log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:45.331094-05:00","level":"DEBUG","fields":{"message":"Debug log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:45.331123-05:00","level":"TRACE","fields":{"message":"Trace log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:46.234539-05:00","level":"INFO","fields":{"message":"Logging initialized: \"info\",support_kit=\"info\",tower_http=debug,axum::rejection=trace","app_name":"support-kit"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:46.234585-05:00","level":"ERROR","fields":{"message":"Error log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:46.234621-05:00","level":"WARN","fields":{"message":"Warn log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:46.234651-05:00","level":"INFO","fields":{"message":"Info log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:46.234681-05:00","level":"DEBUG","fields":{"message":"Debug log level enabled"},"target":"support_kit::telemetry"}
+{"timestamp":"2024-09-25T10:55:46.234711-05:00","level":"TRACE","fields":{"message":"Trace log level enabled"},"target":"support_kit::telemetry"}
