@@ -1,14 +1,16 @@
+use crate::Config;
+
 use super::{LogFileConfig, LogLevel, LogLevelConfig, LogTarget, LoggerConfigOrPreset, Logging};
 
 #[derive(Clone, Debug, Default, serde::Deserialize, PartialEq, bon::Builder)]
 #[serde(rename_all = "kebab-case")]
 pub struct LoggerConfig {
-    #[builder(into)]
-    level: LogLevelConfig,
-    pub console: Option<LogTarget>,
+    console: Option<LogTarget>,
     #[serde(flatten)]
     #[builder(into)]
     file: Option<LogFileConfig>,
+    #[builder(into)]
+    level: LogLevelConfig,
 }
 
 impl LoggerConfig {
@@ -29,7 +31,7 @@ impl LoggerConfig {
         self
     }
 
-    pub fn initialize(&self, logging: &mut Logging) {
+    pub fn initialize(&self, config: &Config, logging: &mut Logging) {
         match &self.file {
             Some(file_config) => {
                 let (logger, guard) = file_config.init_log_appender(&self);
@@ -42,7 +44,7 @@ impl LoggerConfig {
 
         match &self.console {
             Some(console_target) => {
-                let logger = console_target.init_console_logger(&self);
+                let logger = console_target.init_console_logger(config, &self);
 
                 logging.loggers.push(logger);
             }

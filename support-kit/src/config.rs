@@ -1,15 +1,68 @@
+use crate::{LoggerConfig, VerbosityLevel};
+
 use super::{Logging, LoggingConfig};
 
 #[derive(Clone, Debug, Default, serde::Deserialize, PartialEq, bon::Builder)]
 pub struct Config {
     #[builder(into)]
     logging: LoggingConfig,
+    #[builder(into)]
+    verbosity: Option<VerbosityLevel>,
 }
 
 impl Config {
     pub fn init_logging(&self) -> Vec<tracing_appender::non_blocking::WorkerGuard> {
-        Logging::initialize(self.logging.clone())
+        Logging::initialize(self.clone())
     }
+
+    pub fn loggers(&self) -> Vec<LoggerConfig> {
+        self.logging.loggers()
+    }
+
+    pub fn env_filter(&self) -> tracing_subscriber::EnvFilter {
+        let log_level = self
+            .verbosity
+            .map(|verbosity| verbosity.to_string())
+            .unwrap_or_default();
+
+        tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| log_level.into())
+    }
+}
+
+#[test]
+fn verbosity_and_env_filter() -> Result<(), Box<dyn std::error::Error>> {
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "verbosity": "debug",
+            "logging": []
+        }
+        "#,
+    )?;
+
+    assert_eq!(
+        config,
+        Config::builder()
+            .verbosity(VerbosityLevel::Debug)
+            .logging(bon::vec![])
+            .build()
+    );
+
+    assert_eq!(config.env_filter().to_string(), "debug");
+
+    let config: Config = serde_json::from_str(r#"{ "logging": [] }"#)?;
+
+    assert_eq!(
+        config,
+        Config::builder()
+            .verbosity(VerbosityLevel::Off)
+            .logging(bon::vec![])
+            .build()
+    );
+
+    assert_eq!(config.env_filter().to_string(), "");
+
+    Ok(())
 }
 
 #[test]

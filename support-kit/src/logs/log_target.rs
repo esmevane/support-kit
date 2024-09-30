@@ -1,4 +1,4 @@
-use crate::TracingTarget;
+use crate::{Config, TracingTarget};
 
 use super::LoggerConfig;
 
@@ -9,12 +9,13 @@ pub enum LogTarget {
 }
 
 impl LogTarget {
-    pub fn init_console_logger(&self, logger_config: &LoggerConfig) -> TracingTarget {
+    pub fn init_console_logger(
+        &self,
+        config: &Config,
+        logger_config: &LoggerConfig,
+    ) -> TracingTarget {
         use tracing_subscriber::fmt::writer::MakeWriterExt;
-        use tracing_subscriber::EnvFilter;
         use tracing_subscriber::Layer;
-
-        let env_filter = EnvFilter::try_from_default_env().unwrap_or_default();
 
         match self {
             LogTarget::Stderr => tracing_subscriber::fmt::layer()
@@ -23,7 +24,7 @@ impl LogTarget {
                         .with_max_level(logger_config.max_tracing_level())
                         .with_min_level(logger_config.min_tracing_level()),
                 )
-                .with_filter(env_filter)
+                .with_filter(config.env_filter())
                 .boxed(),
             LogTarget::Stdout => tracing_subscriber::fmt::layer()
                 .with_writer(
@@ -31,7 +32,7 @@ impl LogTarget {
                         .with_max_level(logger_config.max_tracing_level())
                         .with_min_level(logger_config.min_tracing_level()),
                 )
-                .with_filter(env_filter)
+                .with_filter(config.env_filter())
                 .boxed(),
         }
     }
