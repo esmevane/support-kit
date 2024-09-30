@@ -6,7 +6,10 @@ members = [
   "service-kit-proto",
   "service-kit-support",
   "service-kit-web",
+  "support-kit-spike",
+  "support-kit",
   "xtask",
+  "examples/*",
 ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -17,13 +20,16 @@ service-kit-core = { version = "0.1.0", path = "./service-kit-core" }
 service-kit-proto = { version = "0.1.0", path = "./service-kit-proto" }
 service-kit-web = { version = "0.1.0", path = "./service-kit-web" }
 service-kit-support = { version = "0.1.0", path = "./service-kit-support" }
+support-kit = { version = "0.0.1", path = "./support-kit" }
 axum = { version = "0.7.5", features = ["ws", "tracing", "tokio"] }
 axum-extra = { version = "0.9", features = ["typed-header"] }
+bon = "2.3.0"
 chrono = { version = "0.4.33", features = ["serde"] }
 clap = { version = "4.5.4", features = ["derive", "env"] }
 clap-verbosity-flag = "2.2.0"
 color-eyre = "0.6.2"
 config = "0.14.0"
+convert_case = "0.6.0"
 crossterm = { version = "0.27.0", features = ["event-stream", "serde"] }
 dialoguer = { version = "0.11.0", features = [
   "history",
@@ -35,9 +41,11 @@ dirs = "5.0.1"
 derive_builder = "0.20.0"
 duct = "0.13"
 futures = "0.3.30"
+figment = { version = "0.10", features = ["env", "json", "toml", "yaml"] }
 getrandom = { version = "0.2", features = ["js"] }
 indicatif = { version = "0.17.8", features = ["tokio"] }
 mime_guess = "2.0.4"
+nutype = { version = "0.5.0", features = ["serde"] }
 owo-colors = { version = "4", features = ["supports-colors"] }
 prost = "0.12"
 prost-build = "0.12"
