@@ -5,6 +5,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
+clap = { workspace = true }
 support-kit = { workspace = true }
 tracing = { workspace = true }
 serde = { workspace = true }

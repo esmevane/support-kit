@@ -1,16 +1,9 @@
-use support_kit::Config;
+use clap::Parser;
 
 pub fn main() {
-    let config: Config = serde_json::from_str(
-        r#"
-        {
-            "logging": ["stderr", "stdout"]
-        }
-        "#,
-    )
-    .unwrap();
+    let args = support_kit::Args::parse();
 
-    let _logging = config.init_logging();
+    let _logging = args.as_config().init_logging();
 
     tracing::trace!("Hello, world!");
     tracing::debug!("Hello, world!");
