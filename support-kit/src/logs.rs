@@ -36,7 +36,7 @@ impl LoggingConfig {
 
 impl Default for LoggingConfig {
     fn default() -> Self {
-        Self::Many(vec![])
+        Self::Many(bon::vec![LoggerPreset::Stdout, LoggerPreset::Stderr,])
     }
 }
 
