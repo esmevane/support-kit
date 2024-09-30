@@ -24,12 +24,12 @@ impl Args {
 #[test]
 fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
     let expectations = [
-        ("app", Some(VerbosityLevel::Off)),
-        ("app -v", Some(VerbosityLevel::Error)),
-        ("app -vv", Some(VerbosityLevel::Warn)),
-        ("app -vvv", Some(VerbosityLevel::Info)),
-        ("app -vvvv", Some(VerbosityLevel::Debug)),
-        ("app -vvvvv", Some(VerbosityLevel::Trace)),
+        ("app", VerbosityLevel::Off),
+        ("app -v", VerbosityLevel::Error),
+        ("app -vv", VerbosityLevel::Warn),
+        ("app -vvv", VerbosityLevel::Info),
+        ("app -vvvv", VerbosityLevel::Debug),
+        ("app -vvvvv", VerbosityLevel::Trace),
     ];
 
     for (input, expected) in expectations.iter() {
@@ -37,7 +37,7 @@ fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
 
         assert_eq!(
             args.as_config(),
-            Config::builder().maybe_verbosity(expected.clone()).build()
+            Config::builder().verbosity(*expected).build()
         );
     }
     Ok(())
