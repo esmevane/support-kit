@@ -36,10 +36,7 @@ impl LoggingConfig {
 
 impl Default for LoggingConfig {
     fn default() -> Self {
-        Self::Many(vec![
-            ConfigOrPreset::Preset(LoggerPreset::Stdout),
-            ConfigOrPreset::Preset(LoggerPreset::Stderr),
-        ])
+        Self::Many(vec![])
     }
 }
 

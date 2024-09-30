@@ -9,14 +9,14 @@ pub struct Args {
 }
 
 impl Args {
-    pub fn verbosity_level(&self) -> VerbosityLevel {
-        VerbosityLevel::from_repr(self.verbosity as usize).unwrap_or_default()
+    pub fn verbosity_level(&self) -> Option<VerbosityLevel> {
+        let verbosity = self.verbosity;
+        VerbosityLevel::from_repr(verbosity as usize)
     }
 
     pub fn as_config(self) -> Config {
         Config::builder()
-            .verbosity(self.verbosity_level())
-            .logging(bon::vec![])
+            .maybe_verbosity(self.verbosity_level())
             .build()
     }
 }
@@ -24,12 +24,12 @@ impl Args {
 #[test]
 fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
     let expectations = [
-        ("app", VerbosityLevel::Off),
-        ("app -v", VerbosityLevel::Error),
-        ("app -vv", VerbosityLevel::Warn),
-        ("app -vvv", VerbosityLevel::Info),
-        ("app -vvvv", VerbosityLevel::Debug),
-        ("app -vvvvv", VerbosityLevel::Trace),
+        ("app", Some(VerbosityLevel::Off)),
+        ("app -v", Some(VerbosityLevel::Error)),
+        ("app -vv", Some(VerbosityLevel::Warn)),
+        ("app -vvv", Some(VerbosityLevel::Info)),
+        ("app -vvvv", Some(VerbosityLevel::Debug)),
+        ("app -vvvvv", Some(VerbosityLevel::Trace)),
     ];
 
     for (input, expected) in expectations.iter() {
@@ -37,10 +37,7 @@ fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
 
         assert_eq!(
             args.as_config(),
-            Config::builder()
-                .logging(bon::vec![])
-                .verbosity(expected.clone())
-                .build()
+            Config::builder().maybe_verbosity(expected.clone()).build()
         );
     }
     Ok(())
