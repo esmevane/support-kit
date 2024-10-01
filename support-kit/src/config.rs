@@ -1,81 +1,6 @@
-use crate::{ConfigOrPreset, LoggerConfig, VerbosityLevel};
+use crate::{LoggerConfig, NetworkConfig, VerbosityLevel};
 
 use super::{Logging, LoggingConfig};
-
-#[derive(Clone, Debug, PartialEq, serde::Deserialize)]
-struct NetworkPort(i32);
-
-impl From<i32> for NetworkPort {
-    fn from(port: i32) -> Self {
-        Self(port)
-    }
-}
-
-impl Default for NetworkPort {
-    fn default() -> Self {
-        Self(80)
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, serde::Deserialize)]
-struct NetworkHost(String);
-
-impl From<&str> for NetworkHost {
-    fn from(host: &str) -> Self {
-        Self(host.to_string())
-    }
-}
-
-impl Default for NetworkHost {
-    fn default() -> Self {
-        Self("0.0.0.0".to_string())
-    }
-}
-
-#[derive(Clone, Debug, Default, serde::Deserialize, PartialEq, bon::Builder)]
-pub struct Network {
-    #[serde(default)]
-    #[builder(default, into)]
-    host: NetworkHost,
-
-    #[serde(default)]
-    #[builder(default, into)]
-    port: NetworkPort,
-}
-
-impl From<&str> for Network {
-    fn from(host: &str) -> Self {
-        Network::builder().host(host).port(80).build()
-    }
-}
-
-impl<T, U> From<(T, U)> for Network
-where
-    T: AsRef<str>,
-    U: Into<NetworkPort>,
-{
-    fn from((host, port): (T, U)) -> Self {
-        Network::builder().host(host.as_ref()).port(port).build()
-    }
-}
-
-impl Default for ConfigOrPreset<Network, NetworkHost> {
-    fn default() -> Self {
-        Self::Config(Network::default())
-    }
-}
-
-impl From<&str> for ConfigOrPreset<Network, NetworkHost> {
-    fn from(host: &str) -> Self {
-        Self::Config(Network::from(host))
-    }
-}
-
-impl From<(&str, i32)> for ConfigOrPreset<Network, NetworkHost> {
-    fn from((host, port): (&str, i32)) -> Self {
-        Self::Config(Network::builder().host(host).port(port).build())
-    }
-}
 
 #[derive(Clone, Debug, Default, serde::Deserialize, PartialEq, bon::Builder)]
 pub struct Config {
@@ -89,7 +14,7 @@ pub struct Config {
 
     #[serde(default)]
     #[builder(default, into)]
-    server: ConfigOrPreset<Network, NetworkHost>,
+    server: NetworkConfig,
 }
 
 impl Config {

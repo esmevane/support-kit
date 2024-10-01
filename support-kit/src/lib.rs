@@ -1,6 +1,7 @@
 mod args;
 mod config;
 mod logs;
+mod network;
 mod structures;
 mod verbosity_level;
 
@@ -12,6 +13,8 @@ pub use verbosity_level::VerbosityLevel;
 
 type TracingTarget = Box<dyn tracing_subscriber::Layer<tracing_subscriber::Registry> + Send + Sync>;
 type TracingTargets = Vec<TracingTarget>;
+
+pub use network::NetworkConfig;
 
 #[test]
 fn todos() {
