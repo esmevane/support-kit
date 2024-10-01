@@ -9,7 +9,7 @@ members = [
   "support-kit-spike",
   "support-kit",
   "xtask",
-  "examples/*",
+  # "examples/*",
 ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

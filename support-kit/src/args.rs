@@ -5,12 +5,12 @@ use crate::{Config, VerbosityLevel};
 #[derive(Parser)]
 pub struct Args {
     #[arg(short, long, action = clap::ArgAction::Count)]
-    verbosity: u8,
+    verbose: u8,
 }
 
 impl Args {
     pub fn verbosity_level(&self) -> Option<VerbosityLevel> {
-        let verbosity = self.verbosity;
+        let verbosity = self.verbose;
         VerbosityLevel::from_repr(verbosity as usize)
     }
 
