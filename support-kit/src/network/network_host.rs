@@ -1,9 +1,12 @@
 #[derive(Clone, Debug, PartialEq, serde::Deserialize)]
 pub struct NetworkHost(String);
 
-impl From<&str> for NetworkHost {
-    fn from(host: &str) -> Self {
-        Self(host.to_string())
+impl<T> From<T> for NetworkHost
+where
+    T: AsRef<str>,
+{
+    fn from(host: T) -> Self {
+        Self(host.as_ref().to_string())
     }
 }
 
