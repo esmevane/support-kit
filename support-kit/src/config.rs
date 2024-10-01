@@ -1,6 +1,81 @@
-use crate::{LoggerConfig, VerbosityLevel};
+use crate::{ConfigOrPreset, LoggerConfig, VerbosityLevel};
 
 use super::{Logging, LoggingConfig};
+
+#[derive(Clone, Debug, PartialEq, serde::Deserialize)]
+struct NetworkPort(i32);
+
+impl From<i32> for NetworkPort {
+    fn from(port: i32) -> Self {
+        Self(port)
+    }
+}
+
+impl Default for NetworkPort {
+    fn default() -> Self {
+        Self(80)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, serde::Deserialize)]
+struct NetworkHost(String);
+
+impl From<&str> for NetworkHost {
+    fn from(host: &str) -> Self {
+        Self(host.to_string())
+    }
+}
+
+impl Default for NetworkHost {
+    fn default() -> Self {
+        Self("0.0.0.0".to_string())
+    }
+}
+
+#[derive(Clone, Debug, Default, serde::Deserialize, PartialEq, bon::Builder)]
+pub struct Network {
+    #[serde(default)]
+    #[builder(default, into)]
+    host: NetworkHost,
+
+    #[serde(default)]
+    #[builder(default, into)]
+    port: NetworkPort,
+}
+
+impl From<&str> for Network {
+    fn from(host: &str) -> Self {
+        Network::builder().host(host).port(80).build()
+    }
+}
+
+impl<T, U> From<(T, U)> for Network
+where
+    T: AsRef<str>,
+    U: Into<NetworkPort>,
+{
+    fn from((host, port): (T, U)) -> Self {
+        Network::builder().host(host.as_ref()).port(port).build()
+    }
+}
+
+impl Default for ConfigOrPreset<Network, NetworkHost> {
+    fn default() -> Self {
+        Self::Config(Network::default())
+    }
+}
+
+impl From<&str> for ConfigOrPreset<Network, NetworkHost> {
+    fn from(host: &str) -> Self {
+        Self::Config(Network::from(host))
+    }
+}
+
+impl From<(&str, i32)> for ConfigOrPreset<Network, NetworkHost> {
+    fn from((host, port): (&str, i32)) -> Self {
+        Self::Config(Network::builder().host(host).port(port).build())
+    }
+}
 
 #[derive(Clone, Debug, Default, serde::Deserialize, PartialEq, bon::Builder)]
 pub struct Config {
@@ -11,6 +86,10 @@ pub struct Config {
     #[serde(default)]
     #[builder(default, into)]
     verbosity: VerbosityLevel,
+
+    #[serde(default)]
+    #[builder(default, into)]
+    server: ConfigOrPreset<Network, NetworkHost>,
 }
 
 impl Config {
@@ -108,6 +187,57 @@ fn root_config_notation() -> Result<(), Box<dyn std::error::Error>> {
             ])
             .build()
     );
+
+    Ok(())
+}
+
+#[test]
+fn server_config() -> Result<(), Box<dyn std::error::Error>> {
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "server": {
+                "host": "1.2.3.4",
+                "port": 8080
+            }
+        }
+        "#,
+    )?;
+
+    assert_eq!(config, Config::builder().server(("1.2.3.4", 8080)).build());
+
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "server": {
+                "host": "127.0.0.1"
+            }
+        }
+        "#,
+    )?;
+
+    assert_eq!(config, Config::builder().server("127.0.0.1").build());
+
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "server": {
+                "port": 22
+            }
+        }
+        "#,
+    )?;
+
+    assert_eq!(config, Config::builder().server(("0.0.0.0", 22)).build());
+
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+        }
+        "#,
+    )?;
+
+    assert_eq!(config, Config::builder().server(("0.0.0.0", 80)).build());
 
     Ok(())
 }
