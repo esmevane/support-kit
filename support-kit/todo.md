@@ -1,7 +1,23 @@
 # todos
 
-- verbosity should go on logging (right now is a type alias for one-or-many, so we can't)
+- structural changes
+  - logging
+    - from 1-or-many to struct
+    - move verbosity up
+    - add color support
 - service
   - app name / label
   - service manager kind
-  - tests!!
+- test needs
+  - usage as a consumer (kind of done)
+  - setting color
+    - cli
+    - config
+    - defaults
+  - service
+    - label
+      - configuration
+      - cli arg
+      - inferring automatically
+    - kind of manager
+    - config vs cli args
