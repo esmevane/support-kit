@@ -3277,6 +3277,7 @@ dependencies = [
  "owo-colors 4.0.0",
  "serde",
  "serde_json",
+ "service-manager",
  "strum",
  "thiserror",
  "tracing",

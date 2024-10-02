@@ -1,4 +1,4 @@
-use crate::{LoggerConfig, NetworkConfig, VerbosityLevel};
+use crate::{LoggerConfig, NetworkConfig, ServiceConfig, VerbosityLevel};
 
 use super::{Logging, LoggingConfig};
 
@@ -15,6 +15,10 @@ pub struct Config {
     #[serde(default)]
     #[builder(default, into)]
     server: NetworkConfig,
+
+    #[serde(default)]
+    #[builder(default, into)]
+    service: ServiceConfig,
 }
 
 impl Config {
@@ -24,6 +28,10 @@ impl Config {
 
     pub fn loggers(&self) -> Vec<LoggerConfig> {
         self.logging.loggers()
+    }
+
+    pub fn name(&self) -> Option<&str> {
+        todo!("Return the name of the service, defaulting to program name")
     }
 
     pub fn env_filter(&self) -> tracing_subscriber::EnvFilter {

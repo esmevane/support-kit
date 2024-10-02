@@ -1,6 +1,6 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
 
-use crate::{Config, NetworkConfig, VerbosityLevel};
+use crate::{Config, NetworkConfig, ServiceArgs, VerbosityLevel};
 
 #[derive(Parser)]
 pub struct Args {
@@ -12,6 +12,15 @@ pub struct Args {
 
     #[arg(short = 'P', long)]
     port: Option<i32>,
+
+    #[command(subcommand)]
+    pub command: Option<Commands>,
+}
+
+#[derive(Clone, Debug, Subcommand, PartialEq)]
+#[clap(rename_all = "kebab-case")]
+pub enum Commands {
+    Service(ServiceArgs),
 }
 
 impl Args {
