@@ -38,7 +38,7 @@ fn service_args() -> Result<(), Box<dyn std::error::Error>> {
     for (input, expected) in expectations.iter() {
         let cli = ServiceArgs::try_parse_from(input.split_whitespace())?;
 
-        assert_eq!(cli.label, Some((*expected).into()));
+        assert_eq!(cli.label, (*expected).into());
     }
 
     Ok(())

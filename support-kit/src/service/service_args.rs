@@ -1,4 +1,4 @@
-use std::{path::PathBuf, str::FromStr};
+use std::{fmt::Display, path::PathBuf, str::FromStr};
 
 use bon::Builder;
 use clap::Parser;
@@ -15,8 +15,9 @@ pub struct ServiceArgs {
     #[clap(subcommand)]
     pub operation: Option<ServiceCommand>,
     /// The service label to use. Defaults to the binary name.
-    #[clap(long = "name", short = 'n')]
-    pub label: Option<Label>,
+    #[clap(long = "name", short = 'n', default_value_t)]
+    #[builder(default)]
+    pub label: Label,
     /// Install system-wide. If not set, attempts to install for the current user.
     #[clap(long)]
     #[builder(default)]
@@ -25,6 +26,12 @@ pub struct ServiceArgs {
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Label(String);
+
+impl Display for Label {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
 
 impl FromStr for Label {
     type Err = String;
