@@ -7,9 +7,11 @@
     - add color support
 - service
   - app name / label
+    - see tauri "identifier" for reference
+    - "com.{app-name}.app" as default?
   - service manager kind
+  - root or not
 - test needs
-  - usage as a consumer (kind of done)
   - setting color
     - cli
     - config

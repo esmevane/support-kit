@@ -1,54 +1,34 @@
 pub fn main() {
-    use clap::Parser;
+    use clap::{Parser, Subcommand};
 
-    #[derive(Parser)]
-    enum ServiceCommand {
-        Install,
-        Uninstall,
-        Start,
-        Stop,
-        Restart,
-    }
-
-    #[derive(Parser)]
-    struct ServiceArgs {
+    #[derive(Debug, Parser)]
+    struct YourOwnCli {
         #[clap(subcommand)]
-        command: ServiceCommand,
+        command: Option<LocalCommand>,
+
+        #[clap(flatten)]
+        support: support_kit::Args,
     }
 
-    #[derive(Parser)]
-    enum Commands {
-        Service(ServiceArgs),
-    }
-
-    #[derive(Parser)]
-    struct SupportArgs {
-        #[clap(subcommand)]
-        command: Commands,
-    }
-
-    #[derive(Parser)]
-    struct ConsumerArgs {
-        #[clap(subcommand)]
-        command: ConsumerCommands,
-    }
-
-    #[derive(Parser)]
-    enum ConsumerCommands {
-        Local(LocalArgs),
-        Support(SupportArgs),
-    }
-
-    #[derive(Parser)]
-    struct LocalArgs {
-        #[clap(subcommand)]
-        command: LocalCommand,
-    }
-
-    #[derive(Parser)]
+    #[derive(Clone, Copy, Debug, Subcommand, PartialEq)]
     enum LocalCommand {
-        Debug,
+        Local,
     }
 
-    ConsumerArgs::parse();
+    let cli = YourOwnCli::parse();
+
+    println!(
+        "CLI: {cli:?}\nCONFIG: {config:?}",
+        config = cli.support.config(),
+        cli = &cli,
+    );
+
+    match &cli.command {
+        Some(LocalCommand::Local) => {
+            println!("Local command detected! {cli:?}");
+        }
+        None => {
+            println!("No local command detected! {cli:?}");
+        }
+    }
 }

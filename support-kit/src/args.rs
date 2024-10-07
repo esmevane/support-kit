@@ -1,8 +1,8 @@
 use clap::{Parser, Subcommand};
 
-use crate::{Config, NetworkConfig, ServiceArgs, VerbosityLevel};
+use crate::{Config, NetworkConfig, ServiceArgs, ServiceCommand, VerbosityLevel};
 
-#[derive(Parser)]
+#[derive(Clone, Debug, Parser)]
 pub struct Args {
     #[arg(short, long, action = clap::ArgAction::Count)]
     verbose: u8,
@@ -21,6 +21,18 @@ pub struct Args {
 #[clap(rename_all = "kebab-case")]
 pub enum Commands {
     Service(ServiceArgs),
+}
+
+impl From<ServiceArgs> for Commands {
+    fn from(args: ServiceArgs) -> Self {
+        Commands::Service(args)
+    }
+}
+
+impl From<ServiceCommand> for Commands {
+    fn from(command: ServiceCommand) -> Self {
+        ServiceArgs::from(command).into()
+    }
 }
 
 impl Args {
@@ -42,7 +54,7 @@ impl Args {
         }
     }
 
-    pub fn as_config(self) -> Config {
+    pub fn config(&self) -> Config {
         Config::builder()
             .maybe_verbosity(self.verbosity_level())
             .maybe_server(self.server())
@@ -65,7 +77,7 @@ fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(
-            args.as_config(),
+            args.config(),
             Config::builder().verbosity(*expected).build()
         );
     }
@@ -88,7 +100,7 @@ fn setting_server_with_args() -> Result<(), Box<dyn std::error::Error>> {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(
-            args.as_config(),
+            args.config(),
             Config::builder().server(expected.clone()).build()
         );
     }

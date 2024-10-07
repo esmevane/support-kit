@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use bon::Builder;
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 
@@ -7,7 +8,7 @@ use crate::Config;
 
 use super::{ServiceCommand, ServiceControl, ServiceControlError};
 
-#[derive(Clone, Debug, Default, Deserialize, Parser, Serialize, PartialEq)]
+#[derive(Clone, Debug, Default, Deserialize, Parser, Serialize, PartialEq, Builder)]
 #[clap(rename_all = "kebab-case")]
 pub struct ServiceArgs {
     /// Control the service itself.
@@ -15,6 +16,7 @@ pub struct ServiceArgs {
     pub operation: Option<ServiceCommand>,
     /// Install system-wide. If not set, attempts to install for the current user.
     #[clap(long)]
+    #[builder(default)]
     pub system: bool,
 }
 
@@ -32,5 +34,11 @@ impl ServiceArgs {
         }
 
         Ok(())
+    }
+}
+
+impl From<ServiceCommand> for ServiceArgs {
+    fn from(command: ServiceCommand) -> Self {
+        Self::builder().operation(command).build()
     }
 }

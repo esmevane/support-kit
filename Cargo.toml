@@ -40,6 +40,7 @@ dialoguer = { version = "0.11.0", features = [
 dirs = "5.0.1"
 derive_builder = "0.20.0"
 duct = "0.13"
+either = { version = "1.13", features = ["serde"] }
 futures = "0.3.30"
 figment = { version = "0.10", features = ["env", "json", "toml", "yaml"] }
 getrandom = { version = "0.2", features = ["js"] }
