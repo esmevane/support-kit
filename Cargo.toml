@@ -9,12 +9,13 @@ members = [
   "support-kit-spike",
   "support-kit",
   "xtask",
-  # "examples/*",
+  "consumer-example",
 ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace.dependencies]
+consumer-example = { version = "0.1.0", path = "./consumer-example" }
 service-kit = { version = "0.1.0", path = "./service-kit" }
 service-kit-core = { version = "0.1.0", path = "./service-kit-core" }
 service-kit-proto = { version = "0.1.0", path = "./service-kit-proto" }
