@@ -1,26 +1,16 @@
 # todos
 
-- structural changes
-  - args don't go into figment directly so why serde them
-  - logging
-    - from 1-or-many to struct
-    - move verbosity up
-    - add color support
+- SupportControl inits with a config and has setup / teardown / execute
+  - might make sense to start doing traits here so it can get tested?
+- args don't go into figment directly so why serde them
+- logging
+  - from 1-or-many to struct
+  - move verbosity up
+  - add color support
 - service
-  - app name / label
-    - see tauri "identifier" for reference
-    - "com.{app-name}.app" as default?
-  - service manager kind
-  - root or not
+  - "com.{app-name}.app" as default?
 - test needs
   - setting color
     - cli
     - config
     - defaults
-  - service
-    - label
-      - configuration
-      - cli arg
-      - inferring automatically
-    - kind of manager
-    - config vs cli args

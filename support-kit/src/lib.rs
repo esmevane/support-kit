@@ -12,10 +12,89 @@ pub use logs::*;
 pub use network::NetworkConfig;
 pub use service::*;
 pub use structures::*;
+pub use support_control::SupportControl;
 pub use verbosity_level::VerbosityLevel;
 
 type TracingTarget = Box<dyn tracing_subscriber::Layer<tracing_subscriber::Registry> + Send + Sync>;
 type TracingTargets = Vec<TracingTarget>;
+
+mod support_control {
+    use crate::{Args, Config};
+
+    #[derive(Default)]
+    pub struct SupportControl {
+        config: Config,
+        _guards: Vec<tracing_appender::non_blocking::WorkerGuard>,
+    }
+
+    impl SupportControl {
+        pub fn from_args(args: &Args) -> Self {
+            Self::from_config(args.config())
+        }
+
+        pub fn from_config(config: Config) -> Self {
+            Self {
+                config,
+                ..Default::default()
+            }
+        }
+
+        pub fn init(mut self) -> Self {
+            self._guards = self.config.init_logging();
+            self
+        }
+
+        pub fn execute(&self, args: Args) {
+            match args.command {
+                Some(command) => {
+                    tracing::info!(
+                        "Executing command: {command:#?}\nConfig: {config:#?}",
+                        config = self.config
+                    );
+
+                    match command {
+                        crate::Commands::Service(service_args) => {
+                            let control = crate::ServiceControl::init(&self.config)
+                                .expect("Failed to initialize service control");
+
+                            match service_args.operation {
+                                Some(operation) => {
+                                    control
+                                        .execute(operation)
+                                        .expect("Failed to execute operation");
+                                }
+                                None => {
+                                    tracing::info!(
+                                        "No operation provided.\nConfig: {config:#?}",
+                                        config = self.config
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+                None => {
+                    tracing::info!(
+                        "No command provided.\nConfig: {config:#?}",
+                        config = self.config
+                    );
+                }
+            }
+        }
+    }
+
+    impl From<Config> for SupportControl {
+        fn from(config: Config) -> Self {
+            Self::from_config(config)
+        }
+    }
+
+    impl From<Args> for SupportControl {
+        fn from(args: Args) -> Self {
+            Self::from_args(&args)
+        }
+    }
+}
 
 // #[test]
 fn todos() {

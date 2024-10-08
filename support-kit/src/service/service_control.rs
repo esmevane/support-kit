@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use crate::Config;
 
-use super::ServiceControlError;
+use super::{ServiceCommand, ServiceControlError};
 
 pub struct ServiceControl {
     label: ServiceLabel,
@@ -38,6 +38,17 @@ impl ServiceControl {
         };
 
         Ok(Self { label, manager })
+    }
+
+    pub fn execute(&self, operation: ServiceCommand) -> Result<(), ServiceControlError> {
+        match operation {
+            ServiceCommand::Install => self.install(PathBuf::new(), vec![]),
+            ServiceCommand::Start => self.start(),
+            ServiceCommand::Stop => self.stop(),
+            ServiceCommand::Uninstall => self.uninstall(),
+        }?;
+
+        Ok(())
     }
 
     pub fn install(

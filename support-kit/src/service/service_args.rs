@@ -2,11 +2,8 @@ use bon::Builder;
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use service_manager::ServiceManagerKind;
-use std::path::PathBuf;
 
-use crate::Config;
-
-use super::{ServiceCommand, ServiceConfig, ServiceControl, ServiceControlError, ServiceLabel};
+use super::{ServiceCommand, ServiceConfig, ServiceLabel};
 
 #[derive(Clone, Debug, Default, Deserialize, Parser, Serialize, PartialEq, Builder)]
 #[clap(rename_all = "kebab-case")]
@@ -27,21 +24,6 @@ pub struct ServiceArgs {
 }
 
 impl ServiceArgs {
-    pub fn execute(&self, config: Config) -> Result<(), ServiceControlError> {
-        let control = ServiceControl::init(&config)?;
-
-        if let Some(operation) = &self.operation {
-            match operation {
-                ServiceCommand::Install => control.install(PathBuf::new(), vec![]),
-                ServiceCommand::Start => control.start(),
-                ServiceCommand::Stop => control.stop(),
-                ServiceCommand::Uninstall => control.uninstall(),
-            }?;
-        }
-
-        Ok(())
-    }
-
     pub fn config(&self) -> ServiceConfig {
         ServiceConfig::builder()
             .maybe_label(self.label.clone())
