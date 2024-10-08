@@ -19,7 +19,8 @@ impl ServiceControl {
             Ok(_) => {}
             Err(_) => {
                 tracing::warn!(
-                    "Failed to set user level service manager, defaulting to system level"
+                    "attempted to set user level service manager but failed, \
+                    defaulting to system level."
                 );
                 manager = <dyn ServiceManager>::native()?;
             }

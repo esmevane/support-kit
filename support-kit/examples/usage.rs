@@ -18,22 +18,24 @@ pub fn main() {
     }
 
     let cli = YourOwnCli::parse();
+    let control = SupportControl::from_args(&cli.support).init();
 
-    println!(
-        "CLI: {cli:?}\nCONFIG: {config:?}",
-        config = cli.support.config(),
-        cli = &cli,
+    tracing::info!(
+        config = ?cli.support.config(),
+        cli = ?cli,
+        "Control initialized."
     );
 
     match &cli.command {
         Some(LocalCommand::Local) => {
-            println!("Local command detected! {cli:#?}");
+            tracing::info!(cli = ?cli, "local command detected!");
         }
         None => {
-            println!("No local command detected! Trying to execute with Support Control. {cli:#?}");
-            SupportControl::from_args(&cli.support)
-                .init()
-                .execute(cli.support);
+            tracing::info!(cli = ?cli, "no local command detected!");
+            tracing::info!("attempting to execute with support control");
+            control
+                .execute(cli.support)
+                .expect("failed to execute control");
         }
     }
 }

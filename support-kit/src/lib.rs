@@ -13,13 +13,26 @@ pub use network::NetworkConfig;
 pub use service::*;
 pub use structures::*;
 pub use support_control::SupportControl;
+pub use support_kit_error::SupportKitError;
 pub use verbosity_level::VerbosityLevel;
 
 type TracingTarget = Box<dyn tracing_subscriber::Layer<tracing_subscriber::Registry> + Send + Sync>;
 type TracingTargets = Vec<TracingTarget>;
 
+mod support_kit_error {
+    use thiserror::Error;
+
+    use crate::ServiceControlError;
+
+    #[derive(Debug, Error)]
+    pub enum SupportKitError {
+        #[error("service control error: {0}")]
+        ServiceControlError(#[from] ServiceControlError),
+    }
+}
+
 mod support_control {
-    use crate::{Args, Config};
+    use crate::{Args, Config, SupportKitError};
 
     #[derive(Default)]
     pub struct SupportControl {
@@ -44,42 +57,32 @@ mod support_control {
             self
         }
 
-        pub fn execute(&self, args: Args) {
+        pub fn execute(&self, args: Args) -> Result<(), SupportKitError> {
             match args.command {
                 Some(command) => {
                     tracing::info!(
-                        "Executing command: {command:#?}\nConfig: {config:#?}",
-                        config = self.config
+                        command = ?command,
+                        config = ?self.config,
+                        "executing command"
                     );
 
                     match command {
                         crate::Commands::Service(service_args) => {
-                            let control = crate::ServiceControl::init(&self.config)
-                                .expect("Failed to initialize service control");
+                            let control = crate::ServiceControl::init(&self.config)?;
 
                             match service_args.operation {
-                                Some(operation) => {
-                                    control
-                                        .execute(operation)
-                                        .expect("Failed to execute operation");
-                                }
+                                Some(operation) => control.execute(operation)?,
                                 None => {
-                                    tracing::info!(
-                                        "No operation provided.\nConfig: {config:#?}",
-                                        config = self.config
-                                    );
+                                    tracing::info!(config = ?self.config, "no operation provided")
                                 }
                             }
                         }
                     }
                 }
-                None => {
-                    tracing::info!(
-                        "No command provided.\nConfig: {config:#?}",
-                        config = self.config
-                    );
-                }
+                None => tracing::trace!(config = ?&self.config, "no command provided."),
             }
+
+            Ok(())
         }
     }
 
