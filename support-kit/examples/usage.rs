@@ -1,3 +1,5 @@
+use support_kit::SupportControl;
+
 pub fn main() {
     use clap::{Parser, Subcommand};
 
@@ -25,10 +27,13 @@ pub fn main() {
 
     match &cli.command {
         Some(LocalCommand::Local) => {
-            println!("Local command detected! {cli:?}");
+            println!("Local command detected! {cli:#?}");
         }
         None => {
-            println!("No local command detected! {cli:?}");
+            println!("No local command detected! Trying to execute with Support Control. {cli:#?}");
+            SupportControl::from_args(&cli.support)
+                .init()
+                .execute(cli.support);
         }
     }
 }
