@@ -12,6 +12,19 @@ pub struct ServiceControl {
     manager: Box<dyn ServiceManager>,
 }
 
+impl std::fmt::Debug for ServiceControl {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ServiceControl")
+            .field("name", &self.name)
+            .field("label", &self.label)
+            .field("manager level", &self.manager.level())
+            .field("manager available", &self.manager.available())
+            .field("program", &self.program())
+            .field("args", &self.args())
+            .finish()
+    }
+}
+
 impl ServiceControl {
     pub fn init(config: &Config) -> Result<Self, ServiceControlError> {
         let mut manager = match config.service.service_manager {
@@ -38,23 +51,24 @@ impl ServiceControl {
         })
     }
 
-    pub fn execute(&self, operation: ServiceCommand) -> Result<(), ServiceControlError> {
-        let program = std::env::current_exe()?;
-        let args: Vec<std::ffi::OsString> = vec![
+    fn program(&self) -> Result<PathBuf, ServiceControlError> {
+        Ok(std::env::current_exe()?)
+    }
+
+    fn args(&self) -> Vec<OsString> {
+        vec![
             "-n".into(),
             self.name.to_string().into(),
             "server".into(),
             "api".into(),
-        ];
+        ]
+    }
 
-        tracing::trace!(
-            program = ?program,
-            args = ?args,
-            "executing service command"
-        );
-
+    #[tracing::instrument(level = "trace", name = "execute a doot")]
+    pub fn execute(&self, operation: ServiceCommand) -> Result<(), ServiceControlError> {
+        tracing::trace!(operation = ?operation, "executing operation");
         match operation {
-            ServiceCommand::Install => self.install(program, args),
+            ServiceCommand::Install => self.install(self.program()?, self.args()),
             ServiceCommand::Start => self.start(),
             ServiceCommand::Stop => self.stop(),
             ServiceCommand::Uninstall => self.uninstall(),
@@ -63,6 +77,7 @@ impl ServiceControl {
         Ok(())
     }
 
+    #[tracing::instrument(level = "trace")]
     pub fn install(
         &self,
         program: PathBuf,
@@ -81,6 +96,7 @@ impl ServiceControl {
         Ok(())
     }
 
+    #[tracing::instrument(level = "trace")]
     pub fn start(&self) -> Result<(), ServiceControlError> {
         self.manager.start(ServiceStartCtx {
             label: self.label.clone(),
@@ -89,6 +105,7 @@ impl ServiceControl {
         Ok(())
     }
 
+    #[tracing::instrument(level = "trace")]
     pub fn stop(&self) -> Result<(), ServiceControlError> {
         self.manager.stop(ServiceStopCtx {
             label: self.label.clone(),
@@ -97,6 +114,7 @@ impl ServiceControl {
         Ok(())
     }
 
+    #[tracing::instrument(level = "trace")]
     pub fn uninstall(&self) -> Result<(), ServiceControlError> {
         self.manager.uninstall(ServiceUninstallCtx {
             label: self.label.clone(),
