@@ -4,13 +4,13 @@ use crate::{Config, NetworkConfig, ServiceArgs, ServiceCommand, VerbosityLevel};
 
 #[derive(Clone, Debug, Parser)]
 pub struct Args {
-    #[arg(short, long, action = clap::ArgAction::Count)]
+    #[arg(short, long, action = clap::ArgAction::Count, global = true)]
     verbose: u8,
 
-    #[arg(short = 'H', long)]
+    #[arg(short = 'H', long, global = true)]
     host: Option<String>,
 
-    #[arg(short = 'P', long)]
+    #[arg(short = 'P', long, global = true)]
     port: Option<i32>,
 
     #[command(subcommand)]

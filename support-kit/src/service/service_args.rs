@@ -12,13 +12,13 @@ pub struct ServiceArgs {
     #[clap(subcommand)]
     pub operation: Option<ServiceCommand>,
     /// The service label to use. Defaults to the binary name.
-    #[clap(long, short)]
+    #[clap(long, short, global = true)]
     pub name: Option<ServiceName>,
     /// The kind of service manager to use. Defaults to system native.
-    #[clap(long, value_enum)]
+    #[clap(long, value_enum, global = true)]
     pub service_manager: Option<ServiceManagerKind>,
     /// Install system-wide. If not set, attempts to install for the current user.
-    #[clap(long)]
+    #[clap(long, global = true)]
     #[builder(default)]
     pub system: bool,
 }

@@ -25,7 +25,7 @@ impl ServiceConfig {
 }
 
 #[test]
-fn default_label() -> Result<(), Box<dyn std::error::Error>> {
+fn default_name() -> Result<(), Box<dyn std::error::Error>> {
     use figment::Jail;
 
     let config: ServiceConfig = serde_json::from_str(r#"{}"#)?;
