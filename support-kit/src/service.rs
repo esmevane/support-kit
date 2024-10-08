@@ -40,11 +40,13 @@ fn service_args() -> Result<(), Box<dyn std::error::Error>> {
     for (input, expected) in expectations {
         let cli = ServiceArgs::try_parse_from(input.split_whitespace())?;
 
-        assert_eq!(cli.label, expected.into());
+        assert_eq!(cli.label.unwrap_or_default(), expected.into());
     }
 
     figment::Jail::expect_with(|jail| {
         jail.set_env("CARGO_PKG_NAME", "consumer-package");
+
+        assert_eq!(service_label::get_runtime_name(), "consumer-package");
 
         let expectations = [
             ("app", "consumer-package"),
@@ -53,10 +55,10 @@ fn service_args() -> Result<(), Box<dyn std::error::Error>> {
         ];
 
         for (input, expected) in expectations {
-            let cli = dbg!(ServiceArgs::try_parse_from(input.split_whitespace()))
-                .expect("failed to parse");
+            let cli =
+                ServiceArgs::try_parse_from(input.split_whitespace()).expect("failed to parse");
 
-            assert_eq!(cli.label, expected.into());
+            assert_eq!(cli.label.unwrap_or_default(), expected.into());
         }
 
         Ok(())

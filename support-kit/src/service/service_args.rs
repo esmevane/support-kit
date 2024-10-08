@@ -14,9 +14,8 @@ pub struct ServiceArgs {
     #[clap(subcommand)]
     pub operation: Option<ServiceCommand>,
     /// The service label to use. Defaults to the binary name.
-    #[clap(long = "name", short = 'n', default_value_t)]
-    #[builder(default)]
-    pub label: ServiceLabel,
+    #[clap(long = "name", short = 'n')]
+    pub label: Option<ServiceLabel>,
     /// Install system-wide. If not set, attempts to install for the current user.
     #[clap(long)]
     #[builder(default)]

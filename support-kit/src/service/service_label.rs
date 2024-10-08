@@ -30,8 +30,8 @@ impl Default for ServiceLabel {
     }
 }
 
-fn get_runtime_name() -> String {
-    dbg!(std::env::var("CARGO_PKG_NAME").unwrap_or_default())
+pub fn get_runtime_name() -> String {
+    std::env::var("CARGO_PKG_NAME").unwrap_or_default()
 }
 
 #[test]
