@@ -6,19 +6,19 @@ use super::{Logging, LoggingConfig};
 pub struct Config {
     #[serde(default)]
     #[builder(default, into)]
-    logging: LoggingConfig,
+    pub logging: LoggingConfig,
 
     #[serde(default)]
     #[builder(default, into)]
-    verbosity: VerbosityLevel,
+    pub verbosity: VerbosityLevel,
 
     #[serde(default)]
     #[builder(default, into)]
-    server: NetworkConfig,
+    pub server: NetworkConfig,
 
     #[serde(default)]
     #[builder(default, into)]
-    service: ServiceConfig,
+    pub service: ServiceConfig,
 }
 
 impl Config {

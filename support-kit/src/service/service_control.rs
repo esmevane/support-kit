@@ -4,37 +4,51 @@ use std::path::PathBuf;
 
 use crate::Config;
 
-use super::{ServiceCommand, ServiceControlError};
+use super::{ServiceCommand, ServiceControlError, ServiceName};
 
 pub struct ServiceControl {
+    name: ServiceName,
     label: ServiceLabel,
     manager: Box<dyn ServiceManager>,
 }
 
 impl ServiceControl {
     pub fn init(config: &Config) -> Result<Self, ServiceControlError> {
-        let mut manager = <dyn ServiceManager>::native()?;
+        let mut manager = match config.service.service_manager {
+            Some(manager) => <dyn ServiceManager>::target(manager),
+            None => <dyn ServiceManager>::native()?,
+        };
 
-        match manager.set_level(ServiceLevel::User) {
-            Ok(_) => {}
-            Err(_) => {
-                tracing::warn!(
-                    "attempted to set user level service manager but failed, \
-                    defaulting to system level."
-                );
-                manager = <dyn ServiceManager>::native()?;
+        if config.service.system {
+            match manager.set_level(ServiceLevel::System) {
+                Ok(_) => {}
+                Err(_) => {
+                    tracing::warn!(
+                        "attempted to set system level service manager but failed, \
+                        continuing at user level."
+                    );
+                }
             }
         }
 
-        todo!("this should turn into a label!");
-        // let label: ServiceLabel = config.name().into()?;
-
-        // Ok(Self { label, manager })
+        Ok(Self {
+            name: config.name(),
+            label: config.name().as_default_label()?,
+            manager,
+        })
     }
 
     pub fn execute(&self, operation: ServiceCommand) -> Result<(), ServiceControlError> {
+        let program = std::env::current_exe()?;
+        let args: Vec<std::ffi::OsString> = vec![
+            "-n".into(),
+            self.name.to_string().into(),
+            "server".into(),
+            "api".into(),
+        ];
+
         match operation {
-            ServiceCommand::Install => self.install(PathBuf::new(), vec![]),
+            ServiceCommand::Install => self.install(program, args),
             ServiceCommand::Start => self.start(),
             ServiceCommand::Stop => self.stop(),
             ServiceCommand::Uninstall => self.uninstall(),

@@ -3,14 +3,14 @@ mod service_command;
 mod service_config;
 mod service_control;
 mod service_control_error;
-mod service_label;
+mod service_name;
 
 pub use service_args::ServiceArgs;
 pub use service_command::ServiceCommand;
 pub use service_config::ServiceConfig;
 pub use service_control::ServiceControl;
 pub use service_control_error::ServiceControlError;
-pub use service_label::ServiceName;
+pub use service_name::ServiceName;
 
 #[test]
 fn building_service_config_from_cli_args() -> Result<(), Box<dyn std::error::Error>> {

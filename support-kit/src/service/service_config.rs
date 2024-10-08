@@ -7,11 +7,11 @@ use super::ServiceName;
 pub struct ServiceConfig {
     #[serde(default)]
     #[builder(default, into)]
-    name: ServiceName,
+    pub name: ServiceName,
 
     #[serde(default)]
     #[builder(default)]
-    system: bool,
+    pub system: bool,
 
     /// The kind of service manager to use. Defaults to system native.
     #[serde(default)]
