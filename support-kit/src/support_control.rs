@@ -8,7 +8,7 @@ pub struct SupportControl {
 
 impl SupportControl {
     pub fn from_args(args: &Args) -> Self {
-        Self::from_config(args.config())
+        Self::from_config(args.build_config())
     }
 
     pub fn from_config(config: Config) -> Self {

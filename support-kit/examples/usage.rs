@@ -30,7 +30,7 @@ pub fn main() {
     let control = SupportControl::from_args(&cli.support).init();
 
     tracing::info!(
-        config = ?cli.support.config(),
+        config = ?cli.support.build_config(),
         cli = ?cli,
         "control initialized."
     );

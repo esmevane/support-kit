@@ -39,6 +39,10 @@ pub struct Args {
     #[clap(long, global = true, default_value = "auto")]
     color: Color,
 
+    /// The path to the configuration file.
+    #[clap(long, short)]
+    config_file: Option<String>,
+
     #[command(subcommand)]
     pub command: Option<Commands>,
 }
@@ -62,6 +66,14 @@ impl From<ServiceCommand> for Commands {
 }
 
 impl Args {
+    pub fn config(&self) -> String {
+        let service_config = self.service();
+        let name = service_config.name();
+        let file_name = format!("{name}.config");
+
+        self.config_file.clone().unwrap_or_else(|| file_name)
+    }
+
     pub fn verbosity_level(&self) -> Option<VerbosityLevel> {
         let verbosity = self.verbose;
         VerbosityLevel::from_repr(verbosity as usize)
@@ -88,7 +100,7 @@ impl Args {
             .build()
     }
 
-    pub fn config(&self) -> Config {
+    pub fn build_config(&self) -> Config {
         Config::builder()
             .maybe_verbosity(self.verbosity_level())
             .maybe_server(self.server())
@@ -113,10 +125,26 @@ fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(
-            args.config(),
+            args.build_config(),
             Config::builder().verbosity(*expected).build()
         );
     }
+    Ok(())
+}
+
+#[test]
+fn default_config_file() -> Result<(), Box<dyn std::error::Error>> {
+    let expectations = [
+        ("app", "support-kit.config"),
+        ("app --config-file custom.config", "custom.config"),
+    ];
+
+    for (input, expected) in expectations {
+        let args = Args::try_parse_from(input.split_whitespace())?;
+
+        assert_eq!(args.config(), expected.to_string());
+    }
+
     Ok(())
 }
 
@@ -129,10 +157,13 @@ fn setting_color_with_args() -> Result<(), Box<dyn std::error::Error>> {
         ("app --color auto", Color::Auto),
     ];
 
-    for (input, expected) in expectations.iter() {
+    for (input, expected) in expectations {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
-        assert_eq!(args.config(), Config::builder().color(*expected).build());
+        assert_eq!(
+            args.build_config(),
+            Config::builder().color(expected).build()
+        );
     }
     Ok(())
 }
@@ -149,11 +180,11 @@ fn setting_server_with_args() -> Result<(), Box<dyn std::error::Error>> {
         ),
     ];
 
-    for (input, expected) in expectations.iter() {
+    for (input, expected) in expectations {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(
-            args.config(),
+            args.build_config(),
             Config::builder().server(expected.clone()).build()
         );
     }

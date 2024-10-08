@@ -47,7 +47,7 @@ fn building_service_config_from_cli_args() -> Result<(), Box<dyn std::error::Err
     for (input, expected) in expectations {
         let cli = Args::try_parse_from(input.split_whitespace())?;
 
-        assert_eq!(cli.config().service, expected.into());
+        assert_eq!(cli.build_config().service, expected.into());
     }
 
     Ok(())
