@@ -1,15 +1,12 @@
 # todos
 
-- might make sense to start doing traits in supportcontrol so it can get tested?
-- verbosity and other args aren't global! whoops
-- args don't go into figment directly so why serde them
 - logging
   - from 1-or-many to struct
-  - move verbosity up
+  - move verbosity into logging config
   - add color support
-- service
-  - set label separately from name (optional)
 - test needs
+  - test from config file sources
+  - service from config
   - setting color
     - cli
     - config

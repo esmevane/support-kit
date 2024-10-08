@@ -1,11 +1,11 @@
-mod service_args;
+pub use service_manager::ServiceManagerKind;
+
 mod service_command;
 mod service_config;
 mod service_control;
 mod service_control_error;
 mod service_name;
 
-pub use service_args::ServiceArgs;
 pub use service_command::ServiceCommand;
 pub use service_config::ServiceConfig;
 pub use service_control::ServiceControl;
@@ -14,6 +14,7 @@ pub use service_name::ServiceName;
 
 #[test]
 fn building_service_config_from_cli_args() -> Result<(), Box<dyn std::error::Error>> {
+    use crate::Args;
     use clap::Parser;
 
     let expectations = [
@@ -44,9 +45,9 @@ fn building_service_config_from_cli_args() -> Result<(), Box<dyn std::error::Err
     ];
 
     for (input, expected) in expectations {
-        let cli = ServiceArgs::try_parse_from(input.split_whitespace())?;
+        let cli = Args::try_parse_from(input.split_whitespace())?;
 
-        assert_eq!(cli.config(), expected.into());
+        assert_eq!(cli.config().service, expected.into());
     }
 
     Ok(())

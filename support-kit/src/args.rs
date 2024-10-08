@@ -1,17 +1,39 @@
 use clap::{Parser, Subcommand};
 
-use crate::{Config, NetworkConfig, ServiceArgs, ServiceCommand, VerbosityLevel};
+use crate::{
+    Config, NetworkConfig, ServiceCommand, ServiceConfig, ServiceManagerKind, ServiceName,
+    VerbosityLevel,
+};
+
+mod service_args;
+
+pub use service_args::ServiceArgs;
 
 #[derive(Clone, Debug, Parser)]
 pub struct Args {
+    /// The verbosity level to use. Defaults to off.
     #[arg(short, long, action = clap::ArgAction::Count, global = true)]
     verbose: u8,
 
+    /// The host to bind to.
     #[arg(short = 'H', long, global = true)]
     host: Option<String>,
 
+    /// The port to bind to.
     #[arg(short = 'P', long, global = true)]
     port: Option<i32>,
+
+    /// The service label to use. Defaults to the binary name.
+    #[clap(long, short, global = true)]
+    name: Option<ServiceName>,
+
+    /// The kind of service manager to use. Defaults to system native.
+    #[clap(long, value_enum, global = true)]
+    service_manager: Option<ServiceManagerKind>,
+
+    /// Install system-wide. If not set, attempts to install for the current user.
+    #[clap(long, global = true)]
+    system: bool,
 
     #[command(subcommand)]
     pub command: Option<Commands>,
@@ -54,10 +76,19 @@ impl Args {
         }
     }
 
+    pub fn service(&self) -> ServiceConfig {
+        ServiceConfig::builder()
+            .maybe_name(self.name.clone())
+            .maybe_service_manager(self.service_manager)
+            .system(self.system)
+            .build()
+    }
+
     pub fn config(&self) -> Config {
         Config::builder()
             .maybe_verbosity(self.verbosity_level())
             .maybe_server(self.server())
+            .service(self.service())
             .build()
     }
 }
