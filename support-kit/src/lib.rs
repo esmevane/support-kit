@@ -1,4 +1,5 @@
 mod args;
+mod color;
 mod config;
 mod logs;
 mod network;
@@ -9,6 +10,7 @@ mod support_kit_error;
 mod verbosity_level;
 
 pub use args::*;
+pub use color::Color;
 pub use config::Config;
 pub use logs::*;
 pub use network::NetworkConfig;

@@ -1,5 +1,3 @@
-use figment::value::magic::Magic;
-
 use crate::Config;
 
 use super::{LogFileConfig, LogLevel, LogLevelConfig, LogTarget, LoggerConfigOrPreset, Logging};

@@ -1,4 +1,4 @@
-use crate::{LoggerConfig, NetworkConfig, ServiceConfig, ServiceName, VerbosityLevel};
+use crate::{Color, LoggerConfig, NetworkConfig, ServiceConfig, ServiceName, VerbosityLevel};
 
 use super::{Logging, LoggingConfig};
 
@@ -11,6 +11,10 @@ pub struct Config {
     #[serde(default)]
     #[builder(default, into)]
     pub verbosity: VerbosityLevel,
+
+    #[serde(default)]
+    #[builder(default, into)]
+    pub color: Color,
 
     #[serde(default)]
     #[builder(default, into)]
@@ -171,6 +175,107 @@ fn server_config() -> Result<(), Box<dyn std::error::Error>> {
     )?;
 
     assert_eq!(config, Config::builder().server(("0.0.0.0", 80)).build());
+
+    Ok(())
+}
+
+#[test]
+fn service_config() -> Result<(), Box<dyn std::error::Error>> {
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "service": {
+                "name": "consumer-package"
+            }
+        }
+        "#,
+    )?;
+
+    assert_eq!(
+        config,
+        Config::builder().service("consumer-package").build()
+    );
+
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "service": {
+                "name": "custom-name"
+            }
+        }
+        "#,
+    )?;
+
+    assert_eq!(config, Config::builder().service("custom-name").build());
+
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "service": {
+                "system": true
+            }
+        }
+        "#,
+    )?;
+
+    assert_eq!(
+        config,
+        Config::builder()
+            .service(ServiceConfig::builder().system(true).build())
+            .build()
+    );
+
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "service": {
+                "system": false
+            }
+        }
+        "#,
+    )?;
+
+    assert_eq!(
+        config,
+        Config::builder()
+            .service(ServiceConfig::builder().system(false).build())
+            .build()
+    );
+
+    Ok(())
+}
+
+#[test]
+fn color_config() -> Result<(), Box<dyn std::error::Error>> {
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "color": "auto"
+        }
+        "#,
+    )?;
+
+    assert_eq!(config, Config::builder().color(Color::Auto).build());
+
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "color": "always"
+        }
+        "#,
+    )?;
+
+    assert_eq!(config, Config::builder().color(Color::Always).build());
+
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "color": "never"
+        }
+        "#,
+    )?;
+
+    assert_eq!(config, Config::builder().color(Color::Never).build());
 
     Ok(())
 }

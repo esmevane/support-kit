@@ -24,6 +24,12 @@ impl ServiceConfig {
     }
 }
 
+impl From<&str> for ServiceConfig {
+    fn from(name: &str) -> Self {
+        Self::builder().name(name).build()
+    }
+}
+
 #[test]
 fn default_name() -> Result<(), Box<dyn std::error::Error>> {
     use figment::Jail;

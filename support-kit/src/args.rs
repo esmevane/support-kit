@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 
 use crate::{
-    Config, NetworkConfig, ServiceCommand, ServiceConfig, ServiceManagerKind, ServiceName,
+    Color, Config, NetworkConfig, ServiceCommand, ServiceConfig, ServiceManagerKind, ServiceName,
     VerbosityLevel,
 };
 
@@ -34,6 +34,10 @@ pub struct Args {
     /// Install system-wide. If not set, attempts to install for the current user.
     #[clap(long, global = true)]
     system: bool,
+
+    /// Color output.
+    #[clap(long, global = true, default_value = "auto")]
+    color: Color,
 
     #[command(subcommand)]
     pub command: Option<Commands>,
@@ -88,6 +92,7 @@ impl Args {
         Config::builder()
             .maybe_verbosity(self.verbosity_level())
             .maybe_server(self.server())
+            .color(self.color)
             .service(self.service())
             .build()
     }
@@ -111,6 +116,23 @@ fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
             args.config(),
             Config::builder().verbosity(*expected).build()
         );
+    }
+    Ok(())
+}
+
+#[test]
+fn setting_color_with_args() -> Result<(), Box<dyn std::error::Error>> {
+    let expectations = [
+        ("app", Color::Auto),
+        ("app --color always", Color::Always),
+        ("app --color never", Color::Never),
+        ("app --color auto", Color::Auto),
+    ];
+
+    for (input, expected) in expectations.iter() {
+        let args = Args::try_parse_from(input.split_whitespace())?;
+
+        assert_eq!(args.config(), Config::builder().color(*expected).build());
     }
     Ok(())
 }
