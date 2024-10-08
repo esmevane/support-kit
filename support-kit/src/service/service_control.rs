@@ -64,7 +64,7 @@ impl ServiceControl {
         ]
     }
 
-    #[tracing::instrument(level = "trace", name = "execute a doot")]
+    #[tracing::instrument(level = "trace")]
     pub fn execute(&self, operation: ServiceCommand) -> Result<(), ServiceControlError> {
         tracing::trace!(operation = ?operation, "executing operation");
         match operation {

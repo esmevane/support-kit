@@ -8,7 +8,6 @@
   - move verbosity up
   - add color support
 - service
-  - "com.{app-name}.app" as default?
   - set label separately from name (optional)
 - test needs
   - setting color
