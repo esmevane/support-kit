@@ -1,4 +1,4 @@
-use crate::{LoggerConfig, NetworkConfig, ServiceConfig, VerbosityLevel};
+use crate::{LoggerConfig, NetworkConfig, ServiceConfig, ServiceName, VerbosityLevel};
 
 use super::{Logging, LoggingConfig};
 
@@ -30,8 +30,8 @@ impl Config {
         self.logging.loggers()
     }
 
-    pub fn name(&self) -> Option<&str> {
-        todo!("Return the name of the service, defaulting to program name")
+    pub fn name(&self) -> ServiceName {
+        self.service.name()
     }
 
     pub fn env_filter(&self) -> tracing_subscriber::EnvFilter {

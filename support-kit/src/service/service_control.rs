@@ -26,17 +26,7 @@ impl ServiceControl {
             }
         }
 
-        let label: ServiceLabel = match config.name() {
-            Some(name) => name.parse()?,
-            None => {
-                return Err(ServiceControlError::InitializationError(
-                    std::io::Error::new(
-                        std::io::ErrorKind::InvalidInput,
-                        "Service name not provided",
-                    ),
-                ))
-            }
-        };
+        let label: ServiceLabel = config.name().into()?;
 
         Ok(Self { label, manager })
     }

@@ -10,7 +10,7 @@ pub use service_command::ServiceCommand;
 pub use service_config::ServiceConfig;
 pub use service_control::ServiceControl;
 pub use service_control_error::ServiceControlError;
-pub use service_label::ServiceLabel;
+pub use service_label::ServiceName;
 
 #[test]
 fn building_service_config_from_cli_args() -> Result<(), Box<dyn std::error::Error>> {
@@ -24,19 +24,19 @@ fn building_service_config_from_cli_args() -> Result<(), Box<dyn std::error::Err
         ),
         (
             "app --name app-name",
-            ServiceConfig::builder().label("app-name").build(),
+            ServiceConfig::builder().name("app-name").build(),
         ),
         (
             "app --name app-name --system",
             ServiceConfig::builder()
-                .label("app-name")
+                .name("app-name")
                 .system(true)
                 .build(),
         ),
         (
             "app --system --name app-name --service-manager systemd",
             ServiceConfig::builder()
-                .label("app-name")
+                .name("app-name")
                 .system(true)
                 .service_manager(service_manager::ServiceManagerKind::Systemd)
                 .build(),

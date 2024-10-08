@@ -3,7 +3,7 @@ use clap::Parser;
 use serde::{Deserialize, Serialize};
 use service_manager::ServiceManagerKind;
 
-use super::{ServiceCommand, ServiceConfig, ServiceLabel};
+use super::{ServiceCommand, ServiceConfig, ServiceName};
 
 #[derive(Clone, Debug, Default, Deserialize, Parser, Serialize, PartialEq, Builder)]
 #[clap(rename_all = "kebab-case")]
@@ -12,8 +12,8 @@ pub struct ServiceArgs {
     #[clap(subcommand)]
     pub operation: Option<ServiceCommand>,
     /// The service label to use. Defaults to the binary name.
-    #[clap(long = "name", short = 'n')]
-    pub label: Option<ServiceLabel>,
+    #[clap(long, short)]
+    pub name: Option<ServiceName>,
     /// The kind of service manager to use. Defaults to system native.
     #[clap(long, value_enum)]
     pub service_manager: Option<ServiceManagerKind>,
@@ -26,7 +26,7 @@ pub struct ServiceArgs {
 impl ServiceArgs {
     pub fn config(&self) -> ServiceConfig {
         ServiceConfig::builder()
-            .maybe_label(self.label.clone())
+            .maybe_name(self.name.clone())
             .maybe_service_manager(self.service_manager)
             .system(self.system)
             .build()
@@ -74,7 +74,7 @@ fn setting_labels() -> Result<(), Box<dyn std::error::Error>> {
     for (input, expected) in expectations {
         let cli = ServiceArgs::try_parse_from(input.split_whitespace())?;
 
-        assert_eq!(cli.label.unwrap_or_default(), expected.into());
+        assert_eq!(cli.name.unwrap_or_default(), expected.into());
     }
 
     Ok(())
@@ -136,7 +136,7 @@ fn reading_cargo_env_for_defaults() -> Result<(), Box<dyn std::error::Error>> {
             let cli =
                 ServiceArgs::try_parse_from(input.split_whitespace()).expect("failed to parse");
 
-            assert_eq!(cli.label.unwrap_or_default(), expected.into());
+            assert_eq!(cli.name.unwrap_or_default(), expected.into());
         }
 
         Ok(())

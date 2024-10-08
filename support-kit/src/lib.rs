@@ -4,6 +4,8 @@ mod logs;
 mod network;
 mod service;
 mod structures;
+mod support_control;
+mod support_kit_error;
 mod verbosity_level;
 
 pub use args::*;
@@ -18,86 +20,6 @@ pub use verbosity_level::VerbosityLevel;
 
 type TracingTarget = Box<dyn tracing_subscriber::Layer<tracing_subscriber::Registry> + Send + Sync>;
 type TracingTargets = Vec<TracingTarget>;
-
-mod support_kit_error {
-    use thiserror::Error;
-
-    use crate::ServiceControlError;
-
-    #[derive(Debug, Error)]
-    pub enum SupportKitError {
-        #[error("service control error: {0}")]
-        ServiceControlError(#[from] ServiceControlError),
-    }
-}
-
-mod support_control {
-    use crate::{Args, Config, SupportKitError};
-
-    #[derive(Default)]
-    pub struct SupportControl {
-        config: Config,
-        _guards: Vec<tracing_appender::non_blocking::WorkerGuard>,
-    }
-
-    impl SupportControl {
-        pub fn from_args(args: &Args) -> Self {
-            Self::from_config(args.config())
-        }
-
-        pub fn from_config(config: Config) -> Self {
-            Self {
-                config,
-                ..Default::default()
-            }
-        }
-
-        pub fn init(mut self) -> Self {
-            self._guards = self.config.init_logging();
-            self
-        }
-
-        pub fn execute(&self, args: Args) -> Result<(), SupportKitError> {
-            match args.command {
-                Some(command) => {
-                    tracing::info!(
-                        command = ?command,
-                        config = ?self.config,
-                        "executing command"
-                    );
-
-                    match command {
-                        crate::Commands::Service(service_args) => {
-                            let control = crate::ServiceControl::init(&self.config)?;
-
-                            match service_args.operation {
-                                Some(operation) => control.execute(operation)?,
-                                None => {
-                                    tracing::info!(config = ?self.config, "no operation provided")
-                                }
-                            }
-                        }
-                    }
-                }
-                None => tracing::trace!(config = ?&self.config, "no command provided."),
-            }
-
-            Ok(())
-        }
-    }
-
-    impl From<Config> for SupportControl {
-        fn from(config: Config) -> Self {
-            Self::from_config(config)
-        }
-    }
-
-    impl From<Args> for SupportControl {
-        fn from(args: Args) -> Self {
-            Self::from_args(&args)
-        }
-    }
-}
 
 // #[test]
 fn todos() {
