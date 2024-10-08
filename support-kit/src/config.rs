@@ -26,6 +26,10 @@ pub struct Config {
 }
 
 impl Config {
+    pub fn init_color(&self) {
+        self.color.init();
+    }
+
     pub fn init_logging(&self) -> Vec<tracing_appender::non_blocking::WorkerGuard> {
         Logging::initialize(self.clone())
     }

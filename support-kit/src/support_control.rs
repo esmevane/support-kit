@@ -19,6 +19,7 @@ impl SupportControl {
     }
 
     pub fn init(mut self) -> Self {
+        self.config.init_color();
         self._guards = self.config.init_logging();
         self
     }

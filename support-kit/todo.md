@@ -3,6 +3,10 @@
 - environment
 - init color
 - test from config file sources
+  - phased config merge
+    - phase 1: cli, get args
+    - phase 2: non-env configs
+    - phase 3: env configs
   - file order
     - cli determines config name
       - use config if present
