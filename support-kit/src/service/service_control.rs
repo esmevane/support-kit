@@ -47,6 +47,12 @@ impl ServiceControl {
             "api".into(),
         ];
 
+        tracing::trace!(
+            program = ?program,
+            args = ?args,
+            "executing service command"
+        );
+
         match operation {
             ServiceCommand::Install => self.install(program, args),
             ServiceCommand::Start => self.start(),
