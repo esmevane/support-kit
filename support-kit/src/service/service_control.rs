@@ -32,13 +32,13 @@ impl ServiceControl {
             None => <dyn ServiceManager>::native()?,
         };
 
-        if config.service.system {
-            match manager.set_level(ServiceLevel::System) {
+        if !config.service.system {
+            match manager.set_level(ServiceLevel::User) {
                 Ok(_) => {}
                 Err(_) => {
                     tracing::warn!(
-                        "attempted to set system level service manager but failed, \
-                        continuing at user level."
+                        "attempted to set user level service manager but failed, \
+                        continuing at system level."
                     );
                 }
             }
