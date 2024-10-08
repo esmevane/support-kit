@@ -17,7 +17,7 @@ pub use verbosity_level::VerbosityLevel;
 type TracingTarget = Box<dyn tracing_subscriber::Layer<tracing_subscriber::Registry> + Send + Sync>;
 type TracingTargets = Vec<TracingTarget>;
 
-// #[test]
+#[test]
 fn todos() {
     let todos = include_str!("../todo.md");
 
@@ -51,10 +51,10 @@ fn subcommand_dispatch() -> Result<(), Box<dyn std::error::Error>> {
         ("app service uninstall", None),
     ];
 
-    for (input, expected) in expectations.iter() {
+    for (input, expected) in expectations {
         let cli = LocalCli::try_parse_from(input.split_whitespace())?;
 
-        assert_eq!(cli.command, *expected);
+        assert_eq!(cli.command, expected);
     }
 
     use crate::{Commands, ServiceCommand::*};
@@ -67,10 +67,10 @@ fn subcommand_dispatch() -> Result<(), Box<dyn std::error::Error>> {
         ("app service uninstall", Some(Commands::from(Uninstall))),
     ];
 
-    for (input, expected) in expectations.iter() {
+    for (input, expected) in expectations {
         let cli = LocalCli::try_parse_from(input.split_whitespace())?;
 
-        assert_eq!(cli.support.command, *expected);
+        assert_eq!(cli.support.command, expected);
     }
 
     Ok(())
