@@ -26,9 +26,10 @@ impl ServiceControl {
             }
         }
 
-        let label: ServiceLabel = config.name().into()?;
+        todo!("this should turn into a label!");
+        // let label: ServiceLabel = config.name().into()?;
 
-        Ok(Self { label, manager })
+        // Ok(Self { label, manager })
     }
 
     pub fn execute(&self, operation: ServiceCommand) -> Result<(), ServiceControlError> {
