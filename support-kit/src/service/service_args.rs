@@ -5,7 +5,7 @@ use std::path::PathBuf;
 
 use crate::Config;
 
-use super::{ServiceCommand, ServiceControl, ServiceControlError, ServiceLabel};
+use super::{ServiceCommand, ServiceConfig, ServiceControl, ServiceControlError, ServiceLabel};
 
 #[derive(Clone, Debug, Default, Deserialize, Parser, Serialize, PartialEq, Builder)]
 #[clap(rename_all = "kebab-case")]
@@ -36,6 +36,13 @@ impl ServiceArgs {
         }
 
         Ok(())
+    }
+
+    pub fn config(&self) -> ServiceConfig {
+        ServiceConfig::builder()
+            .maybe_label(self.label.clone())
+            .system(self.system)
+            .build()
     }
 }
 

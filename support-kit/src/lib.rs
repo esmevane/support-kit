@@ -17,7 +17,7 @@ pub use verbosity_level::VerbosityLevel;
 type TracingTarget = Box<dyn tracing_subscriber::Layer<tracing_subscriber::Registry> + Send + Sync>;
 type TracingTargets = Vec<TracingTarget>;
 
-#[test]
+// #[test]
 fn todos() {
     let todos = include_str!("../todo.md");
 

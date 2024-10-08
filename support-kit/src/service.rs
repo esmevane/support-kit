@@ -13,18 +13,33 @@ pub use service_control_error::ServiceControlError;
 pub use service_label::ServiceLabel;
 
 #[test]
-fn service_config() -> Result<(), Box<dyn std::error::Error>> {
-    // let expectations = [
-    //     ("app", "support-kit"),
-    //     ("app -n app-name", "app-name"),
-    //     ("app --name app-name", "app-name"),
-    // ];
+fn building_service_config_from_cli_args() -> Result<(), Box<dyn std::error::Error>> {
+    use clap::Parser;
 
-    // for (input, expected) in expectations {
-    //     let cli = ServiceArgs::try_parse_from(input.split_whitespace())?;
+    let expectations = [
+        ("app", ServiceConfig::default()),
+        (
+            "app --system",
+            ServiceConfig::builder().system(true).build(),
+        ),
+        (
+            "app --name app-name",
+            ServiceConfig::builder().label("app-name").build(),
+        ),
+        (
+            "app --name app-name --system",
+            ServiceConfig::builder()
+                .label("app-name")
+                .system(true)
+                .build(),
+        ),
+    ];
 
-    //     assert_eq!(cli.label, expected.into());
-    // }
+    for (input, expected) in expectations {
+        let cli = ServiceArgs::try_parse_from(input.split_whitespace())?;
+
+        assert_eq!(cli.config(), expected.into());
+    }
 
     Ok(())
 }
