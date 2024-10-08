@@ -1,6 +1,7 @@
 use bon::Builder;
 use clap::Parser;
 use serde::{Deserialize, Serialize};
+use service_manager::ServiceManagerKind;
 use std::path::PathBuf;
 
 use crate::Config;
@@ -16,6 +17,9 @@ pub struct ServiceArgs {
     /// The service label to use. Defaults to the binary name.
     #[clap(long = "name", short = 'n')]
     pub label: Option<ServiceLabel>,
+    /// The kind of service manager to use. Defaults to system native.
+    #[clap(long, value_enum)]
+    pub service_manager: Option<ServiceManagerKind>,
     /// Install system-wide. If not set, attempts to install for the current user.
     #[clap(long)]
     #[builder(default)]
@@ -41,6 +45,7 @@ impl ServiceArgs {
     pub fn config(&self) -> ServiceConfig {
         ServiceConfig::builder()
             .maybe_label(self.label.clone())
+            .maybe_service_manager(self.service_manager)
             .system(self.system)
             .build()
     }
@@ -88,6 +93,30 @@ fn setting_labels() -> Result<(), Box<dyn std::error::Error>> {
         let cli = ServiceArgs::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(cli.label.unwrap_or_default(), expected.into());
+    }
+
+    Ok(())
+}
+
+#[test]
+fn setting_service_manager() -> Result<(), Box<dyn std::error::Error>> {
+    use clap::Parser;
+    use service_manager::ServiceManagerKind::*;
+
+    let expectations = [
+        ("app", None),
+        ("app --service-manager systemd", Some(Systemd)),
+        ("app --service-manager winsw", Some(WinSw)),
+        ("app --service-manager launchd", Some(Launchd)),
+        ("app --service-manager openrc", Some(OpenRc)),
+        ("app --service-manager rcd", Some(Rcd)),
+        ("app --service-manager sc", Some(Sc)),
+    ];
+
+    for (input, expected) in expectations {
+        let cli = ServiceArgs::try_parse_from(input.split_whitespace())?;
+
+        assert_eq!(cli.service_manager, expected);
     }
 
     Ok(())

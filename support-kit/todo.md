@@ -1,6 +1,7 @@
 # todos
 
 - structural changes
+  - args don't go into figment directly so why serde them
   - logging
     - from 1-or-many to struct
     - move verbosity up

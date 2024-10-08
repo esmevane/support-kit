@@ -33,6 +33,14 @@ fn building_service_config_from_cli_args() -> Result<(), Box<dyn std::error::Err
                 .system(true)
                 .build(),
         ),
+        (
+            "app --system --name app-name --service-manager systemd",
+            ServiceConfig::builder()
+                .label("app-name")
+                .system(true)
+                .service_manager(service_manager::ServiceManagerKind::Systemd)
+                .build(),
+        ),
     ];
 
     for (input, expected) in expectations {
