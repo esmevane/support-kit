@@ -50,6 +50,37 @@ impl Config {
     }
 }
 
+mod sources {
+
+    #[test]
+    fn getting_config_from_json() -> Result<(), Box<dyn std::error::Error>> {
+        use super::Config;
+
+        use figment::{
+            providers::{Format, Json},
+            Figment,
+        };
+
+        figment::Jail::expect_with(|jail| {
+            jail.create_file(
+                "support-kit.json",
+                r#"{
+                    "server": { "host": "0.0.0.0" }
+                }"#,
+            )?;
+
+            let config: Config = Figment::new()
+                .merge(Json::file("support-kit.json"))
+                .extract()?;
+
+            assert_eq!(config, Config::builder().server("0.0.0.0").build());
+            Ok(())
+        });
+
+        Ok(())
+    }
+}
+
 #[test]
 fn verbosity_and_env_filter() -> Result<(), Box<dyn std::error::Error>> {
     let config: Config = serde_json::from_str(

@@ -31,7 +31,7 @@ fn todos() {
 }
 
 #[test]
-fn subcommand_dispatch() -> Result<(), Box<dyn std::error::Error>> {
+fn usage_as_a_library_consumer() -> Result<(), Box<dyn std::error::Error>> {
     use clap::{Parser, Subcommand};
 
     #[derive(Parser)]
