@@ -1,10 +1,13 @@
+use serde::{Deserialize, Serialize};
+
 #[derive(
     Clone,
     Copy,
     Debug,
     Default,
     PartialEq,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     strum::FromRepr,
     strum::EnumString,
     strum::Display,

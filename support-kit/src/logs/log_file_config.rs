@@ -1,10 +1,11 @@
+use serde::{Deserialize, Serialize};
 use tracing_appender::non_blocking::WorkerGuard;
 
 use crate::TracingTarget;
 
 use super::{LogRotation, LoggerConfig};
 
-#[derive(Clone, Debug, Default, serde::Deserialize, PartialEq, bon::Builder)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, bon::Builder)]
 pub struct LogFileConfig {
     #[builder(into)]
     pub directory: std::path::PathBuf,

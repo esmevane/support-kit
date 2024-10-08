@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
+
 use super::LogLevel;
 
-#[derive(Clone, Debug, Default, serde::Deserialize, PartialEq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum LogLevelConfig {
     #[default]

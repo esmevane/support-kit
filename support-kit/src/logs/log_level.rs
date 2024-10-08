@@ -1,4 +1,6 @@
-#[derive(Clone, Copy, Debug, Default, serde::Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(rename_all = "kebab-case")]
 pub enum LogLevel {
     Trace = 0,

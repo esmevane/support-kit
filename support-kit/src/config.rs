@@ -1,8 +1,12 @@
-use crate::{Color, LoggerConfig, NetworkConfig, ServiceConfig, ServiceName, VerbosityLevel};
+use serde::{Deserialize, Serialize};
+
+use crate::{
+    Color, Environment, LoggerConfig, NetworkConfig, ServiceConfig, ServiceName, VerbosityLevel,
+};
 
 use super::{Logging, LoggingConfig};
 
-#[derive(Clone, Debug, Default, serde::Deserialize, PartialEq, bon::Builder)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, bon::Builder)]
 pub struct Config {
     #[serde(default)]
     #[builder(default, into)]
@@ -23,6 +27,10 @@ pub struct Config {
     #[serde(default)]
     #[builder(default, into)]
     pub service: ServiceConfig,
+
+    #[serde(default)]
+    #[builder(default, into)]
+    pub environment: Environment,
 }
 
 impl Config {

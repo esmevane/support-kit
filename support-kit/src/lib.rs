@@ -1,23 +1,25 @@
 mod args;
 mod color;
 mod config;
+mod environment;
+mod errors;
 mod logs;
 mod network;
 mod service;
 mod structures;
 mod support_control;
-mod support_kit_error;
 mod verbosity_level;
 
 pub use args::*;
 pub use color::Color;
 pub use config::Config;
+pub use environment::Environment;
+pub use errors::*;
 pub use logs::*;
 pub use network::NetworkConfig;
 pub use service::*;
 pub use structures::*;
 pub use support_control::SupportControl;
-pub use support_kit_error::SupportKitError;
 pub use verbosity_level::VerbosityLevel;
 
 type TracingTarget = Box<dyn tracing_subscriber::Layer<tracing_subscriber::Registry> + Send + Sync>;

@@ -1,8 +1,10 @@
+use serde::{Deserialize, Serialize};
+
 use crate::Config;
 
 use super::{LogFileConfig, LogLevel, LogLevelConfig, LogTarget, LoggerConfigOrPreset, Logging};
 
-#[derive(Clone, Debug, Default, serde::Deserialize, PartialEq, bon::Builder)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, bon::Builder)]
 #[serde(rename_all = "kebab-case")]
 pub struct LoggerConfig {
     console: Option<LogTarget>,

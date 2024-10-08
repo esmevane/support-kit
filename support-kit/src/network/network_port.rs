@@ -1,4 +1,6 @@
-#[derive(Clone, Debug, PartialEq, serde::Deserialize)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct NetworkPort(i32);
 
 impl From<i32> for NetworkPort {

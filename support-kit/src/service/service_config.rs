@@ -1,8 +1,9 @@
+use serde::{Deserialize, Serialize};
 use service_manager::ServiceManagerKind;
 
 use super::ServiceName;
 
-#[derive(Clone, Debug, Default, serde::Deserialize, PartialEq, bon::Builder)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, bon::Builder)]
 #[serde(rename_all = "kebab-case")]
 pub struct ServiceConfig {
     #[serde(default)]

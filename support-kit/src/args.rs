@@ -1,8 +1,8 @@
 use clap::{Parser, Subcommand};
 
 use crate::{
-    Color, Config, NetworkConfig, ServiceCommand, ServiceConfig, ServiceManagerKind, ServiceName,
-    VerbosityLevel,
+    Color, Config, Environment, NetworkConfig, ServiceCommand, ServiceConfig, ServiceManagerKind,
+    ServiceName, VerbosityLevel,
 };
 
 mod service_args;
@@ -22,6 +22,10 @@ pub struct Args {
     /// The port to bind to.
     #[arg(short = 'P', long, global = true)]
     port: Option<i32>,
+
+    /// The environment to use.
+    #[arg(short, long, global = true)]
+    environment: Option<Environment>,
 
     /// The service label to use. Defaults to the binary name.
     #[clap(long, short, global = true)]
@@ -104,6 +108,7 @@ impl Args {
         Config::builder()
             .maybe_verbosity(self.verbosity_level())
             .maybe_server(self.server())
+            .maybe_environment(self.environment)
             .color(self.color)
             .service(self.service())
             .build()
@@ -133,7 +138,7 @@ fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
-fn default_config_file() -> Result<(), Box<dyn std::error::Error>> {
+fn config_file() -> Result<(), Box<dyn std::error::Error>> {
     let expectations = [
         ("app", "support-kit.config"),
         ("app --config-file custom.config", "custom.config"),
@@ -145,6 +150,42 @@ fn default_config_file() -> Result<(), Box<dyn std::error::Error>> {
         assert_eq!(args.config(), expected.to_string());
     }
 
+    figment::Jail::expect_with(|jail| {
+        jail.set_env("CARGO_PKG_NAME", "custom-package");
+
+        let args = Args::try_parse_from("app".split_whitespace()).unwrap();
+
+        assert_eq!(args.config(), "custom-package.config".to_string());
+
+        Ok(())
+    });
+
+    Ok(())
+}
+
+#[test]
+fn setting_environment_with_args() -> Result<(), Box<dyn std::error::Error>> {
+    let expectations = [
+        ("app", None),
+        (
+            "app --environment development",
+            Some(Environment::Development),
+        ),
+        (
+            "app --environment production",
+            Some(Environment::Production),
+        ),
+        ("app --environment test", Some(Environment::Test)),
+    ];
+
+    for (input, expected) in expectations {
+        let args = Args::try_parse_from(input.split_whitespace())?;
+
+        assert_eq!(
+            args.build_config(),
+            Config::builder().maybe_environment(expected).build()
+        );
+    }
     Ok(())
 }
 

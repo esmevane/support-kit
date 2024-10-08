@@ -1,24 +1,4 @@
 # todos
 
 - args know how to build config. why? why not a third thing (like control?)
-- environment
-- init color
 - test from config file sources
-  - phased config merge
-    - phase 1: cli, get args
-    - phase 2: non-env configs
-    - phase 3: env configs
-  - file order
-    - cli determines config name
-      - use config if present
-      - use name to create config if not
-    - precedence
-      - home config file
-      - base file config (admerge overwrites home config)
-      - env tagged file (admerge overwrites base config)
-  - precedence
-    - yaml
-    - json (admerge overwrites yaml)
-    - toml (admerge overwrites json)
-    - cli (admerge overwrites toml)
-    - env (admerge overwrites cli)

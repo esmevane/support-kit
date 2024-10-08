@@ -1,8 +1,10 @@
+use serde::{Deserialize, Serialize};
+
 use crate::{Config, TracingTarget};
 
 use super::LoggerConfig;
 
-#[derive(Clone, Debug, serde::Deserialize, PartialEq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub enum LogTarget {
     Stdout,
     Stderr,

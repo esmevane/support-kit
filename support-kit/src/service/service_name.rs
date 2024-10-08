@@ -2,13 +2,11 @@ use serde::{Deserialize, Serialize};
 use service_manager::ServiceLabel;
 use std::{fmt::Display, str::FromStr};
 
+use crate::InvalidServiceLabelError;
+
 pub fn get_runtime_name() -> String {
     std::env::var("CARGO_PKG_NAME").unwrap_or_default()
 }
-
-#[derive(Debug, thiserror::Error)]
-#[error("invalid service label: {0}")]
-pub struct InvalidServiceLabelError(#[from] std::io::Error);
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ServiceName(String);

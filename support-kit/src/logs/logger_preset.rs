@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
+
 use super::{LogLevel, LogRotation, LogTarget, LoggerConfig, LoggerConfigOrPreset};
 
-#[derive(Clone, Debug, serde::Deserialize, PartialEq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub enum LoggerPreset {
     Error,

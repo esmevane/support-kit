@@ -1,4 +1,6 @@
-#[derive(Clone, Debug, serde::Deserialize, PartialEq)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum OneOrMany<Contents> {
     Many(Vec<Contents>),

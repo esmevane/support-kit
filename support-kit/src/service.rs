@@ -3,13 +3,11 @@ pub use service_manager::ServiceManagerKind;
 mod service_command;
 mod service_config;
 mod service_control;
-mod service_control_error;
 mod service_name;
 
 pub use service_command::ServiceCommand;
 pub use service_config::ServiceConfig;
 pub use service_control::ServiceControl;
-pub use service_control_error::ServiceControlError;
 pub use service_name::ServiceName;
 
 #[test]

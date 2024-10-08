@@ -1,4 +1,6 @@
-#[derive(Clone, Debug, PartialEq, serde::Deserialize)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct NetworkHost(String);
 
 impl<T> From<T> for NetworkHost

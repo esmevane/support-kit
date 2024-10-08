@@ -2,9 +2,9 @@ use service_manager::*;
 use std::ffi::OsString;
 use std::path::PathBuf;
 
-use crate::Config;
+use crate::{Config, ServiceControlError};
 
-use super::{ServiceCommand, ServiceControlError, ServiceName};
+use super::{ServiceCommand, ServiceName};
 
 pub struct ServiceControl {
     name: ServiceName,

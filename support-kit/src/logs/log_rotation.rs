@@ -1,4 +1,6 @@
-#[derive(Clone, Debug, Default, serde::Deserialize, PartialEq)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub enum LogRotation {
     Daily,
