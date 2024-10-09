@@ -15,7 +15,7 @@ enum LocalCommand {
     Local,
 }
 
-pub fn main() {
+pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     // You can use your own CLI struct here and parse as normal.
     let cli = YourOwnCli::parse();
 
@@ -27,7 +27,7 @@ pub fn main() {
     // does hold on to a few resources like async guards, and does manage some
     // cleanup on drop.
     //
-    let control = SupportControl::from_args(&cli.support).init();
+    let control = SupportControl::load_configuartion(&cli.support)?.init();
 
     tracing::info!(
         config = ?cli.support.build_config(),
@@ -53,4 +53,6 @@ pub fn main() {
                 .expect("failed to execute control");
         }
     }
+
+    Ok(())
 }

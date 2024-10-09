@@ -15,18 +15,14 @@ pub struct SupportControl {
 }
 
 impl SupportControl {
-    pub fn from_args(args: &Args) -> Self {
-        Self::from_arg_config(args.build_config())
-    }
-
-    pub fn from_arg_config(config: Config) -> Self {
+    pub fn from_config(config: Config) -> Self {
         Self {
             config,
             ..Default::default()
         }
     }
 
-    pub fn from_arg_maybe(args: &Args) -> Result<Self, SupportKitError> {
+    pub fn load_configuartion(args: &Args) -> Result<Self, SupportKitError> {
         let home_dir = dirs::home_dir().ok_or(MissingDirError::HomeDir)?;
         let config_dir = dirs::config_dir().ok_or(MissingDirError::ConfigDir)?;
         let base_file_name = args.config();
@@ -72,10 +68,10 @@ impl SupportControl {
 
         figment = figment
             .admerge(Serialized::from(args.build_config(), "default"))
-            .admerge(Env::prefixed(&prefix))
-            .admerge(Env::prefixed(&env_prefix));
+            .admerge(Env::prefixed(&prefix).split("__"))
+            .admerge(Env::prefixed(&env_prefix).split("__"));
 
-        Ok(Self::from_arg_config(figment.extract()?))
+        Ok(Self::from_config(figment.extract()?))
     }
 
     pub fn init(mut self) -> Self {
@@ -110,11 +106,5 @@ impl SupportControl {
         }
 
         Ok(())
-    }
-}
-
-impl From<Args> for SupportControl {
-    fn from(args: Args) -> Self {
-        Self::from_args(&args)
     }
 }
