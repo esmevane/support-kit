@@ -16,6 +16,7 @@ pub struct ServiceConfig {
 
     /// The kind of service manager to use. Defaults to system native.
     #[serde(default)]
+    #[builder(into)]
     pub service_manager: Option<ServiceManagerKind>,
 }
 

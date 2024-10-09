@@ -26,27 +26,36 @@ impl SupportControl {
         let config_dir = dirs::config_dir().ok_or(MissingDirError::ConfigDir)?;
         let base_file_name = args.config();
         let base_config = args.build_config();
-        let config_env = base_config.environment.to_string();
         let name = base_config.name();
-
-        let files = [
-            home_dir.join(&base_file_name),
-            config_dir.join(&base_file_name),
-            PathBuf::from(&base_file_name),
-        ];
+        let paths = [home_dir.clone(), config_dir.clone(), PathBuf::new()];
 
         let mut figment = Figment::new().merge(Serialized::from(base_config, "default"));
-        for file in files {
-            let file = String::from(file.to_string_lossy());
-            let env_file = format!("{file}.{config_env}");
+        for path in &paths {
+            let file = path.with_file_name(&base_file_name);
 
             figment = figment
-                .merge(Yaml::file(format!("{file}.yaml")))
-                .merge(Json::file(format!("{file}.json")))
-                .merge(Toml::file(format!("{file}.toml")))
-                .merge(Yaml::file(format!("{env_file}.yaml")))
-                .merge(Json::file(format!("{env_file}.json")))
-                .merge(Toml::file(format!("{env_file}.toml")));
+                .merge(Yaml::file(file.with_extension("yaml")))
+                .merge(Json::file(file.with_extension("json")))
+                .merge(Toml::file(file.with_extension("toml")));
+        }
+
+        let interim_config = figment.extract::<Config>()?;
+        let config_env = interim_config.environment.to_string();
+        let mut figment = Figment::new().merge(Serialized::from(interim_config, "default"));
+
+        for path in paths {
+            let file = path.with_file_name(&base_file_name);
+
+            figment = figment
+                .merge(Yaml::file(
+                    file.with_extension(format!("{config_env}.yaml")),
+                ))
+                .merge(Json::file(
+                    file.with_extension(format!("{config_env}.json")),
+                ))
+                .merge(Toml::file(
+                    file.with_extension(format!("{config_env}.toml")),
+                ));
         }
 
         let prefix = format!("{name}_").to_case(Case::UpperSnake);
@@ -96,31 +105,43 @@ impl SupportControl {
 
 #[test]
 fn yaml_config() {
-    use crate::Environment;
     use clap::Parser;
 
     figment::Jail::expect_with(|jail| {
-        dbg!(jail.create_file(
+        jail.create_file(
             "support-kit.yaml",
             r#"
             environment: production
-            name: app
-            service:
-                service_manager: systemd
-                system: true
-            verbose: 1
         "#,
-        ))?;
+        )?;
 
-        let config: Config = Figment::new()
-            .merge(Yaml::file("support-kit.yaml"))
-            .extract()?;
+        jail.create_file(
+            "support-kit.production.yaml",
+            r#"
+            environment: production
+            service:
+                name: app
+                system: true
+            verbosity: warn
+        "#,
+        )?;
 
         let args = Args::try_parse_from("app".split_whitespace()).unwrap();
         let control = SupportControl::load_configuartion(&args).unwrap();
 
-        // dbg!(config);
-        assert_eq!(control.config.environment, Environment::Production);
+        assert_eq!(
+            control.config,
+            Config::builder()
+                .environment(crate::Environment::Production)
+                .service(
+                    crate::ServiceConfig::builder()
+                        .name("app")
+                        .system(true)
+                        .build()
+                )
+                .verbosity(crate::VerbosityLevel::Warn)
+                .build()
+        );
 
         Ok(())
     });
