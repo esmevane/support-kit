@@ -30,46 +30,47 @@ impl SupportControl {
         let files = [
             home_dir.join(&base_file_name),
             config_dir.join(&base_file_name),
-            PathBuf::from(base_file_name.clone()),
+            PathBuf::from(&base_file_name),
         ];
 
-        let mut figment = Figment::new().admerge(Serialized::from(Config::default(), "default"));
+        let mut figment = Figment::new().merge(Serialized::from(Config::default(), "default"));
         for file in files {
             let file = String::from(file.to_string_lossy());
             figment = figment
-                .admerge(Yaml::file(format!("{file}.yaml")))
-                .admerge(Json::file(format!("{file}.json")))
-                .admerge(Toml::file(format!("{file}.toml")));
+                .merge(Yaml::file(format!("{file}.yaml")))
+                .merge(Json::file(format!("{file}.json")))
+                .merge(Toml::file(format!("{file}.toml")));
         }
 
         let config: Config = figment
-            .admerge(Serialized::from(args.build_config(), "default"))
+            .merge(Serialized::from(args.build_config(), "default"))
             .extract()?;
 
         let config_env = config.environment.to_string();
+        let name = config.name();
+
         let env_specific_files = [
             home_dir.join(&format!("{base_file_name}.{config_env}")),
             config_dir.join(&format!("{base_file_name}.{config_env}")),
             PathBuf::from(format!("{base_file_name}.{config_env}")),
         ];
 
-        let name = config.name();
-        let mut figment = Figment::new().admerge(Serialized::from(config, "default"));
+        let mut figment = Figment::new().merge(Serialized::from(config, "default"));
         for file in env_specific_files {
             let file = String::from(file.to_string_lossy());
             figment = figment
-                .admerge(Yaml::file(format!("{file}.yaml")))
-                .admerge(Json::file(format!("{file}.json")))
-                .admerge(Toml::file(format!("{file}.toml")));
+                .merge(Yaml::file(format!("{file}.yaml")))
+                .merge(Json::file(format!("{file}.json")))
+                .merge(Toml::file(format!("{file}.toml")));
         }
 
         let prefix = format!("{name}_").to_case(Case::UpperSnake);
         let env_prefix = format!("{name}_{config_env}_").to_case(Case::UpperSnake);
 
         figment = figment
-            .admerge(Serialized::from(args.build_config(), "default"))
-            .admerge(Env::prefixed(&prefix).split("__"))
-            .admerge(Env::prefixed(&env_prefix).split("__"));
+            .merge(Serialized::from(args.build_config(), "default"))
+            .merge(Env::prefixed(&prefix).split("__"))
+            .merge(Env::prefixed(&env_prefix).split("__"));
 
         Ok(Self::from_config(figment.extract()?))
     }

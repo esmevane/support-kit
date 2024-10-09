@@ -72,10 +72,10 @@ impl From<ServiceCommand> for Commands {
 impl Args {
     pub fn config(&self) -> String {
         let service_config = self.service();
-        let name = service_config.name();
-        let file_name = format!("{name}.config");
 
-        self.config_file.clone().unwrap_or_else(|| file_name)
+        self.config_file
+            .clone()
+            .unwrap_or_else(|| service_config.name().to_string())
     }
 
     pub fn verbosity_level(&self) -> Option<VerbosityLevel> {
@@ -140,7 +140,7 @@ fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
 #[test]
 fn config_file() -> Result<(), Box<dyn std::error::Error>> {
     let expectations = [
-        ("app", "support-kit.config"),
+        ("app", "support-kit"),
         ("app --config-file custom.config", "custom.config"),
     ];
 
@@ -155,7 +155,7 @@ fn config_file() -> Result<(), Box<dyn std::error::Error>> {
 
         let args = Args::try_parse_from("app".split_whitespace()).unwrap();
 
-        assert_eq!(args.config(), "custom-package.config".to_string());
+        assert_eq!(args.config(), "custom-package".to_string());
 
         Ok(())
     });
