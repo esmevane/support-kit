@@ -1,9 +1,6 @@
 use clap::{Parser, Subcommand};
 
-use crate::{
-    Color, Config, Environment, NetworkConfig, ServiceCommand, ServiceConfig, ServiceManagerKind,
-    ServiceName, VerbosityLevel,
-};
+use crate::{Color, Environment, ServiceCommand, ServiceConfig, ServiceManagerKind, ServiceName};
 
 mod service_args;
 
@@ -13,39 +10,39 @@ pub use service_args::ServiceArgs;
 pub struct Args {
     /// The verbosity level to use. Defaults to off.
     #[arg(short, long, action = clap::ArgAction::Count, global = true)]
-    verbose: u8,
+    pub verbose: u8,
 
     /// The host to bind to.
     #[arg(short = 'H', long, global = true)]
-    host: Option<String>,
+    pub host: Option<String>,
 
     /// The port to bind to.
     #[arg(short = 'P', long, global = true)]
-    port: Option<i32>,
+    pub port: Option<i32>,
 
     /// The environment to use.
     #[arg(short, long, global = true)]
-    environment: Option<Environment>,
+    pub environment: Option<Environment>,
 
     /// The service label to use. Defaults to the binary name.
     #[clap(long, short, global = true)]
-    name: Option<ServiceName>,
+    pub name: Option<ServiceName>,
 
     /// The kind of service manager to use. Defaults to system native.
     #[clap(long, value_enum, global = true)]
-    service_manager: Option<ServiceManagerKind>,
+    pub service_manager: Option<ServiceManagerKind>,
 
     /// Install system-wide. If not set, attempts to install for the current user.
     #[clap(long, global = true)]
-    system: bool,
+    pub system: bool,
 
     /// Color output.
     #[clap(long, global = true, default_value = "auto")]
-    color: Color,
+    pub color: Color,
 
     /// The path to the configuration file.
     #[clap(long, short)]
-    config_file: Option<String>,
+    pub config_file: Option<String>,
 
     #[command(subcommand)]
     pub command: Option<Commands>,
@@ -78,24 +75,6 @@ impl Args {
             .unwrap_or_else(|| service_config.name().to_string())
     }
 
-    pub fn verbosity_level(&self) -> Option<VerbosityLevel> {
-        let verbosity = self.verbose;
-        VerbosityLevel::from_repr(verbosity as usize)
-    }
-
-    pub fn server(&self) -> Option<NetworkConfig> {
-        match (self.host.clone(), self.port) {
-            (None, None) => None,
-            _ => Some(
-                NetworkConfig::builder()
-                    .maybe_host(self.host.clone())
-                    .maybe_port(self.port)
-                    .build()
-                    .into(),
-            ),
-        }
-    }
-
     pub fn service(&self) -> ServiceConfig {
         ServiceConfig::builder()
             .maybe_name(self.name.clone())
@@ -103,20 +82,12 @@ impl Args {
             .system(self.system)
             .build()
     }
-
-    pub fn build_config(&self) -> Config {
-        Config::builder()
-            .maybe_verbosity(self.verbosity_level())
-            .maybe_server(self.server())
-            .maybe_environment(self.environment)
-            .color(self.color)
-            .service(self.service())
-            .build()
-    }
 }
 
 #[test]
 fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
+    use crate::{Config, VerbosityLevel};
+
     let expectations = [
         ("app", VerbosityLevel::Off),
         ("app -v", VerbosityLevel::Error),
@@ -130,7 +101,7 @@ fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(
-            args.build_config(),
+            Config::from(args),
             Config::builder().verbosity(*expected).build()
         );
     }
@@ -165,6 +136,8 @@ fn config_file() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn setting_environment_with_args() -> Result<(), Box<dyn std::error::Error>> {
+    use crate::Config;
+
     let expectations = [
         ("app", None),
         (
@@ -182,7 +155,7 @@ fn setting_environment_with_args() -> Result<(), Box<dyn std::error::Error>> {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(
-            args.build_config(),
+            Config::from(args),
             Config::builder().maybe_environment(expected).build()
         );
     }
@@ -191,6 +164,8 @@ fn setting_environment_with_args() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn setting_color_with_args() -> Result<(), Box<dyn std::error::Error>> {
+    use crate::Config;
+
     let expectations = [
         ("app", Color::Auto),
         ("app --color always", Color::Always),
@@ -202,7 +177,7 @@ fn setting_color_with_args() -> Result<(), Box<dyn std::error::Error>> {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(
-            args.build_config(),
+            Config::from(args),
             Config::builder().color(expected).build()
         );
     }
@@ -211,6 +186,7 @@ fn setting_color_with_args() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn setting_server_with_args() -> Result<(), Box<dyn std::error::Error>> {
+    use crate::{Config, NetworkConfig};
     let expectations = [
         ("app", NetworkConfig::default()),
         ("app -H localhost", NetworkConfig::from("localhost")),
@@ -225,7 +201,7 @@ fn setting_server_with_args() -> Result<(), Box<dyn std::error::Error>> {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(
-            args.build_config(),
+            Config::from(args),
             Config::builder().server(expected.clone()).build()
         );
     }

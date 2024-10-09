@@ -2,7 +2,8 @@ use figment::{providers::Serialized, Figment, Provider};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    Color, Environment, LoggerConfig, NetworkConfig, ServiceConfig, ServiceName, VerbosityLevel,
+    Args, Color, Environment, LoggerConfig, NetworkConfig, ServiceConfig, ServiceName,
+    VerbosityLevel,
 };
 
 use super::{Logging, LoggingConfig};
@@ -74,6 +75,53 @@ impl Provider for Config {
         Figment::new()
             .merge(Serialized::from(self.clone(), "default"))
             .data()
+    }
+}
+
+impl From<Args> for Config {
+    fn from(args: Args) -> Self {
+        let Args {
+            color,
+            environment,
+            host,
+            name,
+            service_manager,
+            system,
+            port,
+            verbose,
+            ..
+        } = args.clone();
+
+        let verbosity_level = VerbosityLevel::from_repr(verbose as usize);
+        let server = match (&host, port) {
+            (None, None) => None,
+            _ => Some(
+                NetworkConfig::builder()
+                    .maybe_host(host)
+                    .maybe_port(port)
+                    .build(),
+            ),
+        };
+
+        let service = ServiceConfig::builder()
+            .maybe_name(name)
+            .maybe_service_manager(service_manager)
+            .system(system)
+            .build();
+
+        Self::builder()
+            .maybe_verbosity(verbosity_level)
+            .maybe_server(server)
+            .maybe_environment(environment)
+            .color(color)
+            .service(service)
+            .build()
+    }
+}
+
+impl From<&Args> for Config {
+    fn from(args: &Args) -> Self {
+        args.clone().into()
     }
 }
 

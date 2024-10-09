@@ -13,6 +13,7 @@ pub use service_name::ServiceName;
 #[test]
 fn building_service_config_from_cli_args() -> Result<(), Box<dyn std::error::Error>> {
     use crate::Args;
+    use crate::Config;
     use clap::Parser;
 
     let expectations = [
@@ -45,7 +46,7 @@ fn building_service_config_from_cli_args() -> Result<(), Box<dyn std::error::Err
     for (input, expected) in expectations {
         let cli = Args::try_parse_from(input.split_whitespace())?;
 
-        assert_eq!(cli.build_config().service, expected.into());
+        assert_eq!(Config::from(cli).service, expected.into());
     }
 
     Ok(())

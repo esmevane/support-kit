@@ -30,7 +30,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let control = SupportControl::load_configuartion(&cli.support)?.init();
 
     tracing::info!(
-        config = ?cli.support.build_config(),
+        controller = ?control,
         cli = ?cli,
         "control initialized."
     );

@@ -2,7 +2,7 @@ use figment::Figment;
 
 use crate::{Args, Config, Sources, SupportKitError};
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct SupportControl {
     pub config: Config,
     _guards: Vec<tracing_appender::non_blocking::WorkerGuard>,
@@ -17,7 +17,7 @@ impl SupportControl {
     }
 
     pub fn load_configuartion(args: &Args) -> Result<Self, SupportKitError> {
-        let base_config = args.build_config();
+        let base_config = Config::from(args);
 
         let sources = Sources::builder().name(base_config.name().clone()).build();
         let figment = Figment::new().merge(base_config).merge(sources.clone());

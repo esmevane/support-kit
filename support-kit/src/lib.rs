@@ -28,13 +28,6 @@ type TracingTarget = Box<dyn tracing_subscriber::Layer<tracing_subscriber::Regis
 type TracingTargets = Vec<TracingTarget>;
 
 #[test]
-fn todos() {
-    let todos = include_str!("../todo.md");
-
-    assert!(false, "{todos}");
-}
-
-#[test]
 fn usage_as_a_library_consumer() -> Result<(), Box<dyn std::error::Error>> {
     use clap::{Parser, Subcommand};
 
