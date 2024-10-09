@@ -1,9 +1,19 @@
 use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
-use strum::{Display, EnumIs};
+use strum::{AsRefStr, Display, EnumIs};
 
 #[derive(
-    Clone, Copy, Debug, Default, Deserialize, Display, EnumIs, ValueEnum, Serialize, PartialEq,
+    Clone,
+    Copy,
+    Debug,
+    Default,
+    Deserialize,
+    Display,
+    EnumIs,
+    AsRefStr,
+    ValueEnum,
+    Serialize,
+    PartialEq,
 )]
 #[serde(rename_all = "kebab-case")]
 #[strum(serialize_all = "kebab-case")]

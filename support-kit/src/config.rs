@@ -1,3 +1,4 @@
+use figment::{providers::Serialized, Figment, Provider};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -59,6 +60,20 @@ impl Config {
         } else {
             maybe_env_filter.unwrap_or_else(|_| log_level.into())
         }
+    }
+}
+
+impl Provider for Config {
+    fn metadata(&self) -> figment::Metadata {
+        Default::default()
+    }
+
+    fn data(
+        &self,
+    ) -> Result<figment::value::Map<figment::Profile, figment::value::Dict>, figment::Error> {
+        Figment::new()
+            .merge(Serialized::from(self.clone(), "default"))
+            .data()
     }
 }
 

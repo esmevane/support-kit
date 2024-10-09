@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use service_manager::ServiceLabel;
-use std::{fmt::Display, str::FromStr};
+use std::{ffi::OsStr, fmt::Display, str::FromStr};
 
 use crate::InvalidServiceLabelError;
 
@@ -41,6 +41,18 @@ impl FromStr for ServiceName {
 impl From<&str> for ServiceName {
     fn from(s: &str) -> Self {
         Self(s.to_string())
+    }
+}
+
+impl AsRef<str> for ServiceName {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
+impl AsRef<OsStr> for ServiceName {
+    fn as_ref(&self) -> &OsStr {
+        self.0.as_ref()
     }
 }
 
