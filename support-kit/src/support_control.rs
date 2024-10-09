@@ -58,11 +58,18 @@ impl SupportControl {
                 ));
         }
 
-        let prefix = format!("{name}_").to_case(Case::UpperSnake);
-        let env_prefix = format!("{name}_{config_env}_").to_case(Case::UpperSnake);
+        let prefix = format!(
+            "{name}__",
+            name = name.to_string().to_case(Case::UpperSnake)
+        );
+        let env_prefix = format!(
+            "{name}__{config_env}__",
+            name = name.to_string().to_case(Case::UpperSnake),
+            config_env = config_env.to_case(Case::UpperSnake)
+        );
 
         figment = figment
-            .merge(Env::prefixed(&prefix).split("__"))
+            .merge(dbg!(Env::prefixed(&prefix).split("__")))
             .merge(Env::prefixed(&env_prefix).split("__"));
 
         Ok(Self::from_config(figment.extract()?))
@@ -104,7 +111,7 @@ impl SupportControl {
 }
 
 #[test]
-fn yaml_config() {
+fn yaml_config_precedence_flow() {
     use clap::Parser;
 
     figment::Jail::expect_with(|jail| {
@@ -126,12 +133,16 @@ fn yaml_config() {
         "#,
         )?;
 
+        jail.set_env("SUPPORT_KIT__COLOR", "never");
+        jail.set_env("SUPPORT_KIT__PRODUCTION__VERBOSITY", "trace");
+
         let args = Args::try_parse_from("app".split_whitespace()).unwrap();
         let control = SupportControl::load_configuartion(&args).unwrap();
 
         assert_eq!(
             control.config,
             Config::builder()
+                .color(crate::Color::Never)
                 .environment(crate::Environment::Production)
                 .service(
                     crate::ServiceConfig::builder()
@@ -139,7 +150,109 @@ fn yaml_config() {
                         .system(true)
                         .build()
                 )
-                .verbosity(crate::VerbosityLevel::Warn)
+                .verbosity(crate::VerbosityLevel::Trace)
+                .build()
+        );
+
+        Ok(())
+    });
+}
+
+#[test]
+fn json_config_precedence_flow() {
+    use clap::Parser;
+
+    figment::Jail::expect_with(|jail| {
+        jail.create_file(
+            "support-kit.json",
+            r#"
+            {
+                "environment": "production"
+            }
+        "#,
+        )?;
+
+        jail.create_file(
+            "support-kit.production.json",
+            r#"
+            {
+                "environment": "production",
+                "service": {
+                    "name": "app",
+                    "system": true
+                },
+                "verbosity": "warn"
+            }
+        "#,
+        )?;
+
+        jail.set_env("SUPPORT_KIT__COLOR", "never");
+        jail.set_env("SUPPORT_KIT__PRODUCTION__VERBOSITY", "trace");
+
+        let args = Args::try_parse_from("app".split_whitespace()).unwrap();
+        let control = SupportControl::load_configuartion(&args).unwrap();
+
+        assert_eq!(
+            control.config,
+            Config::builder()
+                .color(crate::Color::Never)
+                .environment(crate::Environment::Production)
+                .service(
+                    crate::ServiceConfig::builder()
+                        .name("app")
+                        .system(true)
+                        .build()
+                )
+                .verbosity(crate::VerbosityLevel::Trace)
+                .build()
+        );
+
+        Ok(())
+    });
+}
+
+#[test]
+fn toml_config_precedence_flow() {
+    use clap::Parser;
+
+    figment::Jail::expect_with(|jail| {
+        jail.create_file(
+            "support-kit.toml",
+            r#"
+            environment = "production"
+        "#,
+        )?;
+
+        jail.create_file(
+            "support-kit.production.toml",
+            r#"
+            environment = "production"
+            verbosity = "warn"
+
+            [service]
+            name = "app"
+            system = true
+        "#,
+        )?;
+
+        jail.set_env("SUPPORT_KIT__COLOR", "never");
+        jail.set_env("SUPPORT_KIT__PRODUCTION__VERBOSITY", "trace");
+
+        let args = Args::try_parse_from("app".split_whitespace()).unwrap();
+        let control = SupportControl::load_configuartion(&args).unwrap();
+
+        assert_eq!(
+            control.config,
+            Config::builder()
+                .color(crate::Color::Never)
+                .environment(crate::Environment::Production)
+                .service(
+                    crate::ServiceConfig::builder()
+                        .name("app")
+                        .system(true)
+                        .build()
+                )
+                .verbosity(crate::VerbosityLevel::Trace)
                 .build()
         );
 
