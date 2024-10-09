@@ -1,10 +1,9 @@
-use std::path::PathBuf;
-
 use convert_case::{Case, Casing};
 use figment::{
     providers::{Env, Format, Json, Serialized, Toml, Yaml},
     Figment,
 };
+use std::path::PathBuf;
 
 use crate::{Args, Config, MissingDirError, SupportKitError};
 
@@ -26,6 +25,9 @@ impl SupportControl {
         let home_dir = dirs::home_dir().ok_or(MissingDirError::HomeDir)?;
         let config_dir = dirs::config_dir().ok_or(MissingDirError::ConfigDir)?;
         let base_file_name = args.config();
+        let base_config = args.build_config();
+        let config_env = base_config.environment.to_string();
+        let name = base_config.name();
 
         let files = [
             home_dir.join(&base_file_name),
@@ -33,42 +35,24 @@ impl SupportControl {
             PathBuf::from(&base_file_name),
         ];
 
-        let mut figment = Figment::new().merge(Serialized::from(Config::default(), "default"));
+        let mut figment = Figment::new().merge(Serialized::from(base_config, "default"));
         for file in files {
             let file = String::from(file.to_string_lossy());
+            let env_file = format!("{file}.{config_env}");
+
             figment = figment
                 .merge(Yaml::file(format!("{file}.yaml")))
                 .merge(Json::file(format!("{file}.json")))
-                .merge(Toml::file(format!("{file}.toml")));
-        }
-
-        let config: Config = figment
-            .merge(Serialized::from(args.build_config(), "default"))
-            .extract()?;
-
-        let config_env = config.environment.to_string();
-        let name = config.name();
-
-        let env_specific_files = [
-            home_dir.join(&format!("{base_file_name}.{config_env}")),
-            config_dir.join(&format!("{base_file_name}.{config_env}")),
-            PathBuf::from(format!("{base_file_name}.{config_env}")),
-        ];
-
-        let mut figment = Figment::new().merge(Serialized::from(config, "default"));
-        for file in env_specific_files {
-            let file = String::from(file.to_string_lossy());
-            figment = figment
-                .merge(Yaml::file(format!("{file}.yaml")))
-                .merge(Json::file(format!("{file}.json")))
-                .merge(Toml::file(format!("{file}.toml")));
+                .merge(Toml::file(format!("{file}.toml")))
+                .merge(Yaml::file(format!("{env_file}.yaml")))
+                .merge(Json::file(format!("{env_file}.json")))
+                .merge(Toml::file(format!("{env_file}.toml")));
         }
 
         let prefix = format!("{name}_").to_case(Case::UpperSnake);
         let env_prefix = format!("{name}_{config_env}_").to_case(Case::UpperSnake);
 
         figment = figment
-            .merge(Serialized::from(args.build_config(), "default"))
             .merge(Env::prefixed(&prefix).split("__"))
             .merge(Env::prefixed(&env_prefix).split("__"));
 
@@ -108,4 +92,36 @@ impl SupportControl {
 
         Ok(())
     }
+}
+
+#[test]
+fn yaml_config() {
+    use crate::Environment;
+    use clap::Parser;
+
+    figment::Jail::expect_with(|jail| {
+        dbg!(jail.create_file(
+            "support-kit.yaml",
+            r#"
+            environment: production
+            name: app
+            service:
+                service_manager: systemd
+                system: true
+            verbose: 1
+        "#,
+        ))?;
+
+        let config: Config = Figment::new()
+            .merge(Yaml::file("support-kit.yaml"))
+            .extract()?;
+
+        let args = Args::try_parse_from("app".split_whitespace()).unwrap();
+        let control = SupportControl::load_configuartion(&args).unwrap();
+
+        // dbg!(config);
+        assert_eq!(control.config.environment, Environment::Production);
+
+        Ok(())
+    });
 }

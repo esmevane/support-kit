@@ -322,3 +322,51 @@ fn color_config() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+#[test]
+fn environment_config() -> Result<(), Box<dyn std::error::Error>> {
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "environment": "development"
+        }
+        "#,
+    )?;
+
+    assert_eq!(
+        config,
+        Config::builder()
+            .environment(Environment::Development)
+            .build()
+    );
+
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "environment": "production"
+        }
+        "#,
+    )?;
+
+    assert_eq!(
+        config,
+        Config::builder()
+            .environment(Environment::Production)
+            .build()
+    );
+
+    let config: Config = serde_json::from_str(
+        r#"
+        {
+            "environment": "test"
+        }
+        "#,
+    )?;
+
+    assert_eq!(
+        config,
+        Config::builder().environment(Environment::Test).build()
+    );
+
+    Ok(())
+}
