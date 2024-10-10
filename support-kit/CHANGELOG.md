@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.1...support-kit-v0.0.2) - 2024-10-10
+
+### Other
+
+- Add a server address fetcher. ([#7](https://github.com/esmevane/support-kit/pull/7))
+- release ([#5](https://github.com/esmevane/support-kit/pull/5))
+
 ## [0.0.1](https://github.com/esmevane/support-kit/releases/tag/support-kit-v0.0.1) - 2024-10-10
 
 ### Other
