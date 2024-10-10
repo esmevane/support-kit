@@ -1,16 +1,6 @@
 [workspace]
 resolver = "2"
-members = [
-  "service-kit",
-  "service-kit-core",
-  "service-kit-proto",
-  "service-kit-support",
-  "service-kit-web",
-  "support-kit-spike",
-  "support-kit",
-  "xtask",
-  "consumer-example",
-]
+members = ["support-kit", "xtask", "consumer-example"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

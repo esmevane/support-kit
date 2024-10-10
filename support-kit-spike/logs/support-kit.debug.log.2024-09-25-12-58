@@ -1,6 +1,0 @@
-{"timestamp":"2024-09-25T07:58:26.507291-05:00","level":"INFO","fields":{"message":"Logging initialized: \"info\",support_kit=\"info\",tower_http=debug,axum::rejection=trace","app_name":"support-kit"},"target":"support_kit::telemetry"}
-{"timestamp":"2024-09-25T07:58:26.507356-05:00","level":"ERROR","fields":{"message":"Error log level enabled"},"target":"support_kit::telemetry"}
-{"timestamp":"2024-09-25T07:58:26.507410-05:00","level":"WARN","fields":{"message":"Warn log level enabled"},"target":"support_kit::telemetry"}
-{"timestamp":"2024-09-25T07:58:26.507457-05:00","level":"INFO","fields":{"message":"Info log level enabled"},"target":"support_kit::telemetry"}
-{"timestamp":"2024-09-25T07:58:26.507500-05:00","level":"DEBUG","fields":{"message":"Debug log level enabled"},"target":"support_kit::telemetry"}
-{"timestamp":"2024-09-25T07:58:26.507542-05:00","level":"TRACE","fields":{"message":"Trace log level enabled"},"target":"support_kit::telemetry"}

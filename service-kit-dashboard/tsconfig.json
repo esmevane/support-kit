@@ -1,4 +1,0 @@
-{
-  "extends": "astro/tsconfigs/strict",
-  "exclude": ["public/wasm", "dist/wasm"]
-}
