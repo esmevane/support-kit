@@ -2,7 +2,7 @@ use clap::Parser;
 
 pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = support_kit::Args::parse();
-    let control = support_kit::SupportControl::load_configuartion(&args)?.init();
+    let control = support_kit::SupportControl::load_configuration(&args)?.init();
 
     tracing::trace!("Only shows up if you use --verbose x5 or -vvvvv");
     tracing::debug!("Only shows up if you use --verbose x4 or -vvvv");

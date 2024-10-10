@@ -16,7 +16,7 @@ impl SupportControl {
         }
     }
 
-    pub fn load_configuartion(args: &Args) -> Result<Self, SupportKitError> {
+    pub fn load_configuration(args: &Args) -> Result<Self, SupportKitError> {
         let base_config = Config::from(args);
 
         let sources = Sources::builder().name(base_config.name().clone()).build();
@@ -95,7 +95,7 @@ fn yaml_config_precedence_flow() {
         jail.set_env("SUPPORT_KIT__PRODUCTION__VERBOSITY", "trace");
 
         let args = Args::try_parse_from("app".split_whitespace()).unwrap();
-        let control = SupportControl::load_configuartion(&args).unwrap();
+        let control = SupportControl::load_configuration(&args).unwrap();
 
         assert_eq!(
             control.config,
@@ -148,7 +148,7 @@ fn json_config_precedence_flow() {
         jail.set_env("SUPPORT_KIT__PRODUCTION__VERBOSITY", "trace");
 
         let args = Args::try_parse_from("app".split_whitespace()).unwrap();
-        let control = SupportControl::load_configuartion(&args).unwrap();
+        let control = SupportControl::load_configuration(&args).unwrap();
 
         assert_eq!(
             control.config,
@@ -197,7 +197,7 @@ fn toml_config_precedence_flow() {
         jail.set_env("SUPPORT_KIT__PRODUCTION__VERBOSITY", "trace");
 
         let args = Args::try_parse_from("app".split_whitespace()).unwrap();
-        let control = SupportControl::load_configuartion(&args).unwrap();
+        let control = SupportControl::load_configuration(&args).unwrap();
 
         assert_eq!(
             control.config,

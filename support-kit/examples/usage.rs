@@ -27,7 +27,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     // does hold on to a few resources like async guards, and does manage some
     // cleanup on drop.
     //
-    let control = SupportControl::load_configuartion(&cli.support)?.init();
+    let control = SupportControl::load_configuration(&cli.support)?.init();
 
     tracing::info!(
         controller = ?control,
