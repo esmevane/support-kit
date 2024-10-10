@@ -78,7 +78,10 @@ mod tests {
         let expectations = [
             ("app", None),
             ("app local", None),
-            ("app service install", Some(Commands::from(Install))),
+            (
+                "app service install",
+                Some(Commands::from(Install(Default::default()))),
+            ),
             ("app service start", Some(Commands::from(Start))),
             ("app service stop", Some(Commands::from(Stop))),
             ("app service uninstall", Some(Commands::from(Uninstall))),

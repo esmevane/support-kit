@@ -20,7 +20,6 @@ impl std::fmt::Debug for ServiceControl {
             .field("manager level", &self.manager.level())
             .field("manager available", &self.manager.available())
             .field("program", &self.program())
-            .field("args", &self.args())
             .finish()
     }
 }
@@ -55,20 +54,17 @@ impl ServiceControl {
         Ok(std::env::current_exe()?)
     }
 
-    fn args(&self) -> Vec<OsString> {
-        vec![
-            "-n".into(),
-            self.name.to_string().into(),
-            "server".into(),
-            "api".into(),
-        ]
-    }
-
     #[tracing::instrument(level = "trace")]
     pub fn execute(&self, operation: ServiceCommand) -> Result<(), ServiceControlError> {
-        tracing::trace!(operation = ?operation, "executing operation");
         match operation {
-            ServiceCommand::Install => self.install(self.program()?, self.args()),
+            ServiceCommand::Install(install) => {
+                tracing::trace!(
+                    install_args = ?install,
+                    "installing with args"
+                );
+
+                self.install(self.program()?, install.args)
+            }
             ServiceCommand::Start => self.start(),
             ServiceCommand::Stop => self.stop(),
             ServiceCommand::Uninstall => self.uninstall(),

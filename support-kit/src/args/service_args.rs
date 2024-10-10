@@ -31,7 +31,7 @@ fn operations() -> Result<(), Box<dyn std::error::Error>> {
 
     let expectations = [
         ("app service", None),
-        ("app service install", Some(Install)),
+        ("app service install", Some(Install(Default::default()))),
         ("app service start", Some(Start)),
         ("app service stop", Some(Stop)),
         ("app service uninstall", Some(Uninstall)),
