@@ -9,7 +9,6 @@ clap = { workspace = true }
 dirs = { workspace = true }
 convert_case = { workspace = true }
 figment = { workspace = true }
-nutype = { workspace = true }
 owo-colors = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

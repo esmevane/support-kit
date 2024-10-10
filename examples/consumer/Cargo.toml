@@ -1,8 +1,8 @@
 [package]
-name = "consumer-example"
-version = "0.1.0"
+name = "consumer"
+version = "0.1.1"
+publish = false
 edition = "2021"
 
 [dependencies]
-clap = { workspace = true }
 support-kit = { workspace = true }
