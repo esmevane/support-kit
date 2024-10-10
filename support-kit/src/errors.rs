@@ -1,5 +1,9 @@
-use std::io::Error;
+use std::{io::Error, net::AddrParseError};
 use thiserror::Error;
+
+#[derive(Debug, thiserror::Error)]
+#[error("network init error: {0}")]
+pub struct NetworkInitError(#[from] AddrParseError);
 
 #[derive(Debug, thiserror::Error)]
 #[error("invalid service label: {0}")]
@@ -32,4 +36,7 @@ pub enum SupportKitError {
 
     #[error("problem building config: {0}")]
     ConfigBuildError(#[from] figment::Error),
+
+    #[error("problem initializing network: {0}")]
+    NetworkInitError(#[from] NetworkInitError),
 }
