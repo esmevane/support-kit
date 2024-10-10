@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Other
 
+- Add license and description.
+- release ([#4](https://github.com/esmevane/support-kit/pull/4))
+- Verbosity -> VerbosityLevel.
+- Move 'structures' into a flat file.
+- Add Result convenience type.
+- Support Kit v0.
+
+## [0.0.1](https://github.com/esmevane/support-kit/releases/tag/support-kit-v0.0.1) - 2024-10-10
+
+### Other
+
 - Verbosity -> VerbosityLevel.
 - Move 'structures' into a flat file.
 - Add Result convenience type.
