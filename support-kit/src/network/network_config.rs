@@ -1,4 +1,8 @@
+use std::net::SocketAddr;
+
 use serde::{Deserialize, Serialize};
+
+use crate::NetworkInitError;
 
 use super::{NetworkHost, NetworkPort};
 
@@ -6,11 +10,19 @@ use super::{NetworkHost, NetworkPort};
 pub struct NetworkConfig {
     #[serde(default)]
     #[builder(default, into)]
-    host: NetworkHost,
+    pub host: NetworkHost,
 
     #[serde(default)]
     #[builder(default, into)]
-    port: NetworkPort,
+    pub port: NetworkPort,
+}
+
+impl NetworkConfig {
+    pub fn address(&self) -> crate::Result<SocketAddr> {
+        Ok(format!("{}:{}", self.host, self.port)
+            .parse()
+            .map_err(|error| NetworkInitError::from(error))?)
+    }
 }
 
 impl From<&str> for NetworkConfig {

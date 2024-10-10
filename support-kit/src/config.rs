@@ -51,6 +51,10 @@ impl Config {
         self.service.name()
     }
 
+    pub fn address(&self) -> crate::Result<std::net::SocketAddr> {
+        self.server.address()
+    }
+
     pub fn env_filter(&self) -> tracing_subscriber::EnvFilter {
         let log_level = self.verbosity.to_string();
         let maybe_env_filter = tracing_subscriber::EnvFilter::try_from_default_env();
