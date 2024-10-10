@@ -1,3 +1,0 @@
-[alias]
-xtask = "run --package xtask --bin xtask --"
-service-kit = "run --package service-kit --bin service-kit --"

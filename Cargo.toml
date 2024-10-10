@@ -1,16 +1,10 @@
 [workspace]
 resolver = "2"
-members = ["support-kit", "xtask", "consumer-example"]
+members = ["support-kit", "examples/*"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace.dependencies]
-consumer-example = { version = "0.1.0", path = "./consumer-example" }
-service-kit = { version = "0.1.0", path = "./service-kit" }
-service-kit-core = { version = "0.1.0", path = "./service-kit-core" }
-service-kit-proto = { version = "0.1.0", path = "./service-kit-proto" }
-service-kit-web = { version = "0.1.0", path = "./service-kit-web" }
-service-kit-support = { version = "0.1.0", path = "./service-kit-support" }
 support-kit = { version = "0.0.1", path = "./support-kit" }
 axum = { version = "0.7.5", features = ["ws", "tracing", "tokio"] }
 axum-extra = { version = "0.9", features = ["typed-header"] }
