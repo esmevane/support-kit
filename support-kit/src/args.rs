@@ -86,15 +86,15 @@ impl Args {
 
 #[test]
 fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
-    use crate::{Config, VerbosityLevel};
+    use crate::{Config, Verbosity};
 
     let expectations = [
-        ("app", VerbosityLevel::Off),
-        ("app -v", VerbosityLevel::Error),
-        ("app -vv", VerbosityLevel::Warn),
-        ("app -vvv", VerbosityLevel::Info),
-        ("app -vvvv", VerbosityLevel::Debug),
-        ("app -vvvvv", VerbosityLevel::Trace),
+        ("app", Verbosity::Off),
+        ("app -v", Verbosity::Error),
+        ("app -vv", Verbosity::Warn),
+        ("app -vvv", Verbosity::Info),
+        ("app -vvvv", Verbosity::Debug),
+        ("app -vvvvv", Verbosity::Trace),
     ];
 
     for (input, expected) in expectations.iter() {

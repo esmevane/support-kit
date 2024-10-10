@@ -9,7 +9,7 @@ mod service;
 mod sources;
 mod structures;
 mod support_control;
-mod verbosity_level;
+mod verbosity;
 
 pub use args::*;
 pub use color::Color;
@@ -22,7 +22,7 @@ pub use service::*;
 pub use sources::Sources;
 pub use structures::*;
 pub use support_control::SupportControl;
-pub use verbosity_level::VerbosityLevel;
+pub use verbosity::Verbosity;
 
 pub mod reexports {
     pub use clap;

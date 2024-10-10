@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
     strum::Display,
 )]
 #[serde(rename_all = "kebab-case")]
-pub enum VerbosityLevel {
+pub enum Verbosity {
     #[default]
     #[strum(serialize = "")]
     Off,

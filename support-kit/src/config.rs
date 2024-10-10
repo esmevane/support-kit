@@ -2,8 +2,7 @@ use figment::{providers::Serialized, Figment, Provider};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    Args, Color, Environment, LoggerConfig, NetworkConfig, ServiceConfig, ServiceName,
-    VerbosityLevel,
+    Args, Color, Environment, LoggerConfig, NetworkConfig, ServiceConfig, ServiceName, Verbosity,
 };
 
 use super::{Logging, LoggingConfig};
@@ -16,7 +15,7 @@ pub struct Config {
 
     #[serde(default)]
     #[builder(default, into)]
-    pub verbosity: VerbosityLevel,
+    pub verbosity: Verbosity,
 
     #[serde(default)]
     #[builder(default, into)]
@@ -92,7 +91,7 @@ impl From<Args> for Config {
             ..
         } = args.clone();
 
-        let verbosity_level = VerbosityLevel::from_repr(verbose as usize);
+        let verbosity_level = Verbosity::from_repr(verbose as usize);
         let server = match (&host, port) {
             (None, None) => None,
             _ => Some(
@@ -168,7 +167,7 @@ fn verbosity_and_env_filter() -> Result<(), Box<dyn std::error::Error>> {
 
     assert_eq!(
         config,
-        Config::builder().verbosity(VerbosityLevel::Debug).build()
+        Config::builder().verbosity(Verbosity::Debug).build()
     );
 
     assert_eq!(config.env_filter().to_string(), "debug");

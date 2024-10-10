@@ -108,7 +108,7 @@ fn yaml_config_precedence_flow() {
                         .system(true)
                         .build()
                 )
-                .verbosity(crate::VerbosityLevel::Trace)
+                .verbosity(crate::Verbosity::Trace)
                 .build()
         );
 
@@ -161,7 +161,7 @@ fn json_config_precedence_flow() {
                         .system(true)
                         .build()
                 )
-                .verbosity(crate::VerbosityLevel::Trace)
+                .verbosity(crate::Verbosity::Trace)
                 .build()
         );
 
@@ -210,7 +210,7 @@ fn toml_config_precedence_flow() {
                         .system(true)
                         .build()
                 )
-                .verbosity(crate::VerbosityLevel::Trace)
+                .verbosity(crate::Verbosity::Trace)
                 .build()
         );
 
