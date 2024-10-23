@@ -64,7 +64,7 @@ impl ImageControl {
             "docker build \
             -f {definition} \
             --label {label} \
-            -t {descriptor} ..",
+            -t {descriptor} .",
             definition = self.image.definition,
             descriptor = self.descriptor(),
         ))
