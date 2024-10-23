@@ -39,34 +39,40 @@ impl ContainerControl {
         Self { images, registry }
     }
 
+    #[tracing::instrument(skip(self), level = "trace")]
     pub fn setup_cert_volume(&self) -> crate::Result<OpsProcess> {
-        Ok(format!("docker volume create certs").try_into()?)
+        to_container_op(format!("docker volume create certs"))
     }
 
     /// Get the shell script from the [docker-install repo][docker-install].
     ///
     /// [docker-install]: https://github.com/docker/docker-install
+    #[tracing::instrument(skip(self), level = "trace")]
     pub fn get_install_script(&self) -> crate::Result<OpsProcess> {
-        Ok(format!("curl -fsSL https://get.docker.com -o get-docker.sh").try_into()?)
+        to_container_op(format!(
+            "curl -fsSL https://get.docker.com -o get-docker.sh"
+        ))
     }
 
     /// Install Docker on the host machine.
+    #[tracing::instrument(skip(self), level = "trace")]
     pub fn install_docker(&self) -> crate::Result<OpsProcess> {
-        Ok(format!("sh get-docker.sh").try_into()?)
+        to_container_op(format!("sh get-docker.sh"))
     }
 
+    #[tracing::instrument(skip(self), level = "trace")]
     pub fn login(&self) -> crate::Result<OpsProcess> {
-        Ok(format!(
+        to_container_op(format!(
             "docker login {host} -u {account} -p {token}",
             host = self.registry.host,
             account = self.registry.account,
             token = self.registry.token
-        )
-        .try_into()?)
+        ))
     }
 
+    #[tracing::instrument(skip(self), level = "trace")]
     pub fn list_containers(&self) -> crate::Result<OpsProcess> {
-        Ok(format!("docker ps").try_into()?)
+        to_container_op(format!("docker ps"))
     }
 }
 
@@ -74,4 +80,13 @@ impl From<&SupportControl> for ContainerControl {
     fn from(controller: &SupportControl) -> Self {
         Self::from_controller(controller)
     }
+}
+
+#[tracing::instrument(skip(operation), level = "trace")]
+fn to_container_op<T: Into<String>>(operation: T) -> crate::Result<OpsProcess> {
+    let operation = operation.into();
+
+    tracing::trace!(operation = ?operation, "converting to operation");
+
+    Ok(operation.try_into()?)
 }
