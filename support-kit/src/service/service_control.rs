@@ -2,7 +2,7 @@ use service_manager::*;
 use std::ffi::OsString;
 use std::path::PathBuf;
 
-use crate::{Config, ServiceControlError};
+use crate::{Configuration, ServiceControlError};
 
 use super::{ServiceCommand, ServiceName};
 
@@ -25,7 +25,7 @@ impl std::fmt::Debug for ServiceControl {
 }
 
 impl ServiceControl {
-    pub fn init(config: &Config) -> Result<Self, ServiceControlError> {
+    pub fn init(config: &Configuration) -> Result<Self, ServiceControlError> {
         let mut manager = match config.service.service_manager {
             Some(manager) => <dyn ServiceManager>::target(manager),
             None => <dyn ServiceManager>::native()?,

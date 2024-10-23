@@ -1,37 +1,32 @@
 mod args;
 mod color;
 mod config;
+mod containers;
+mod deploy;
 mod environment;
 mod errors;
 mod logs;
 mod network;
 mod service;
-mod sources;
+mod ssh;
 mod structures;
 mod support_control;
 mod verbosity;
 
 pub use args::*;
 pub use color::Color;
-pub use config::Config;
+pub use config::*;
+pub use containers::*;
+pub use deploy::*;
 pub use environment::Environment;
 pub use errors::*;
 pub use logs::*;
 pub use network::NetworkConfig;
 pub use service::*;
-pub use sources::Sources;
+pub use ssh::*;
 pub use structures::*;
 pub use support_control::SupportControl;
 pub use verbosity::Verbosity;
-
-pub mod reexports {
-    pub use clap;
-    pub use figment;
-    pub use owo_colors;
-    pub use tracing;
-    pub use tracing_appender;
-    pub use tracing_subscriber;
-}
 
 type TracingTarget = Box<dyn tracing_subscriber::Layer<tracing_subscriber::Registry> + Send + Sync>;
 type TracingTargets = Vec<TracingTarget>;
