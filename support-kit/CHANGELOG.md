@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.6](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.5...support-kit-v0.0.6) - 2024-10-23
+
+### Fixed
+
+- Actually change context path! ([#14](https://github.com/esmevane/support-kit/pull/14))
+
 ## [0.0.5](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.4...support-kit-v0.0.5) - 2024-10-23
 
 ### Fixed

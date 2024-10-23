@@ -1,6 +1,6 @@
 [package]
 name = "support-kit"
-version = "0.0.5"
+version = "0.0.6"
 description = "Some cli, config, service, and tracing boilerplate for networked applications."
 license = "MIT"
 edition = "2021"
