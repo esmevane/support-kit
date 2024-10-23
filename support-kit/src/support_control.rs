@@ -1,42 +1,68 @@
 use figment::Figment;
+use rustls_acme::axum::AxumAcceptor;
 
-use crate::{Args, Config, Sources, SupportKitError};
+use crate::{Args, ConfigManifest, ConfigSources, Configuration, SshControl, SupportKitError};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, bon::Builder)]
 pub struct SupportControl {
-    pub config: Config,
+    pub args: Args,
+    pub config: Configuration,
+    #[builder(default, into)]
     _guards: Vec<tracing_appender::non_blocking::WorkerGuard>,
 }
 
 impl SupportControl {
-    pub fn from_config(config: Config) -> Self {
-        Self {
-            config,
-            ..Default::default()
-        }
+    pub fn manifest(&self) -> Result<ConfigManifest, SupportKitError> {
+        Ok(self.source_collection().sources()?)
+    }
+
+    pub fn source_collection(&self) -> ConfigSources {
+        ConfigSources::builder()
+            .file(self.args.config())
+            .maybe_env(self.config.environment)
+            .build()
+    }
+
+    pub fn figment(&self) -> Result<Figment, SupportKitError> {
+        Ok(Figment::new()
+            .merge(&self.config)
+            .merge(&self.source_collection()))
     }
 
     pub fn load_configuration(args: &Args) -> Result<Self, SupportKitError> {
-        let base_config = Config::from(args);
+        let initial_setup = Self::builder()
+            .args(args.clone())
+            .config(Configuration::from(args))
+            .build();
 
-        let sources = Sources::builder().name(base_config.name().clone()).build();
-        let figment = Figment::new().merge(base_config).merge(sources.clone());
-
-        let env = figment.extract::<Config>()?.environment;
-
-        Ok(Self::from_config(
-            figment
-                .merge(sources.with_env(env))
-                .merge(sources.prefix())
-                .merge(sources.with_env(env).prefix())
-                .extract()?,
-        ))
+        Ok(Self::builder()
+            .args(args.clone())
+            .config(initial_setup.figment()?.extract()?)
+            .build())
     }
 
     pub fn init(mut self) -> Self {
         self.config.init_color();
         self._guards = self.config.init_logging();
         self
+    }
+
+    pub async fn init_tls(&self) -> Option<AxumAcceptor> {
+        self.config.init_tls().await
+    }
+
+    pub async fn on_hosts<Func, Fut>(&self, callback_fn: Func) -> Result<(), SupportKitError>
+    where
+        Func: Fn(crate::SshHost) -> Fut,
+        Fut: std::future::Future<Output = Result<(), crate::SshError>>,
+    {
+        let deployment = self.config.deployment.clone();
+
+        if let Some(deployment) = deployment {
+            SshControl::on_hosts(&deployment, callback_fn).await?;
+        }
+
+        Ok(())
     }
 
     pub fn execute(&self, args: Args) -> Result<(), SupportKitError> {
@@ -99,7 +125,7 @@ fn yaml_config_precedence_flow() {
 
         assert_eq!(
             control.config,
-            Config::builder()
+            Configuration::builder()
                 .color(crate::Color::Never)
                 .environment(crate::Environment::Production)
                 .service(
@@ -152,7 +178,7 @@ fn json_config_precedence_flow() {
 
         assert_eq!(
             control.config,
-            Config::builder()
+            Configuration::builder()
                 .color(crate::Color::Never)
                 .environment(crate::Environment::Production)
                 .service(
@@ -201,7 +227,7 @@ fn toml_config_precedence_flow() {
 
         assert_eq!(
             control.config,
-            Config::builder()
+            Configuration::builder()
                 .color(crate::Color::Never)
                 .environment(crate::Environment::Production)
                 .service(

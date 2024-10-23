@@ -6,17 +6,24 @@ members = ["support-kit", "examples/*"]
 
 [workspace.dependencies]
 support-kit = { version = "0.0.3", path = "./support-kit" }
+async-trait = "0.1.83"
+axum-server = { version = "0.7.1" }
 bon = "2.3.0"
 clap = { version = "4.5.4", features = ["derive", "env"] }
 convert_case = "0.6.0"
 dirs = "5.0.1"
 figment = { version = "0.10", features = ["env", "json", "toml", "yaml"] }
 owo-colors = { version = "4", features = ["supports-colors"] }
+rustls-acme = { version = "0.11.1", features = ["axum"] }
+russh = "0.45.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 service-manager = { version = "0.6.1", features = ["clap", "serde"] }
+shell-escape = "0.1.5"
 strum = { version = "0.26.2", features = ["derive"] }
 thiserror = "1.0.59"
+tokio = { version = "1.40.0", features = ["io-std"] }
+tokio-stream = "0.1.16"
 tracing = { version = "0.1.40", features = ["log"] }
 tracing-appender = { version = "0.2.0" }
 tracing-subscriber = { version = "0.3.18", features = [

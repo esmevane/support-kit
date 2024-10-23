@@ -1,4 +1,5 @@
-use support_kit::reexports::{clap::Parser, owo_colors::OwoColorize, tracing};
+use clap::Parser;
+use owo_colors::OwoColorize;
 
 fn main() -> support_kit::Result<()> {
     let args = support_kit::Args::parse();

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::Config;
+use crate::Configuration;
 
 use super::{LogFileConfig, LogLevel, LogLevelConfig, LogTarget, LoggerConfigOrPreset, Logging};
 
@@ -33,7 +33,7 @@ impl LoggerConfig {
         self
     }
 
-    pub fn initialize(&self, config: &Config, logging: &mut Logging) {
+    pub fn initialize(&self, config: &Configuration, logging: &mut Logging) {
         match &self.file {
             Some(file_config) => {
                 let (logger, guard) = file_config.init_log_appender(&self);

@@ -1,12 +1,14 @@
 use clap::{Parser, Subcommand};
 
-use crate::{Color, Environment, ServiceCommand, ServiceConfig, ServiceManagerKind, ServiceName};
+use crate::{
+    Color, ConfigFile, Environment, ServiceCommand, ServiceConfig, ServiceManagerKind, ServiceName,
+};
 
 mod service_args;
 
 pub use service_args::ServiceArgs;
 
-#[derive(Clone, Debug, Parser)]
+#[derive(Clone, Debug, Default, Parser)]
 pub struct Args {
     /// The verbosity level to use. Defaults to off.
     #[arg(short, long, action = clap::ArgAction::Count, global = true)]
@@ -42,7 +44,7 @@ pub struct Args {
 
     /// The path to the configuration file.
     #[clap(long, short)]
-    pub config_file: Option<String>,
+    pub config_file: Option<ConfigFile>,
 
     #[command(subcommand)]
     pub command: Option<Commands>,
@@ -67,12 +69,12 @@ impl From<ServiceCommand> for Commands {
 }
 
 impl Args {
-    pub fn config(&self) -> String {
+    pub fn config(&self) -> ConfigFile {
         let service_config = self.service();
 
         self.config_file
             .clone()
-            .unwrap_or_else(|| service_config.name().to_string())
+            .unwrap_or_else(|| service_config.name().into())
     }
 
     pub fn service(&self) -> ServiceConfig {
@@ -86,7 +88,7 @@ impl Args {
 
 #[test]
 fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
-    use crate::{Config, Verbosity};
+    use crate::{Configuration, Verbosity};
 
     let expectations = [
         ("app", Verbosity::Off),
@@ -101,8 +103,8 @@ fn setting_verbosity_with_args() -> Result<(), Box<dyn std::error::Error>> {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(
-            Config::from(args),
-            Config::builder().verbosity(*expected).build()
+            Configuration::from(args),
+            Configuration::builder().verbosity(*expected).build()
         );
     }
     Ok(())
@@ -118,7 +120,7 @@ fn config_file() -> Result<(), Box<dyn std::error::Error>> {
     for (input, expected) in expectations {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
-        assert_eq!(args.config(), expected.to_string());
+        assert_eq!(args.config(), expected.into());
     }
 
     figment::Jail::expect_with(|jail| {
@@ -126,7 +128,7 @@ fn config_file() -> Result<(), Box<dyn std::error::Error>> {
 
         let args = Args::try_parse_from("app".split_whitespace()).unwrap();
 
-        assert_eq!(args.config(), "custom-package".to_string());
+        assert_eq!(args.config(), "custom-package".into());
 
         Ok(())
     });
@@ -136,7 +138,7 @@ fn config_file() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn setting_environment_with_args() -> Result<(), Box<dyn std::error::Error>> {
-    use crate::Config;
+    use crate::Configuration;
 
     let expectations = [
         ("app", None),
@@ -155,8 +157,8 @@ fn setting_environment_with_args() -> Result<(), Box<dyn std::error::Error>> {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(
-            Config::from(args),
-            Config::builder().maybe_environment(expected).build()
+            Configuration::from(args),
+            Configuration::builder().maybe_environment(expected).build()
         );
     }
     Ok(())
@@ -164,7 +166,7 @@ fn setting_environment_with_args() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn setting_color_with_args() -> Result<(), Box<dyn std::error::Error>> {
-    use crate::Config;
+    use crate::Configuration;
 
     let expectations = [
         ("app", Color::Auto),
@@ -177,8 +179,8 @@ fn setting_color_with_args() -> Result<(), Box<dyn std::error::Error>> {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(
-            Config::from(args),
-            Config::builder().color(expected).build()
+            Configuration::from(args),
+            Configuration::builder().color(expected).build()
         );
     }
     Ok(())
@@ -186,7 +188,7 @@ fn setting_color_with_args() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn setting_server_with_args() -> Result<(), Box<dyn std::error::Error>> {
-    use crate::{Config, NetworkConfig};
+    use crate::{Configuration, NetworkConfig};
     let expectations = [
         ("app", NetworkConfig::default()),
         ("app -H localhost", NetworkConfig::from("localhost")),
@@ -201,8 +203,8 @@ fn setting_server_with_args() -> Result<(), Box<dyn std::error::Error>> {
         let args = Args::try_parse_from(input.split_whitespace())?;
 
         assert_eq!(
-            Config::from(args),
-            Config::builder().server(expected.clone()).build()
+            Configuration::from(args),
+            Configuration::builder().server(expected.clone()).build()
         );
     }
     Ok(())

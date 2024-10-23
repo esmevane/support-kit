@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use service_manager::ServiceLabel;
-use std::{ffi::OsStr, fmt::Display, str::FromStr};
+use std::{ffi::OsStr, fmt::Display, path::Path, str::FromStr};
 
 use crate::InvalidServiceLabelError;
 
@@ -30,6 +30,12 @@ impl Display for ServiceName {
     }
 }
 
+impl From<ServiceName> for String {
+    fn from(service_name: ServiceName) -> Self {
+        service_name.0
+    }
+}
+
 impl FromStr for ServiceName {
     type Err = String;
 
@@ -52,6 +58,12 @@ impl AsRef<str> for ServiceName {
 
 impl AsRef<OsStr> for ServiceName {
     fn as_ref(&self) -> &OsStr {
+        self.0.as_ref()
+    }
+}
+
+impl AsRef<Path> for ServiceName {
+    fn as_ref(&self) -> &Path {
         self.0.as_ref()
     }
 }

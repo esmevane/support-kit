@@ -1,6 +1,6 @@
 use tracing_appender::non_blocking::WorkerGuard;
 
-use crate::{Config, TracingTargets};
+use crate::{Configuration, TracingTargets};
 
 use super::LoggingConfig;
 
@@ -12,7 +12,7 @@ pub struct Logging {
 }
 
 impl Logging {
-    pub fn initialize(config: Config) -> Vec<WorkerGuard> {
+    pub fn initialize(config: Configuration) -> Vec<WorkerGuard> {
         use tracing_subscriber::layer::SubscriberExt;
 
         let mut logging = Self::default();

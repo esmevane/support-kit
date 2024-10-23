@@ -6,3 +6,6 @@ edition = "2021"
 
 [dependencies]
 support-kit = { workspace = true }
+clap = { workspace = true }
+owo-colors = { workspace = true }
+tracing = { workspace = true }

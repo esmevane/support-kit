@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{Config, TracingTarget};
+use crate::{Configuration, TracingTarget};
 
 use super::LoggerConfig;
 
@@ -13,7 +13,7 @@ pub enum LogTarget {
 impl LogTarget {
     pub fn init_console_logger(
         &self,
-        config: &Config,
+        config: &Configuration,
         logger_config: &LoggerConfig,
     ) -> TracingTarget {
         use tracing_subscriber::fmt::writer::MakeWriterExt;
