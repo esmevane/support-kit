@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.3...support-kit-v0.0.4) - 2024-10-23
+
+### Added
+
+- Container ops, config manifests, ssh support. ([#10](https://github.com/esmevane/support-kit/pull/10))
+
 ## [0.0.3](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.2...support-kit-v0.0.3) - 2024-10-10
 
 ### Added
