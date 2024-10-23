@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::{Configuration, Image, Registry};
 
 use super::OpsProcess;
@@ -79,16 +81,46 @@ impl ImageControl {
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
+    pub fn emit_config(&self) -> crate::Result<PathBuf> {
+        let path =
+            std::env::temp_dir().join(format!("{name}.container.json", name = self.config.name()));
+
+        let contents = serde_json::to_string(&self.config)?;
+
+        tracing::trace!(path = ?path, contents = ?contents,"writing container config file");
+
+        std::fs::write(&path, contents).expect("Unable to write file");
+
+        Ok(path)
+    }
+
+    #[tracing::instrument(skip(self), level = "trace")]
     pub fn start(&self) -> crate::Result<OpsProcess> {
-        to_image_op(format!(
-            "docker run --rm \
-            -p 443:{port} \
-            --mount source=certs,target=/certs \
-            -e RUST_LOG=debug \
-            {descriptor}",
+        let path = self.emit_config()?;
+
+        let operation = to_image_op(format!(
+            r#"
+            docker run
+              --rm
+              -p 443:{port}
+              -e RUST_LOG="debug,support_kit=debug"
+              -v {path}:/{app_name}.json
+              --mount source=certs,target=/certs
+              --name {name}
+              {descriptor}
+              --config-file /{app_name}.json
+              --port {port}
+            "#,
             descriptor = self.descriptor(),
+            app_name = self.config.name(),
+            name = self.name(),
             port = self.config.server.port,
-        ))
+            path = path.display()
+        ));
+
+        println!("{:?}", operation);
+
+        operation
     }
 }
 
