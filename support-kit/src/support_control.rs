@@ -12,10 +12,12 @@ pub struct SupportControl {
 }
 
 impl SupportControl {
+    #[tracing::instrument(skip(self), level = "trace")]
     pub fn manifest(&self) -> Result<ConfigManifest, SupportKitError> {
         Ok(self.source_collection().sources()?)
     }
 
+    #[tracing::instrument(skip(self), level = "trace")]
     pub fn source_collection(&self) -> ConfigSources {
         ConfigSources::builder()
             .file(self.args.config())
@@ -23,34 +25,43 @@ impl SupportControl {
             .build()
     }
 
+    #[tracing::instrument(skip(self), level = "trace")]
     pub fn figment(&self) -> Result<Figment, SupportKitError> {
         Ok(Figment::new()
             .merge(&self.config)
             .merge(&self.source_collection()))
     }
 
+    #[tracing::instrument(skip(args), level = "trace")]
     pub fn load_configuration(args: &Args) -> Result<Self, SupportKitError> {
         let initial_setup = Self::builder()
             .args(args.clone())
             .config(Configuration::from(args))
             .build();
 
-        Ok(Self::builder()
+        let controller = Self::builder()
             .args(args.clone())
             .config(initial_setup.figment()?.extract()?)
-            .build())
+            .build();
+
+        tracing::debug!(sources = ?controller.manifest()?.known(), "loaded configuration with sources");
+
+        Ok(controller)
     }
 
+    #[tracing::instrument(skip(self), level = "trace")]
     pub fn init(mut self) -> Self {
         self.config.init_color();
         self._guards = self.config.init_logging();
         self
     }
 
+    #[tracing::instrument(skip(self), level = "trace")]
     pub async fn init_tls(&self) -> Option<AxumAcceptor> {
         self.config.init_tls().await
     }
 
+    #[tracing::instrument(skip(self, callback_fn), level = "trace")]
     pub async fn on_hosts<Func, Fut>(&self, callback_fn: Func) -> Result<(), SupportKitError>
     where
         Func: Fn(crate::SshHost) -> Fut,
