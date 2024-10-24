@@ -63,10 +63,7 @@ impl ImageControl {
         );
 
         to_image_op(format!(
-            "docker build \
-            -f {definition} \
-            --label {label} \
-            -t {descriptor} .",
+            "docker build -f {definition} --label {label} -t {descriptor} .",
             definition = self.image.definition,
             descriptor = self.descriptor(),
         ))
@@ -87,7 +84,7 @@ impl ImageControl {
 
         let contents = serde_json::to_string(&self.config)?;
 
-        tracing::trace!(path = ?path, contents = ?contents,"writing container config file");
+        tracing::debug!(path = ?path, contents = ?contents,"writing container config file");
 
         std::fs::write(&path, contents).expect("Unable to write file");
 
@@ -103,12 +100,13 @@ impl ImageControl {
             docker run
               --rm
               -p 443:{port}
-              -e RUST_LOG="debug,support_kit=debug"
+              -e RUST_LOG=debug,support_kit=debug
               -v {path}:/{app_name}.json
               --mount source=certs,target=/certs
               --name {name}
               {descriptor}
-              --config-file /{app_name}.json
+              -vvvv
+              --config-file {app_name}
               --port {port}
             "#,
             descriptor = self.descriptor(),
