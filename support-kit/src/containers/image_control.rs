@@ -1,8 +1,6 @@
 use std::path::PathBuf;
 
-use crate::{Configuration, Image, Registry};
-
-use super::OpsProcess;
+use crate::{Configuration, Image, Registry, ShellCommand};
 
 pub struct ImageControl {
     pub config: Configuration,
@@ -32,7 +30,7 @@ impl ImageControl {
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn setup_config_volume(&self) -> crate::Result<OpsProcess> {
+    pub fn setup_config_volume(&self) -> crate::Result<ShellCommand> {
         to_image_op(format!(
             "docker volume create {namespace}-{name}-config",
             name = self.image.name,
@@ -41,14 +39,12 @@ impl ImageControl {
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn kill_all(&self) -> crate::Result<OpsProcess> {
-        let container_ids = format!("docker ps -qf name={name}", name = self.name());
-
-        to_image_op(format!("docker kill $({container_ids})"))
+    pub fn kill_all(&self) -> crate::Result<ShellCommand> {
+        to_image_op(format!("docker kill {name}", name = self.name()))
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn push(&self) -> crate::Result<OpsProcess> {
+    pub fn push(&self) -> crate::Result<ShellCommand> {
         to_image_op(format!(
             "docker push {descriptor}",
             descriptor = self.descriptor()
@@ -56,7 +52,7 @@ impl ImageControl {
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn build(&self) -> crate::Result<OpsProcess> {
+    pub fn build(&self) -> crate::Result<ShellCommand> {
         let label = format!(
             "org.opencontainers.image.source={repo}",
             repo = self.image.repo
@@ -70,7 +66,7 @@ impl ImageControl {
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn pull(&self) -> crate::Result<OpsProcess> {
+    pub fn pull(&self) -> crate::Result<ShellCommand> {
         to_image_op(format!(
             "docker pull {descriptor}",
             descriptor = self.descriptor()
@@ -92,7 +88,7 @@ impl ImageControl {
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn start(&self) -> crate::Result<OpsProcess> {
+    pub fn start(&self) -> crate::Result<ShellCommand> {
         let path = self.emit_config()?;
 
         let operation = to_image_op(format!(
@@ -123,7 +119,7 @@ impl ImageControl {
 }
 
 #[tracing::instrument(skip(operation), level = "trace")]
-fn to_image_op<T: Into<String>>(operation: T) -> crate::Result<OpsProcess> {
+fn to_image_op<T: Into<String>>(operation: T) -> crate::Result<ShellCommand> {
     let operation = operation.into();
 
     tracing::trace!(operation = ?operation, "converting to operation");

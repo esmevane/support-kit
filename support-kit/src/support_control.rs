@@ -1,7 +1,10 @@
+use bon::builder;
 use figment::Figment;
 use rustls_acme::axum::AxumAcceptor;
 
-use crate::{Args, ConfigManifest, ConfigSources, Configuration, SshControl, SupportKitError};
+use crate::{
+    Args, ConfigManifest, ConfigSources, Configuration, ShellCommand, SshControl, SupportKitError,
+};
 
 #[derive(Debug, Default, bon::Builder)]
 pub struct SupportControl {
@@ -11,6 +14,7 @@ pub struct SupportControl {
     _guards: Vec<tracing_appender::non_blocking::WorkerGuard>,
 }
 
+#[bon::bon]
 impl SupportControl {
     #[tracing::instrument(skip(self), level = "trace")]
     pub fn manifest(&self) -> Result<ConfigManifest, SupportKitError> {
@@ -61,16 +65,15 @@ impl SupportControl {
         self.config.init_tls().await
     }
 
-    #[tracing::instrument(skip(self, callback_fn), level = "trace")]
-    pub async fn on_hosts<Func, Fut>(&self, callback_fn: Func) -> Result<(), SupportKitError>
-    where
-        Func: Fn(crate::SshHost) -> Fut,
-        Fut: std::future::Future<Output = Result<(), crate::SshError>>,
-    {
+    #[builder]
+    pub async fn on_remotes(
+        &self,
+        #[builder(default, into)] commands: Vec<ShellCommand>,
+    ) -> Result<(), SupportKitError> {
         let deployment = self.config.deployment.clone();
 
         if let Some(deployment) = deployment {
-            SshControl::on_hosts(&deployment, callback_fn).await?;
+            SshControl::on_remotes(&deployment, commands).await?;
         }
 
         Ok(())

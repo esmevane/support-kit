@@ -10,11 +10,11 @@ pub enum BoilerplateError {
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum OpsProcessError {
-    #[error("unable to complete process: {0}")]
-    ProcessExecError(#[from] std::io::Error),
+pub enum ShellCommandError {
+    #[error("unable to execute command: {0}")]
+    ExecError(#[from] std::io::Error),
     #[error("malformed command, unable to parse: {0}")]
-    MalformedCommand(String),
+    MalformedError(String),
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -77,7 +77,7 @@ pub enum SupportKitError {
     SerdeError(#[from] serde_json::Error),
 
     #[error("ops process error: {0}")]
-    OpsProcessError(#[from] OpsProcessError),
+    OpsProcessError(#[from] ShellCommandError),
 
     #[error("boilerplate error: {0}")]
     BoilerplateError(#[from] BoilerplateError),

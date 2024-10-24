@@ -1,6 +1,6 @@
-use crate::{Registry, SupportControl};
+use crate::{Registry, ShellCommand, SupportControl};
 
-use super::{ImageControl, OpsProcess};
+use super::ImageControl;
 
 pub struct ContainerControl {
     pub images: Vec<ImageControl>,
@@ -40,7 +40,7 @@ impl ContainerControl {
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn setup_cert_volume(&self) -> crate::Result<OpsProcess> {
+    pub fn setup_cert_volume(&self) -> crate::Result<ShellCommand> {
         to_container_op(format!("docker volume create certs"))
     }
 
@@ -48,7 +48,7 @@ impl ContainerControl {
     ///
     /// [docker-install]: https://github.com/docker/docker-install
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn get_install_script(&self) -> crate::Result<OpsProcess> {
+    pub fn get_install_script(&self) -> crate::Result<ShellCommand> {
         to_container_op(format!(
             "curl -fsSL https://get.docker.com -o get-docker.sh"
         ))
@@ -56,12 +56,12 @@ impl ContainerControl {
 
     /// Install Docker on the host machine.
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn install_docker(&self) -> crate::Result<OpsProcess> {
+    pub fn install_docker(&self) -> crate::Result<ShellCommand> {
         to_container_op(format!("sh get-docker.sh"))
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn login(&self) -> crate::Result<OpsProcess> {
+    pub fn login(&self) -> crate::Result<ShellCommand> {
         to_container_op(format!(
             "docker login {host} -u {account} -p {token}",
             host = self.registry.host,
@@ -71,7 +71,7 @@ impl ContainerControl {
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn list_containers(&self) -> crate::Result<OpsProcess> {
+    pub fn list_containers(&self) -> crate::Result<ShellCommand> {
         to_container_op(format!("docker ps"))
     }
 }
@@ -83,7 +83,7 @@ impl From<&SupportControl> for ContainerControl {
 }
 
 #[tracing::instrument(skip(operation), level = "trace")]
-fn to_container_op<T: Into<String>>(operation: T) -> crate::Result<OpsProcess> {
+fn to_container_op<T: Into<String>>(operation: T) -> crate::Result<ShellCommand> {
     let operation = operation.into();
 
     tracing::trace!(operation = ?operation, "converting to operation");

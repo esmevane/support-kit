@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use russh::{client, keys, ChannelMsg};
 use tokio::io::AsyncWriteExt;
 
-use crate::{Deployment, SshError};
+use crate::{Deployment, ShellCommand, SshError};
 
 struct SshHostConfig {
     address: String,
@@ -155,6 +155,24 @@ impl client::Handler for SshConnection {
 pub struct SshControl;
 
 impl SshControl {
+    pub async fn on_remotes(
+        deployment: &Deployment,
+        commands: Vec<ShellCommand>,
+    ) -> Result<(), SshError> {
+        Self::on_hosts(&deployment, |connection| {
+            let commands = commands.clone();
+            async move {
+                for command in commands {
+                    connection.run_cmd(command.command_and_args()).await?;
+                }
+                Ok(())
+            }
+        })
+        .await?;
+
+        Ok(())
+    }
+
     pub async fn on_hosts<Func, Fut>(
         deployment: &Deployment,
         callback_fn: Func,

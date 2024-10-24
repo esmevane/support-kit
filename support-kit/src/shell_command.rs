@@ -1,13 +1,13 @@
-use crate::OpsProcessError;
+use crate::ShellCommandError;
 
 #[derive(Clone, Debug)]
-pub struct OpsProcess {
+pub struct ShellCommand {
     pub command: String,
     pub args: Vec<String>,
 }
 
-impl OpsProcess {
-    pub fn run(&self) -> Result<(), OpsProcessError> {
+impl ShellCommand {
+    pub fn run(&self) -> Result<(), ShellCommandError> {
         std::process::Command::new(&self.command)
             .args(&self.args)
             .spawn()?
@@ -16,15 +16,21 @@ impl OpsProcess {
         Ok(())
     }
 
-    pub fn command(&self) -> Vec<String> {
+    pub fn command_and_args(&self) -> Vec<String> {
         let mut command = vec![self.command.clone()];
         command.extend(self.args.clone());
         command
     }
 }
 
-impl TryFrom<String> for OpsProcess {
-    type Error = OpsProcessError;
+impl From<ShellCommand> for Vec<ShellCommand> {
+    fn from(process: ShellCommand) -> Self {
+        vec![process]
+    }
+}
+
+impl TryFrom<String> for ShellCommand {
+    type Error = ShellCommandError;
 
     fn try_from(command: String) -> Result<Self, Self::Error> {
         let command: &str = command.as_ref();
@@ -32,8 +38,8 @@ impl TryFrom<String> for OpsProcess {
     }
 }
 
-impl TryFrom<&str> for OpsProcess {
-    type Error = OpsProcessError;
+impl TryFrom<&str> for ShellCommand {
+    type Error = ShellCommandError;
 
     fn try_from(command: &str) -> Result<Self, Self::Error> {
         let command_chunks: Vec<String> = command.split_whitespace().map(String::from).collect();
@@ -44,7 +50,7 @@ impl TryFrom<&str> for OpsProcess {
                 args: args.to_vec(),
             })
         } else {
-            Err(OpsProcessError::MalformedCommand(command.to_string()))
+            Err(ShellCommandError::MalformedError(command.to_string()))
         }
     }
 }
