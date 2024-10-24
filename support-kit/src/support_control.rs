@@ -104,7 +104,7 @@ impl SupportControl {
                         None => {}
                     },
                     crate::Commands::Local(deployment_args) => match deployment_args.command {
-                        Some(operation) => operation.exec_remote(&self).await?,
+                        Some(operation) => operation.exec_local(&self).await?,
                         None => {}
                     },
                 }
