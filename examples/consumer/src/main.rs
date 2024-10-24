@@ -1,7 +1,8 @@
 use clap::Parser;
 use owo_colors::OwoColorize;
 
-fn main() -> support_kit::Result<()> {
+#[tokio::main]
+async fn main() -> support_kit::Result<()> {
     let args = support_kit::Args::parse();
     let controller = support_kit::SupportControl::load_configuration(&args)?.init();
 
@@ -11,7 +12,7 @@ fn main() -> support_kit::Result<()> {
     tracing::debug!(config = ?controller.config, "loaded configuration");
 
     match &args.command {
-        Some(_) => controller.execute(args)?,
+        Some(_) => controller.execute(args).await?,
         None => {}
     }
 

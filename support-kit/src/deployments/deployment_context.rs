@@ -2,17 +2,27 @@ use std::path::PathBuf;
 
 use crate::{shell, Configuration, Registry, ShellCommand, SupportControl};
 
-use super::ImageCommands;
+use super::{HostDeploymentContext, ImageDeploymentContext};
 
-pub struct ContainerCommands {
+#[derive(Debug, Clone, bon::Builder)]
+pub struct DeploymentContext {
     pub config: Configuration,
-    pub images: Vec<ImageCommands>,
+    #[builder(default, into)]
+    pub images: Vec<ImageDeploymentContext>,
+    #[builder(default, into)]
+    pub hosts: Vec<HostDeploymentContext>,
     pub registry: Registry,
 }
 
-impl ContainerCommands {
+impl DeploymentContext {
     pub fn from_controller(controller: &SupportControl) -> Self {
         let config = controller.config.clone();
+        let host_defs = config
+            .deployment
+            .clone()
+            .map(|deployment| deployment.hosts)
+            .unwrap_or_default();
+
         let (image_defs, registry) = config
             .deployment
             .clone()
@@ -22,20 +32,34 @@ impl ContainerCommands {
             .unwrap_or_default();
 
         let mut images = vec![];
+        let mut hosts = vec![];
+
+        for host in host_defs {
+            hosts.push(
+                HostDeploymentContext::builder()
+                    .config(config.clone())
+                    .host(host)
+                    .registry(registry.clone())
+                    .build(),
+            );
+        }
 
         for image in image_defs {
-            images.push(ImageCommands {
-                config: config.clone(),
-                image,
-                registry: registry.clone(),
-            });
+            images.push(
+                ImageDeploymentContext::builder()
+                    .config(config.clone())
+                    .image(image)
+                    .registry(registry.clone())
+                    .build(),
+            );
         }
 
-        Self {
-            config,
-            images,
-            registry,
-        }
+        Self::builder()
+            .config(config)
+            .images(images)
+            .hosts(hosts)
+            .registry(registry)
+            .build()
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
@@ -89,7 +113,7 @@ impl ContainerCommands {
     }
 }
 
-impl From<&SupportControl> for ContainerCommands {
+impl From<&SupportControl> for DeploymentContext {
     fn from(controller: &SupportControl) -> Self {
         Self::from_controller(controller)
     }

@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use crate::{Deployment, ShellCommand, SshError};
+use crate::{DeploymentConfig, ShellCommand, SshError};
 
 use super::HostSession;
 
@@ -8,7 +8,7 @@ pub struct HostControl;
 
 impl HostControl {
     pub async fn on_hosts(
-        deployment: &Deployment,
+        deployment: &DeploymentConfig,
         commands: Vec<ShellCommand>,
     ) -> Result<(), SshError> {
         Self::exec_on_hosts(&deployment, |connection| {
@@ -26,7 +26,7 @@ impl HostControl {
     }
 
     async fn exec_on_hosts<Func, Fut>(
-        deployment: &Deployment,
+        deployment: &DeploymentConfig,
         callback_fn: Func,
     ) -> Result<(), SshError>
     where

@@ -1,14 +1,15 @@
 use std::path::PathBuf;
 
-use crate::{shell, Configuration, Image, Registry, ShellCommand};
+use crate::{shell, Configuration, ImageDefinition, Registry, ShellCommand};
 
-pub struct ImageCommands {
+#[derive(Debug, Clone, bon::Builder)]
+pub struct ImageDeploymentContext {
     pub config: Configuration,
-    pub image: Image,
+    pub image: ImageDefinition,
     pub registry: Registry,
 }
 
-impl ImageCommands {
+impl ImageDeploymentContext {
     #[tracing::instrument(skip(self), level = "trace")]
     fn descriptor(&self) -> String {
         format!(

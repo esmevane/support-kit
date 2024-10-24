@@ -3,8 +3,7 @@ use figment::Figment;
 use rustls_acme::axum::AxumAcceptor;
 
 use crate::{
-    Args, ConfigManifest, ConfigSources, Configuration, HostControl, HostDetails, ShellCommand,
-    SupportKitError,
+    Args, ConfigManifest, ConfigSources, Configuration, HostControl, ShellCommand, SupportKitError,
 };
 
 #[derive(Debug, Default, bon::Builder)]
@@ -66,21 +65,6 @@ impl SupportControl {
         self.config.init_tls().await
     }
 
-    pub async fn per_remote<Func>(&self, host_fn: Func) -> Result<(), SupportKitError>
-    where
-        Func: Fn(HostDetails) -> Result<(), SupportKitError>,
-    {
-        let deployment = self.config.deployment.clone();
-
-        if let Some(deployment) = deployment {
-            for host in deployment.hosts.clone() {
-                host_fn(host.into())?;
-            }
-        }
-
-        Ok(())
-    }
-
     #[builder]
     pub async fn on_remotes(
         &self,
@@ -95,7 +79,7 @@ impl SupportControl {
         Ok(())
     }
 
-    pub fn execute(&self, args: Args) -> Result<(), SupportKitError> {
+    pub async fn execute(&self, args: Args) -> Result<(), SupportKitError> {
         match args.command {
             Some(command) => {
                 tracing::info!(
@@ -115,6 +99,14 @@ impl SupportControl {
                             }
                         }
                     }
+                    crate::Commands::Deploy(deployment_args) => match deployment_args.command {
+                        Some(operation) => operation.exec_remote(&self).await?,
+                        None => {}
+                    },
+                    crate::Commands::Local(deployment_args) => match deployment_args.command {
+                        Some(operation) => operation.exec_remote(&self).await?,
+                        None => {}
+                    },
                 }
             }
             None => tracing::trace!(config = ?&self.config, "no command provided."),

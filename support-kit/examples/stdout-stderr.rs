@@ -1,6 +1,7 @@
 use clap::Parser;
 
-pub fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[tokio::main]
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = support_kit::Args::parse();
     let control = support_kit::SupportControl::load_configuration(&args)?.init();
 
@@ -10,7 +11,10 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing::warn!("Only shows up if you use --verbose x2 or -vv");
     tracing::error!("Only shows up if you use --verbose or -v");
 
-    control.execute(args).expect("failed to execute control");
+    control
+        .execute(args)
+        .await
+        .expect("failed to execute control");
 
     Ok(())
 }

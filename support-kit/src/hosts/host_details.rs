@@ -1,4 +1,4 @@
-use crate::Host;
+use crate::HostDefinition;
 
 #[derive(Debug, Clone)]
 pub struct HostDetails {
@@ -29,8 +29,8 @@ impl HostDetails {
     }
 }
 
-impl From<Host> for HostDetails {
-    fn from(host: Host) -> Self {
+impl From<HostDefinition> for HostDetails {
+    fn from(host: HostDefinition) -> Self {
         Self::builder()
             .address(host.address)
             .maybe_port(host.port)

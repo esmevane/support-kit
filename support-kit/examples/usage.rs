@@ -15,7 +15,8 @@ enum LocalCommand {
     Local,
 }
 
-pub fn main() -> Result<(), Box<dyn std::error::Error>> {
+#[tokio::main]
+pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // You can use your own CLI struct here and parse as normal.
     let cli = YourOwnCli::parse();
 
@@ -50,6 +51,7 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
             tracing::info!("attempting to execute with support control");
             control
                 .execute(cli.support)
+                .await
                 .expect("failed to execute control");
         }
     }

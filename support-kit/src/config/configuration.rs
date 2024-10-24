@@ -2,8 +2,8 @@ use figment::{providers::Serialized, Figment, Provider};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    Args, Color, Deployment, Environment, LoggerConfig, Logging, LoggingConfig, NetworkConfig,
-    ServiceConfig, ServiceName, Verbosity,
+    Args, Color, DeploymentConfig, DeploymentControl, Environment, LoggerConfig, Logging,
+    LoggingConfig, NetworkConfig, ServiceConfig, ServiceName, Verbosity,
 };
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, bon::Builder)]
@@ -34,7 +34,7 @@ pub struct Configuration {
 
     #[serde(default)]
     #[builder(into)]
-    pub deployment: Option<Deployment>,
+    pub deployment: Option<DeploymentConfig>,
 }
 
 impl Configuration {
@@ -48,7 +48,7 @@ impl Configuration {
 
     pub async fn init_tls(&self) -> Option<rustls_acme::axum::AxumAcceptor> {
         match &self.deployment {
-            Some(deployment) => deployment.init_tls().await,
+            Some(deployment) => DeploymentControl::initialize(deployment).await,
             None => None,
         }
     }
