@@ -1,7 +1,7 @@
-mod container_control;
-mod container_op;
-mod image_control;
+mod container_commands;
+mod container_ops;
+mod image_commands;
 
-pub use container_control::ContainerControl;
-pub use container_op::ContainerOp;
-pub use image_control::ImageControl;
+pub use container_commands::ContainerCommands;
+pub use container_ops::ContainerOps;
+pub use image_commands::ImageCommands;

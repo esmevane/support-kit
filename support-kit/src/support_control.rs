@@ -3,7 +3,8 @@ use figment::Figment;
 use rustls_acme::axum::AxumAcceptor;
 
 use crate::{
-    Args, ConfigManifest, ConfigSources, Configuration, ShellCommand, SshControl, SupportKitError,
+    Args, ConfigManifest, ConfigSources, Configuration, HostControl, HostDetails, ShellCommand,
+    SupportKitError,
 };
 
 #[derive(Debug, Default, bon::Builder)]
@@ -65,6 +66,21 @@ impl SupportControl {
         self.config.init_tls().await
     }
 
+    pub async fn per_remote<Func>(&self, host_fn: Func) -> Result<(), SupportKitError>
+    where
+        Func: Fn(HostDetails) -> Result<(), SupportKitError>,
+    {
+        let deployment = self.config.deployment.clone();
+
+        if let Some(deployment) = deployment {
+            for host in deployment.hosts.clone() {
+                host_fn(host.into())?;
+            }
+        }
+
+        Ok(())
+    }
+
     #[builder]
     pub async fn on_remotes(
         &self,
@@ -73,7 +89,7 @@ impl SupportControl {
         let deployment = self.config.deployment.clone();
 
         if let Some(deployment) = deployment {
-            SshControl::on_remotes(&deployment, commands).await?;
+            HostControl::on_hosts(&deployment, commands).await?;
         }
 
         Ok(())

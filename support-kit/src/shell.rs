@@ -54,3 +54,12 @@ impl TryFrom<&str> for ShellCommand {
         }
     }
 }
+
+#[tracing::instrument(skip(shell_command), level = "trace")]
+pub fn shell<T: Into<String>>(shell_command: T) -> crate::Result<ShellCommand> {
+    let shell_command = shell_command.into();
+
+    tracing::trace!(shell_command = ?shell_command, "converting to shell command");
+
+    Ok(shell_command.try_into()?)
+}

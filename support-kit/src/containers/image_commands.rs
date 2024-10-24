@@ -1,14 +1,14 @@
 use std::path::PathBuf;
 
-use crate::{Configuration, Image, Registry, ShellCommand};
+use crate::{shell, Configuration, Image, Registry, ShellCommand};
 
-pub struct ImageControl {
+pub struct ImageCommands {
     pub config: Configuration,
     pub image: Image,
     pub registry: Registry,
 }
 
-impl ImageControl {
+impl ImageCommands {
     #[tracing::instrument(skip(self), level = "trace")]
     fn descriptor(&self) -> String {
         format!(
@@ -31,7 +31,7 @@ impl ImageControl {
 
     #[tracing::instrument(skip(self), level = "trace")]
     pub fn setup_config_volume(&self) -> crate::Result<ShellCommand> {
-        to_image_op(format!(
+        shell(format!(
             "docker volume create {namespace}-{name}-config",
             name = self.image.name,
             namespace = self.image.namespace
@@ -40,12 +40,12 @@ impl ImageControl {
 
     #[tracing::instrument(skip(self), level = "trace")]
     pub fn kill_all(&self) -> crate::Result<ShellCommand> {
-        to_image_op(format!("docker kill {name}", name = self.name()))
+        shell(format!("docker kill {name}", name = self.name()))
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
     pub fn push(&self) -> crate::Result<ShellCommand> {
-        to_image_op(format!(
+        shell(format!(
             "docker push {descriptor}",
             descriptor = self.descriptor()
         ))
@@ -58,7 +58,7 @@ impl ImageControl {
             repo = self.image.repo
         );
 
-        to_image_op(format!(
+        shell(format!(
             "docker build -f {definition} --label {label} -t {descriptor} .",
             definition = self.image.definition,
             descriptor = self.descriptor(),
@@ -67,31 +67,17 @@ impl ImageControl {
 
     #[tracing::instrument(skip(self), level = "trace")]
     pub fn pull(&self) -> crate::Result<ShellCommand> {
-        to_image_op(format!(
+        shell(format!(
             "docker pull {descriptor}",
             descriptor = self.descriptor()
         ))
     }
 
-    #[tracing::instrument(skip(self), level = "trace")]
-    pub fn emit_config(&self) -> crate::Result<PathBuf> {
-        let path =
-            std::env::temp_dir().join(format!("{name}.container.json", name = self.config.name()));
+    #[tracing::instrument(skip(self, path), level = "trace")]
+    pub fn start(&self, path: impl Into<PathBuf>) -> crate::Result<ShellCommand> {
+        let path = path.into();
 
-        let contents = serde_json::to_string(&self.config)?;
-
-        tracing::debug!(path = ?path, contents = ?contents,"writing container config file");
-
-        std::fs::write(&path, contents).expect("Unable to write file");
-
-        Ok(path)
-    }
-
-    #[tracing::instrument(skip(self), level = "trace")]
-    pub fn start(&self) -> crate::Result<ShellCommand> {
-        let path = self.emit_config()?;
-
-        let operation = to_image_op(format!(
+        let operation = shell(format!(
             r#"
             docker run
               --rm
@@ -116,13 +102,4 @@ impl ImageControl {
 
         operation
     }
-}
-
-#[tracing::instrument(skip(operation), level = "trace")]
-fn to_image_op<T: Into<String>>(operation: T) -> crate::Result<ShellCommand> {
-    let operation = operation.into();
-
-    tracing::trace!(operation = ?operation, "converting to operation");
-
-    Ok(operation.try_into()?)
 }
