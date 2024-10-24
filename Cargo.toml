@@ -13,6 +13,7 @@ clap = { version = "4.5.4", features = ["derive", "env"] }
 convert_case = "0.6.0"
 dirs = "5.0.1"
 figment = { version = "0.10", features = ["env", "json", "toml", "yaml"] }
+minijinja = "2.3.1"
 owo-colors = { version = "4", features = ["supports-colors"] }
 rustls-acme = { version = "0.11.1", features = ["axum"] }
 russh = "0.45.0"

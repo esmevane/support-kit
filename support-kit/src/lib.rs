@@ -1,4 +1,5 @@
 mod args;
+mod boilerplate;
 mod color;
 mod config;
 mod containers;
@@ -14,6 +15,7 @@ mod support_control;
 mod verbosity;
 
 pub use args::*;
+pub use boilerplate::*;
 pub use color::Color;
 pub use config::*;
 pub use containers::*;

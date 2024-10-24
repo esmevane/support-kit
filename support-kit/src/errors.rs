@@ -2,6 +2,14 @@ use std::{io::Error, net::AddrParseError};
 use thiserror::Error;
 
 #[derive(Debug, thiserror::Error)]
+pub enum BoilerplateError {
+    #[error("problem with template: {0}")]
+    TemplateError(#[from] minijinja::Error),
+    #[error("template persistence error: {0}")]
+    IoError(#[from] std::io::Error),
+}
+
+#[derive(Debug, thiserror::Error)]
 pub enum OpsProcessError {
     #[error("unable to complete process: {0}")]
     ProcessExecError(#[from] std::io::Error),
@@ -70,4 +78,7 @@ pub enum SupportKitError {
 
     #[error("ops process error: {0}")]
     OpsProcessError(#[from] OpsProcessError),
+
+    #[error("boilerplate error: {0}")]
+    BoilerplateError(#[from] BoilerplateError),
 }
