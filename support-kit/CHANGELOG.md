@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.8](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.7...support-kit-v0.0.8) - 2024-10-26
+
+### Other
+
+- Container polish ([#18](https://github.com/esmevane/support-kit/pull/18))
+
 ## [0.0.7](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.6...support-kit-v0.0.7) - 2024-10-23
 
 ### Added
