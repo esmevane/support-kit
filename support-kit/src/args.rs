@@ -4,8 +4,12 @@ use crate::{
     Color, ConfigFile, Environment, ServiceCommand, ServiceConfig, ServiceManagerKind, ServiceName,
 };
 
+mod boilerplate_args;
+mod deployment_args;
 mod service_args;
 
+pub use boilerplate_args::*;
+pub use deployment_args::DeploymentArgs;
 pub use service_args::ServiceArgs;
 
 #[derive(Clone, Debug, Default, Parser)]
@@ -54,6 +58,9 @@ pub struct Args {
 #[clap(rename_all = "kebab-case")]
 pub enum Commands {
     Service(ServiceArgs),
+    Deploy(DeploymentArgs),
+    Generate(BoilerplateArgs),
+    Container(DeploymentArgs),
 }
 
 impl From<ServiceArgs> for Commands {

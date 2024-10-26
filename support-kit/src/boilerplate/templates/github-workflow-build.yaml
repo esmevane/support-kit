@@ -1,0 +1,35 @@
+name: Build & Deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      RUST_LOG: "debug,support-kit=trace"
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: {{ '${{ github.actor }}' }}
+          password: {{ '${{ secrets.' + secret_name + '_REPO_KEY }}' }}
+      - run: {{ "rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}" }}
+      - uses: jsdaniell/create-json@v1.2.3
+        with:
+          name: "emblem.json"
+          json: {{ '${{ secrets.' + secret_name + '_CONFIG }}' }}
+      - uses: shimataro/ssh-key-action@v2
+        with:
+          key: {{ '${{ secrets.' + secret_name + '_SSH_KEY }}' }}
+          name: id_rsa
+          known_hosts: {{ '${{ secrets.' + secret_name + '_KNOWN_HOSTS }}' }}
+      - run: cargo run deploy list
+      - run: cargo run container build
+      - run: cargo run container push
+      - run: cargo run deploy restart

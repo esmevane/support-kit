@@ -1,16 +1,15 @@
 use std::path::PathBuf;
 
-use crate::{Configuration, Image, Registry};
+use crate::{shell, Configuration, ImageDefinition, Registry, ShellCommand};
 
-use super::OpsProcess;
-
-pub struct ImageControl {
+#[derive(Debug, Clone, bon::Builder)]
+pub struct ImageDeploymentContext {
     pub config: Configuration,
-    pub image: Image,
+    pub image: ImageDefinition,
     pub registry: Registry,
 }
 
-impl ImageControl {
+impl ImageDeploymentContext {
     #[tracing::instrument(skip(self), level = "trace")]
     fn descriptor(&self) -> String {
         format!(
@@ -32,8 +31,8 @@ impl ImageControl {
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn setup_config_volume(&self) -> crate::Result<OpsProcess> {
-        to_image_op(format!(
+    pub fn setup_config_volume(&self) -> crate::Result<ShellCommand> {
+        shell(format!(
             "docker volume create {namespace}-{name}-config",
             name = self.image.name,
             namespace = self.image.namespace
@@ -41,74 +40,57 @@ impl ImageControl {
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn kill_all(&self) -> crate::Result<OpsProcess> {
-        let container_ids = format!("docker ps -qf name={name}", name = self.name());
-
-        to_image_op(format!("docker kill $({container_ids})"))
+    pub fn kill_all(&self) -> crate::Result<ShellCommand> {
+        shell(format!("docker kill {name}", name = self.name()))
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn push(&self) -> crate::Result<OpsProcess> {
-        to_image_op(format!(
+    pub fn push(&self) -> crate::Result<ShellCommand> {
+        shell(format!(
             "docker push {descriptor}",
             descriptor = self.descriptor()
         ))
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn build(&self) -> crate::Result<OpsProcess> {
+    pub fn build(&self) -> crate::Result<ShellCommand> {
         let label = format!(
             "org.opencontainers.image.source={repo}",
             repo = self.image.repo
         );
 
-        to_image_op(format!(
-            "docker build \
-            -f {definition} \
-            --label {label} \
-            -t {descriptor} .",
+        shell(format!(
+            "docker build -f {definition} --label {label} -t {descriptor} .",
             definition = self.image.definition,
             descriptor = self.descriptor(),
         ))
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn pull(&self) -> crate::Result<OpsProcess> {
-        to_image_op(format!(
+    pub fn pull(&self) -> crate::Result<ShellCommand> {
+        shell(format!(
             "docker pull {descriptor}",
             descriptor = self.descriptor()
         ))
     }
 
-    #[tracing::instrument(skip(self), level = "trace")]
-    pub fn emit_config(&self) -> crate::Result<PathBuf> {
-        let path =
-            std::env::temp_dir().join(format!("{name}.container.json", name = self.config.name()));
+    #[tracing::instrument(skip(self, path), level = "trace")]
+    pub fn start(&self, path: impl Into<PathBuf>) -> crate::Result<ShellCommand> {
+        let path = path.into();
 
-        let contents = serde_json::to_string(&self.config)?;
-
-        tracing::trace!(path = ?path, contents = ?contents,"writing container config file");
-
-        std::fs::write(&path, contents).expect("Unable to write file");
-
-        Ok(path)
-    }
-
-    #[tracing::instrument(skip(self), level = "trace")]
-    pub fn start(&self) -> crate::Result<OpsProcess> {
-        let path = self.emit_config()?;
-
-        let operation = to_image_op(format!(
+        let operation = shell(format!(
             r#"
             docker run
               --rm
+              -d 
               -p 443:{port}
-              -e RUST_LOG="debug,support_kit=debug"
-              -v {path}:/{app_name}.json
+              -e RUST_LOG=debug,support_kit=debug
+              -v ./{path}:/{app_name}.json
               --mount source=certs,target=/certs
               --name {name}
               {descriptor}
-              --config-file /{app_name}.json
+              -vvvv
+              --config-file {app_name}
               --port {port}
             "#,
             descriptor = self.descriptor(),
@@ -122,13 +104,4 @@ impl ImageControl {
 
         operation
     }
-}
-
-#[tracing::instrument(skip(operation), level = "trace")]
-fn to_image_op<T: Into<String>>(operation: T) -> crate::Result<OpsProcess> {
-    let operation = operation.into();
-
-    tracing::trace!(operation = ?operation, "converting to operation");
-
-    Ok(operation.try_into()?)
 }

@@ -9,3 +9,4 @@ support-kit = { workspace = true }
 clap = { workspace = true }
 owo-colors = { workspace = true }
 tracing = { workspace = true }
+tokio = { workspace = true }
