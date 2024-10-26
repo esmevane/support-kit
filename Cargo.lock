@@ -673,6 +673,7 @@ dependencies = [
  "clap",
  "owo-colors",
  "support-kit",
+ "tokio",
  "tracing",
 ]
 
@@ -1627,6 +1628,15 @@ name = "memchr"
 version = "2.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
+
+[[package]]
+name = "minijinja"
+version = "2.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1028b628753a7e1a88fc59c9ba4b02ecc3bc0bd3c7af23df667bc28df9b3310e"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "minimal-lexical"
@@ -2854,6 +2864,7 @@ dependencies = [
  "convert_case",
  "dirs 5.0.1",
  "figment",
+ "minijinja",
  "owo-colors",
  "russh",
  "rustls-acme",

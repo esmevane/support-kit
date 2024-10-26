@@ -1,29 +1,31 @@
 mod args;
+mod boilerplate;
 mod color;
 mod config;
-mod containers;
-mod deploy;
+mod deployments;
 mod environment;
 mod errors;
+mod hosts;
 mod logs;
 mod network;
 mod service;
-mod ssh;
+mod shell;
 mod structures;
 mod support_control;
 mod verbosity;
 
 pub use args::*;
+pub use boilerplate::*;
 pub use color::Color;
 pub use config::*;
-pub use containers::*;
-pub use deploy::*;
+pub use deployments::*;
 pub use environment::Environment;
 pub use errors::*;
+pub use hosts::*;
 pub use logs::*;
 pub use network::NetworkConfig;
 pub use service::*;
-pub use ssh::*;
+pub use shell::*;
 pub use structures::*;
 pub use support_control::SupportControl;
 pub use verbosity::Verbosity;
@@ -50,13 +52,14 @@ mod tests {
         }
 
         #[derive(Clone, Copy, Debug, Subcommand, PartialEq)]
+        #[clap(rename_all = "kebab-case")]
         enum LocalCommand {
-            Local,
+            DoTheThing,
         }
 
         let expectations = [
             ("app", None),
-            ("app local", Some(LocalCommand::Local)),
+            ("app do-the-thing", Some(LocalCommand::DoTheThing)),
             ("app service install", None),
             ("app service start", None),
             ("app service stop", None),
@@ -72,7 +75,7 @@ mod tests {
         use crate::{Commands, ServiceCommand::*};
         let expectations = [
             ("app", None),
-            ("app local", None),
+            ("app do-the-thing", None),
             (
                 "app service install",
                 Some(Commands::from(Install(Default::default()))),

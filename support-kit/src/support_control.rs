@@ -1,7 +1,11 @@
+use bon::builder;
 use figment::Figment;
 use rustls_acme::axum::AxumAcceptor;
 
-use crate::{Args, ConfigManifest, ConfigSources, Configuration, SshControl, SupportKitError};
+use crate::{
+    Args, BoilerplateCommand, BoilerplatePreset, ConfigManifest, ConfigSources, Configuration,
+    HostControl, ShellCommand, SupportKitError,
+};
 
 #[derive(Debug, Default, bon::Builder)]
 pub struct SupportControl {
@@ -11,6 +15,7 @@ pub struct SupportControl {
     _guards: Vec<tracing_appender::non_blocking::WorkerGuard>,
 }
 
+#[bon::bon]
 impl SupportControl {
     #[tracing::instrument(skip(self), level = "trace")]
     pub fn manifest(&self) -> Result<ConfigManifest, SupportKitError> {
@@ -61,22 +66,22 @@ impl SupportControl {
         self.config.init_tls().await
     }
 
-    #[tracing::instrument(skip(self, callback_fn), level = "trace")]
-    pub async fn on_hosts<Func, Fut>(&self, callback_fn: Func) -> Result<(), SupportKitError>
-    where
-        Func: Fn(crate::SshHost) -> Fut,
-        Fut: std::future::Future<Output = Result<(), crate::SshError>>,
-    {
+    #[builder]
+    #[tracing::instrument(skip(self), level = "trace")]
+    pub async fn on_remotes(
+        &self,
+        #[builder(default, into)] commands: Vec<ShellCommand>,
+    ) -> Result<(), SupportKitError> {
         let deployment = self.config.deployment.clone();
 
         if let Some(deployment) = deployment {
-            SshControl::on_hosts(&deployment, callback_fn).await?;
+            HostControl::on_hosts(&deployment, commands).await?;
         }
 
         Ok(())
     }
 
-    pub fn execute(&self, args: Args) -> Result<(), SupportKitError> {
+    pub async fn execute(&self, args: Args) -> Result<(), SupportKitError> {
         match args.command {
             Some(command) => {
                 tracing::info!(
@@ -96,6 +101,33 @@ impl SupportControl {
                             }
                         }
                     }
+                    crate::Commands::Generate(boilerplate_args) => {
+                        let control = crate::BoilerplateControl::from(self.config.clone());
+
+                        match boilerplate_args.command {
+                            Some(operation) => match operation {
+                                BoilerplateCommand::Init => {
+                                    for preset in BoilerplatePreset::all() {
+                                        control.write(preset)?;
+                                    }
+                                }
+                                BoilerplateCommand::Template { command: preset } => {
+                                    control.write(preset)?;
+                                }
+                            },
+                            None => {
+                                tracing::info!(config = ?self.config, "no operation provided")
+                            }
+                        }
+                    }
+                    crate::Commands::Deploy(deployment_args) => match deployment_args.command {
+                        Some(operation) => operation.exec_remote(&self).await?,
+                        None => {}
+                    },
+                    crate::Commands::Container(deployment_args) => match deployment_args.command {
+                        Some(operation) => operation.exec_local(&self).await?,
+                        None => {}
+                    },
                 }
             }
             None => tracing::trace!(config = ?&self.config, "no command provided."),

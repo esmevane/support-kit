@@ -3,6 +3,6 @@ COPY . .
 RUN cargo build --release 
 
 FROM gcr.io/distroless/cc:latest AS runtime
-COPY --from=builder /target/release/{{image}} {{image}}
+COPY --from=builder /target/release/{{name}} {{name}}
 
-ENTRYPOINT ["./{{image}}"]
+ENTRYPOINT ["./{{name}}"]
