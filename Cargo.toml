@@ -5,7 +5,7 @@ members = ["support-kit", "examples/*"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace.dependencies]
-support-kit = { version = "0.0.8", path = "./support-kit" }
+support-kit = { version = "0.0.9", path = "./support-kit" }
 async-trait = "0.1.83"
 axum-server = { version = "0.7.1" }
 bon = "2.3.0"
