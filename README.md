@@ -3,6 +3,10 @@
 ## Todo
 
 - [ ] Preflight check
+  - [ ] Github token
+  - [ ] SSH key per host
+  - [ ] Config on Github
+  - [ ] SSH Known Hosts
 - [ ] Init config
 - [ ] Docs
   - [ ] forbid undocumented public stuff

@@ -6,6 +6,8 @@ use super::{BoilerplateContext, BoilerplatePreset, BoilerplateTemplate};
 
 #[derive(Debug, Clone, bon::Builder)]
 pub struct BoilerplateControl {
+    #[builder(default)]
+    pub config: Configuration,
     #[builder(into)]
     pub context: BoilerplateContext,
     #[builder(into, default)]
@@ -18,7 +20,7 @@ impl BoilerplateControl {
     }
 
     pub fn template(&self, preset: BoilerplatePreset) -> BoilerplateTemplate {
-        preset.init(&self.base_path)
+        preset.init(&self)
     }
 }
 
