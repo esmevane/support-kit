@@ -36,7 +36,8 @@ fn custom_template() {
 
 #[cfg(test)]
 const CARGO_CONFIG: &str = r#"[alias]
-xtask = "run --package xtask --bin xtask --""#;
+xtask = "run --package xtask --bin xtask --"
+tools = "run tools""#;
 
 #[test]
 fn cargo_config() -> Result<(), Box<dyn std::error::Error>> {
@@ -128,6 +129,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.SUPPORT_KIT_REPO_KEY }}
       - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - uses: Swatinem/rust-cache@v2
       - uses: jsdaniell/create-json@v1.2.3
         with:
           name: "emblem.json"
@@ -137,7 +139,7 @@ jobs:
           key: ${{ secrets.SUPPORT_KIT_SSH_KEY }}
           name: id_rsa
           known_hosts: ${{ secrets.SUPPORT_KIT_KNOWN_HOSTS }}
-      - run: cargo run deploy list
+      - run: cargo run deploy setup
       - run: cargo run container build
       - run: cargo run container push
       - run: cargo run deploy restart"#;
@@ -187,6 +189,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - uses: Swatinem/rust-cache@v2
       - run: cargo check --all-targets --all-features
       - run: cargo test
       - run: cargo clippy --all-targets --all-features"#;

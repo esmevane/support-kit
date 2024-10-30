@@ -15,6 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: {{ "rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}" }}
+      - uses: Swatinem/rust-cache@v2
       - run: cargo check --all-targets --all-features
       - run: cargo test
       - run: cargo clippy --all-targets --all-features
