@@ -2,6 +2,10 @@
 
 ## Todo
 
+- [ ] Connect images to volumes made during setup
+
+- [ ] "support" / "tools" root scope for config
+- [ ] Database support
 - [ ] Preflight check
   - [ ] Github token
   - [ ] SSH key per host

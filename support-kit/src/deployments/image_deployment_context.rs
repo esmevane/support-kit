@@ -11,6 +11,16 @@ pub struct ImageDeploymentContext {
 
 impl ImageDeploymentContext {
     #[tracing::instrument(skip(self), level = "trace")]
+    fn volume_name(&self, volume: &str) -> String {
+        format!(
+            "{namespace}-{name}-{volume}",
+            name = self.image.name,
+            namespace = self.image.namespace,
+            volume = volume
+        )
+    }
+
+    #[tracing::instrument(skip(self), level = "trace")]
     fn descriptor(&self) -> String {
         format!(
             "{repo}/{namespace}/{name}:{label}",
@@ -31,12 +41,26 @@ impl ImageDeploymentContext {
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
-    pub fn setup_config_volume(&self) -> crate::Result<ShellCommand> {
+    pub fn setup_volume(&self, volume: &str) -> crate::Result<ShellCommand> {
         shell(format!(
-            "docker volume create {namespace}-{name}-config",
-            name = self.image.name,
-            namespace = self.image.namespace
+            "docker volume create {volume_name}",
+            volume_name = self.volume_name(volume)
         ))
+    }
+
+    #[tracing::instrument(skip(self), level = "trace")]
+    pub fn setup_data_volume(&self) -> crate::Result<ShellCommand> {
+        self.setup_volume("data")
+    }
+
+    #[tracing::instrument(skip(self), level = "trace")]
+    pub fn setup_log_volume(&self) -> crate::Result<ShellCommand> {
+        self.setup_volume("logs")
+    }
+
+    #[tracing::instrument(skip(self), level = "trace")]
+    pub fn setup_config_volume(&self) -> crate::Result<ShellCommand> {
+        self.setup_volume("config")
     }
 
     #[tracing::instrument(skip(self), level = "trace")]
@@ -86,7 +110,9 @@ impl ImageDeploymentContext {
               -p 443:{port}
               -e RUST_LOG=debug,support_kit=debug
               -v ./{path}:/{app_name}.json
-              --mount source=certs,target=/certs
+              --mount source={certs},target=/certs
+              --mount source={logs},target=/logs
+              --mount source={data},target=/data
               --name {name}
               {descriptor}
               -vvvv
@@ -97,7 +123,10 @@ impl ImageDeploymentContext {
             app_name = self.config.name(),
             name = self.name(),
             port = self.config.server.port,
-            path = path.display()
+            path = path.display(),
+            certs = self.volume_name("certs"),
+            logs = self.volume_name("logs"),
+            data = self.volume_name("data"),
         ));
 
         println!("{:?}", operation);
