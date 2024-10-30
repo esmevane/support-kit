@@ -71,6 +71,8 @@ pub async fn exec_local_container_op(
             deployment_context.setup_cert_volume()?.run()?;
 
             for image in deployment_context.images {
+                image.setup_log_volume()?.run()?;
+                image.setup_data_volume()?.run()?;
                 image.setup_config_volume()?.run()?;
             }
         }
@@ -165,6 +167,8 @@ pub async fn exec_remote_container_op(
                     .on_remotes()
                     .commands(bon::vec![
                         certs_volume.clone(),
+                        image.setup_log_volume()?,
+                        image.setup_data_volume()?,
                         image.setup_config_volume()?
                     ])
                     .call()

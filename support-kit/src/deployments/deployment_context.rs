@@ -81,6 +81,14 @@ impl DeploymentContext {
         shell(format!("docker volume create certs"))
     }
 
+    #[tracing::instrument(skip(self), level = "trace")]
+    pub fn setup_network(&self) -> crate::Result<ShellCommand> {
+        shell(format!(
+            "docker network create {name}-network",
+            name = self.config.name()
+        ))
+    }
+
     /// Get the shell script from the [docker-install repo][docker-install].
     ///
     /// [docker-install]: https://github.com/docker/docker-install
