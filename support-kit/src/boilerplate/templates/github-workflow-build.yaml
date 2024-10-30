@@ -20,6 +20,7 @@ jobs:
           username: {{ '${{ github.actor }}' }}
           password: {{ '${{ secrets.' + secret_name + '_REPO_KEY }}' }}
       - run: {{ "rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}" }}
+      - uses: Swatinem/rust-cache@v2
       - uses: jsdaniell/create-json@v1.2.3
         with:
           name: "emblem.json"
@@ -29,7 +30,7 @@ jobs:
           key: {{ '${{ secrets.' + secret_name + '_SSH_KEY }}' }}
           name: id_rsa
           known_hosts: {{ '${{ secrets.' + secret_name + '_KNOWN_HOSTS }}' }}
-      - run: cargo run deploy list
+      - run: cargo run deploy setup
       - run: cargo run container build
       - run: cargo run container push
       - run: cargo run deploy restart
