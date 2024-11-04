@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::{shell, Configuration, ImageDefinition, Registry, ShellCommand};
+use crate::{shell, Configuration, ImageDefinition, Registry, ShellCommand, ShellCommandError};
 
 #[derive(Debug, Clone, bon::Builder)]
 pub struct ImageDeploymentContext {
@@ -102,6 +102,14 @@ impl ImageDeploymentContext {
     pub fn start(&self, path: impl Into<PathBuf>) -> crate::Result<ShellCommand> {
         let path = path.into();
 
+        let path = if path.is_absolute() {
+            path
+        } else {
+            std::env::current_dir()
+                .map_err(ShellCommandError::from)?
+                .join(path)
+        };
+
         let operation = shell(format!(
             r#"
             docker run
@@ -109,7 +117,7 @@ impl ImageDeploymentContext {
               -d 
               -p 443:{port}
               -e RUST_LOG=debug,support_kit=debug
-              -v ./{path}:/{app_name}.json
+              -v {path}:/{app_name}.json
               --mount source={certs},target=/certs
               --mount source={logs},target=/logs
               --mount source={data},target=/data
