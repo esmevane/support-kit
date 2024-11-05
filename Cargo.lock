@@ -2967,7 +2967,6 @@ version = "0.0.10"
 dependencies = [
  "async-trait",
  "axum",
- "axum-server",
  "bon",
  "clap",
  "convert_case",
