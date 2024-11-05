@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.11](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.10...support-kit-v0.0.11) - 2024-11-05
+
+### Added
+
+- Merge downstream configs. ([#28](https://github.com/esmevane/support-kit/pull/28))
+
+### Fixed
+
+- Predictable paths for container start. ([#25](https://github.com/esmevane/support-kit/pull/25))
+
+### Other
+
+- drop axum server ([#27](https://github.com/esmevane/support-kit/pull/27))
+
 ## [0.0.10](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.9...support-kit-v0.0.10) - 2024-10-30
 
 ### Added
