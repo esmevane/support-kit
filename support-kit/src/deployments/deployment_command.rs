@@ -61,6 +61,14 @@ pub async fn exec_local_container_op(
         }
         DeploymentCommand::Restart => {
             let path = deployment_context.emit_config()?;
+            let path = if path.is_absolute() {
+                path
+            } else {
+                std::env::current_dir()
+                    .expect("unable to get current directory")
+                    .join(path)
+            };
+
             for image in deployment_context.images {
                 image.pull()?.run()?;
                 image.kill_all()?.run()?;
@@ -78,6 +86,14 @@ pub async fn exec_local_container_op(
         }
         DeploymentCommand::Start => {
             let path = deployment_context.emit_config()?;
+            let path = if path.is_absolute() {
+                path
+            } else {
+                std::env::current_dir()
+                    .expect("unable to get current directory")
+                    .join(path)
+            };
+
             for image in deployment_context.images {
                 image.start(path.clone())?.run()?;
             }
@@ -141,7 +157,7 @@ pub async fn exec_remote_container_op(
         DeploymentCommand::Restart => {
             let path = deployment_context.emit_config()?;
             let from_path = path.to_string_lossy();
-            let to_path = format!("{name}.json", name = controller.config.name());
+            let to_path = format!("./{name}.json", name = controller.config.name());
 
             for host in deployment_context.hosts {
                 host.send_file(&from_path, &to_path)?.run()?;

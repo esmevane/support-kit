@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::{shell, Configuration, ImageDefinition, Registry, ShellCommand, ShellCommandError};
+use crate::{shell, Configuration, ImageDefinition, Registry, ShellCommand};
 
 #[derive(Debug, Clone, bon::Builder)]
 pub struct ImageDeploymentContext {
@@ -98,17 +98,9 @@ impl ImageDeploymentContext {
         ))
     }
 
-    #[tracing::instrument(skip(self, path), level = "trace")]
-    pub fn start(&self, path: impl Into<PathBuf>) -> crate::Result<ShellCommand> {
-        let path = path.into();
-
-        let path = if path.is_absolute() {
-            path
-        } else {
-            std::env::current_dir()
-                .map_err(ShellCommandError::from)?
-                .join(path)
-        };
+    #[tracing::instrument(skip(self, config_path), level = "trace")]
+    pub fn start(&self, config_path: impl Into<PathBuf>) -> crate::Result<ShellCommand> {
+        let config_path = config_path.into();
 
         let operation = shell(format!(
             r#"
@@ -117,7 +109,7 @@ impl ImageDeploymentContext {
               -d 
               -p 443:{port}
               -e RUST_LOG=debug,support_kit=debug
-              -v {path}:/{app_name}.json
+              -v {config_path}:/{app_name}.json
               --mount source={certs},target=/certs
               --mount source={logs},target=/logs
               --mount source={data},target=/data
@@ -131,7 +123,7 @@ impl ImageDeploymentContext {
             app_name = self.config.name(),
             name = self.name(),
             port = self.config.server.port,
-            path = path.display(),
+            config_path = config_path.display(),
             certs = self.volume_name("certs"),
             logs = self.volume_name("logs"),
             data = self.volume_name("data"),
