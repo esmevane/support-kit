@@ -1,27 +1,31 @@
 [workspace]
 resolver = "2"
-members = ["support-kit", "examples/*"]
-
+members = ["examples/*", "support-kit"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace.dependencies]
-support-kit = { version = "0.0.11", path = "./support-kit" }
+argon2 = "0.5.3"
 async-trait = "0.1.83"
+axum = { version = "0.7.7", features = ["ws"] }
 axum-server = { version = "0.7.1" }
 bon = "2.3.0"
 clap = { version = "4.5.4", features = ["derive", "env"] }
 convert_case = "0.6.0"
 dirs = "5.0.1"
 figment = { version = "0.10", features = ["env", "json", "toml", "yaml"] }
+jsonwebtoken = "9.3.0"
 minijinja = "2.3.1"
 owo-colors = { version = "4", features = ["supports-colors"] }
-rustls-acme = { version = "0.11.1", features = ["axum"] }
+rand = "0.8.5"
 russh = "0.45.0"
+rustls-acme = { version = "0.11.1", features = ["axum"] }
+secrecy = { version = "0.10.3", features = ["serde"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 service-manager = { version = "0.6.1", features = ["clap", "serde"] }
 shell-escape = "0.1.5"
 strum = { version = "0.26.2", features = ["derive"] }
+support-kit = { version = "0.0.11", path = "./support-kit" }
 thiserror = "1.0.59"
 tokio = { version = "1.40.0", features = ["io-std"] }
 tokio-stream = "0.1.16"
@@ -34,3 +38,4 @@ tracing-subscriber = { version = "0.3.18", features = [
   "serde",
   "serde_json",
 ] }
+uuid = { version = "1.11.0", features = ["serde", "v4"] }

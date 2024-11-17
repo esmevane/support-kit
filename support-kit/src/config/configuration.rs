@@ -1,4 +1,5 @@
 use figment::{providers::Serialized, Figment, Provider};
+use secrecy::SecretString;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -6,7 +7,7 @@ use crate::{
     LoggingConfig, NetworkConfig, ServiceConfig, ServiceName, Verbosity,
 };
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, bon::Builder)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, bon::Builder)]
 pub struct Configuration {
     #[serde(default)]
     #[builder(default, into)]
@@ -35,6 +36,10 @@ pub struct Configuration {
     #[serde(default)]
     #[builder(into)]
     pub deployment: Option<DeploymentConfig>,
+
+    #[serde(default, skip_serializing)]
+    #[builder(default)]
+    pub secret: SecretString,
 }
 
 impl Configuration {
@@ -88,6 +93,18 @@ impl Provider for Configuration {
         Figment::new()
             .merge(Serialized::from(self.clone(), "default"))
             .data()
+    }
+}
+
+impl PartialEq for Configuration {
+    fn eq(&self, other: &Self) -> bool {
+        self.logging == other.logging
+            && self.verbosity == other.verbosity
+            && self.color == other.color
+            && self.server == other.server
+            && self.service == other.service
+            && self.environment == other.environment
+            && self.deployment == other.deployment
     }
 }
 

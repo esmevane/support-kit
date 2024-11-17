@@ -6,17 +6,21 @@ license = "MIT"
 edition = "2021"
 
 [dependencies]
+argon2 = { workspace = true }
 async-trait = { workspace = true }
-axum = { version = "0.7.7", features = ["ws"] }
+axum = { workspace = true }
 bon = { workspace = true }
 clap = { workspace = true }
 convert_case = { workspace = true }
 dirs = { workspace = true }
 figment = { workspace = true }
+jsonwebtoken = { workspace = true }
 minijinja = { workspace = true }
 owo-colors = { workspace = true }
+rand = { workspace = true }
 russh = { workspace = true }
 rustls-acme = { workspace = true }
+secrecy = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 service-manager = { workspace = true }
@@ -28,6 +32,7 @@ tokio-stream = { workspace = true }
 tracing = { workspace = true }
 tracing-appender = { workspace = true }
 tracing-subscriber = { workspace = true }
+uuid = { workspace = true }
 
 [dev-dependencies]
 figment = { workspace = true, features = ["test"] }
