@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.12](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.11...support-kit-v0.0.12) - 2024-11-17
+
+### Added
+
+- *(encryption)* Add encryption module / secrets ([#29](https://github.com/esmevane/support-kit/pull/29))
+
 ## [0.0.11](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.10...support-kit-v0.0.11) - 2024-11-05
 
 ### Added
