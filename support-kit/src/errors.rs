@@ -1,6 +1,40 @@
 use std::{io::Error, net::AddrParseError};
 use thiserror::Error;
 
+/// The auth token failed to verify.
+#[derive(thiserror::Error, Debug)]
+#[error("Token verification failed: {0}")]
+pub struct AuthTokenVerificationFailure(#[from] jsonwebtoken::errors::Error);
+
+/// We couldn't make an auth token.
+#[derive(thiserror::Error, Debug)]
+#[error("Unable to generate auth token: {0}")]
+pub struct AuthTokenGenerationFailure(#[from] jsonwebtoken::errors::Error);
+
+/// Something went wrong with our session token.
+#[derive(thiserror::Error, Debug)]
+#[error(transparent)]
+pub enum TokenError {
+    /// An ID parse error means the ID in the token is not a valid uuid.
+    InvalidUuid(#[from] uuid::Error),
+    /// We couldn't verify the token.
+    VerificationFailed(#[from] AuthTokenVerificationFailure),
+    /// We couldn't make the token.
+    TokenGenerationFailure(#[from] AuthTokenGenerationFailure),
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum PasswordError {
+    #[error("Failed to hash password: {0}")]
+    HashError(argon2::password_hash::Error),
+}
+
+impl From<argon2::password_hash::Error> for PasswordError {
+    fn from(err: argon2::password_hash::Error) -> Self {
+        PasswordError::HashError(err)
+    }
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum BoilerplateError {
     #[error("problem with template: {0}")]
@@ -84,4 +118,10 @@ pub enum SupportKitError {
 
     #[error("boilerplate error: {0}")]
     BoilerplateError(#[from] BoilerplateError),
+
+    #[error("token error: {0}")]
+    TokenError(#[from] TokenError),
+
+    #[error("password error: {0}")]
+    PasswordError(#[from] PasswordError),
 }
