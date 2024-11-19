@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.13](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.12...support-kit-v0.0.13) - 2024-11-19
+
+### Fixed
+
+- Auth token creation accepts uuid. ([#31](https://github.com/esmevane/support-kit/pull/31))
+
 ## [0.0.12](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.11...support-kit-v0.0.12) - 2024-11-17
 
 ### Added
