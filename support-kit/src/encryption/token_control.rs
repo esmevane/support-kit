@@ -20,8 +20,7 @@ impl TokenControl {
         Self(config)
     }
 
-    pub fn auth_token(&self) -> crate::Result<String> {
-        let id = uuid::Uuid::new_v4();
+    pub fn auth_token(&self, id: uuid::Uuid) -> crate::Result<String> {
         let secret = self.0.secret.clone();
 
         Ok(generate_auth_token(&id, &secret)?)
