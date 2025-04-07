@@ -39,7 +39,7 @@ impl Debug for ConfigEnvVar {
     }
 }
 
-#[bon::builder]
+#[builder]
 pub fn env_prefix(#[builder(into)] name: String, env: Option<Environment>) -> String {
     let name = name
         .replace(|c: char| !c.is_alphanumeric(), "_")
