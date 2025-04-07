@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.14](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.13...support-kit-v0.0.14) - 2025-04-07
+
+### Other
+
+- Bump axum. ([#33](https://github.com/esmevane/support-kit/pull/33))
+
 ## [0.0.13](https://github.com/esmevane/support-kit/compare/support-kit-v0.0.12...support-kit-v0.0.13) - 2024-11-19
 
 ### Fixed
