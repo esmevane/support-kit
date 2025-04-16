@@ -28,7 +28,7 @@ serde_json = "1"
 service-manager = { version = "0.6.1", features = ["clap", "serde"] }
 shell-escape = "0.1.5"
 strum = { version = "0.26.2", features = ["derive"] }
-support-kit = { version = "0.0.14", path = "./support-kit" }
+support-kit = { version = "0.0.15", path = "./support-kit" }
 thiserror = "1.0.59"
 tokio = { version = "1.40.0", features = ["io-std"] }
 tokio-stream = "0.1.16"
